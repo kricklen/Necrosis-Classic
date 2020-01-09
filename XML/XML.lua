@@ -88,9 +88,9 @@ function Necrosis:CreateWarlockUI()
 	frame:EnableMouse(true)
 	frame:SetWidth(34)
 	frame:SetHeight(34)
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\SpellTimerButton-Normal")
-	frame:SetPushedTexture("Interface\\AddOns\\Necrosis\\UI\\SpellTimerButton-Pushed")
-	frame:SetHighlightTexture("Interface\\AddOns\\Necrosis\\UI\\SpellTimerButton-Highlight")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture("SpellTimerButton-Normal"))
+	frame:SetPushedTexture(GraphicsHelper:GetTexture("SpellTimerButton-Pushed"))
+	frame:SetHighlightTexture(GraphicsHelper:GetTexture("SpellTimerButton-Highlight"))
 	frame:RegisterForClicks("AnyUp")
 	frame:Show()
 
@@ -128,7 +128,7 @@ function Necrosis:CreateWarlockUI()
 	frame = _G["NecrosisButton"]
 	if not frame then
 		frame = CreateFrame("Button", "NecrosisButton", UIParent, "SecureActionButtonTemplate")
-		frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\Shard")
+		frame:SetNormalTexture(GraphicsHelper:GetTexture("Shard"))
 	end
 
 	-- Define its attributes || Définition de ses attributs
@@ -194,14 +194,14 @@ local function CreateStoneButton(stone)
 	frame:EnableMouse(true)
 	frame:SetWidth(34)
 	frame:SetHeight(34)
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\"..stone.."Button-01")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture(stone.."Button-01"))
 	local num = 3
 	if stone == "Soulstone" then
 		num = 4
 	elseif stone == "Mount" then
 		num = 2
 	end
-	frame:SetHighlightTexture("Interface\\AddOns\\Necrosis\\UI\\"..stone.."Button-0"..num)
+	frame:SetHighlightTexture(GraphicsHelper:GetTexture(stone.."Button-0"..num))
 	frame:RegisterForDrag("LeftButton")
 	frame:RegisterForClicks("AnyUp")
 	frame:Show()
@@ -261,8 +261,8 @@ local function CreateMenuButton(button)
 	frame:EnableMouse(true)
 	frame:SetWidth(34)
 	frame:SetHeight(34)
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\"..button.."Button-01")
-	frame:SetHighlightTexture("Interface\\AddOns\\Necrosis\\UI\\"..button.."Button-02")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture(button.."Button-01"))
+	frame:SetHighlightTexture(GraphicsHelper:GetTexture(button.."Button-02"))
 	frame:RegisterForDrag("LeftButton")
 	frame:RegisterForClicks("AnyUp")
 	frame:Show()
@@ -312,11 +312,11 @@ function Necrosis:CreateMenuBuff(i)
 		frame:EnableMouse(true)
 		frame:SetWidth(40)
 		frame:SetHeight(40)
-		frame:SetHighlightTexture("Interface\\AddOns\\Necrosis\\UI\\"..BuffName[i].."-02")
+		frame:SetHighlightTexture(GraphicsHelper:GetTexture(BuffName[i].."-02"))
 		frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	end
 
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\"..BuffName[i].."-01")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture(BuffName[i].."-01"))
 	frame:Hide()
 
 	-- Edit the scripts associated with the button || Edition des scripts associés au bouton
@@ -365,10 +365,10 @@ function Necrosis:CreateMenuPet(i)
 		frame:SetWidth(40)
 		frame:SetHeight(40)
 		frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-		frame:SetHighlightTexture("Interface\\AddOns\\Necrosis\\UI\\"..PetName[i].."-02")
+		frame:SetHighlightTexture(GraphicsHelper:GetTexture(PetName[i].."-02"))
 	end
 
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\"..PetName[i].."-01")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture(PetName[i].."-01"))
 	frame:Hide()
 
 	-- Edit the scripts associated with the button || Edition des scripts associés au bouton
@@ -396,11 +396,11 @@ function Necrosis:CreateMenuCurse(i)
 		frame:EnableMouse(true)
 		frame:SetWidth(40)
 		frame:SetHeight(40)
-		frame:SetHighlightTexture("Interface\\AddOns\\Necrosis\\UI\\"..CurseName[i].."-02")
+		frame:SetHighlightTexture(GraphicsHelper:GetTexture(CurseName[i].."-02"))
 		frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	end
 
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\"..CurseName[i].."-01")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture(CurseName[i].."-01"))
 	frame:Hide()
 
 	-- Edit the scripts associated with the button || Edition des scripts associés au bouton
@@ -415,7 +415,6 @@ end
 ------------------------------------------------------------------------------------------------------
 
 function Necrosis:CreateWarlockPopup()
-
 	-- Create the ShadowTrance button || Creation du bouton de ShadowTrance
 	local frame = nil
 	frame = _G["NecrosisShadowTranceButton"]
@@ -429,7 +428,7 @@ function Necrosis:CreateWarlockPopup()
 	frame:SetFrameStrata("HIGH")
 	frame:SetWidth(40)
 	frame:SetHeight(40)
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\ShadowTrance-Icon")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture("ShadowTrance-Icon"))
 	frame:RegisterForDrag("LeftButton")
 	frame:RegisterForClicks("AnyUp")
 	frame:Hide()
@@ -463,7 +462,7 @@ function Necrosis:CreateWarlockPopup()
 	frame:SetFrameStrata("HIGH")
 	frame:SetWidth(40)
 	frame:SetHeight(40)
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\Backlash-Icon")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture("Backlash-Icon"))
 	frame:RegisterForDrag("LeftButton")
 	frame:Hide()
 
@@ -497,7 +496,7 @@ function Necrosis:CreateWarlockPopup()
 	frame:SetFrameStrata("HIGH")
 	frame:SetWidth(40)
 	frame:SetHeight(40)
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\ElemAlert")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture("ElemAlert"))
 	frame:RegisterForDrag("LeftButton")
 	frame:Hide()
 
@@ -535,7 +534,7 @@ function Necrosis:CreateWarlockPopup()
 	frame:SetFrameStrata("HIGH")
 	frame:SetWidth(40)
 	frame:SetHeight(40)
-	frame:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\AntiFear-01")
+	frame:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear-01"))
 	frame:RegisterForDrag("LeftButton")
 	frame:Hide()
 

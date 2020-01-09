@@ -39,20 +39,16 @@
 -- SPANISH VERSION TEXTS --
 ------------------------------------------------
 
-function Necrosis:Localization_Dialog_Es()
+function Localization.esES()
 
-	function Necrosis:Localization()
-		self:Localization_Speech_Es()
-	end
-
-	self.HealthstoneCooldown = "Tiempo de regeneraci\195\179n Piedra de Salud"
+	Necrosis.HealthstoneCooldown = "Tiempo de regeneraci\195\179n Piedra de Salud"
 	
-	self.Localize = {
+	Necrosis.Localize = {
 		["Utilisation"] = "Use",
 		["Echange"] = "Trade",
 	}
 
-	self.TooltipData = {
+	Necrosis.TooltipData = {
 		["Main"] = {
 			Label = "|c00FFFFFFNecrosis|r",
 			Stone = {
@@ -146,7 +142,7 @@ function Necrosis:Localization_Dialog_Es()
 		["DominationCooldown"] = "Click Derecho para invocaci\195\179n r\195\161pida",
 	}
 
-	self.Sound = {
+	Necrosis.Sound = {
 		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-En.mp3",
 		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\SoulstoneEnd-En.mp3",
 		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\EnslaveDemonEnd-En.mp3",
@@ -154,13 +150,13 @@ function Necrosis:Localization_Dialog_Es()
 		["Backlash"] = "Interface\\AddOns\\Necrosis\\sounds\\Backlash-Fr.mp3",
 	}
 
-	self.ProcText = {
+	Necrosis.ProcText = {
 		["ShadowTrance"] = "<white>Tr<lightPurple1>a<lightPurple2>n<purple>c<darkPurple1>e<darkPurple2> de las S<darkPurple1>o<purple>m<lightPurple2>b<lightPurple1>r<white>as",
 		["Backlash"] = "<white>B<lightPurple1>a<lightPurple2>c<purple>k<darkPurple1>l<darkPurple2>a<darkPurple1>s<purple>h"
 	}
 
 
-	self.ChatMessage = {
+	Necrosis.ChatMessage = {
 		["Bag"] = {
 			["FullPrefix"] = "\194\161 Tu ",
 			["FullSuffix"] = " est\195\161 llena !",
@@ -188,7 +184,7 @@ function Necrosis:Localization_Dialog_Es()
 
 
 	-- Gestion XML - Menu de configuration
-	self.Config.Panel = {
+	Necrosis.Config.Panel = {
 		"Opci\195\179nes de Mensaje",
 		"Opci\195\179nes de la Esfera",
 		"Opci\195\179nes de Bot\195\179n",
@@ -197,7 +193,7 @@ function Necrosis:Localization_Dialog_Es()
 		"Miscel\195\161neos"
 	}
 
-	self.Config.Messages = {
+	Necrosis.Config.Messages = {
 		["Position"] = "<- Los mensajes de Sistema de Necrosis aparecer\195\161n aqu\195\173 ->",
 		["Afficher les bulles d'aide"] = "Mostrar consejos detallados",
 		["Afficher les messages dans la zone systeme"] = "Mensajes de Necrosis como mensajes de sistema",
@@ -212,7 +208,7 @@ function Necrosis:Localization_Dialog_Es()
 		["M'alerter quand j'entre en Transe"] = "Al\195\169rtame cuando entre en un Trance",
 	}
 
-	self.Config.Sphere = {
+	Necrosis.Config.Sphere = {
 		["Taille de la sphere"] = "Tama\195\177o del bot\195\179n Necrosis",
 		["Skin de la pierre Necrosis"] = "Color de la Esfera Necrosis",
 		["Evenement montre par la sphere"] = "Evento mostrado en la Esfera",
@@ -220,7 +216,7 @@ function Necrosis:Localization_Dialog_Es()
 		["Afficher le compteur numerique"] = "Mostrar la contabilizaci\195\179n de Fragmentos en Necrosis",
 		["Type de compteur numerique"] = "Tipo de Piedra contabilizada"
 	}
-	self.Config.Sphere.Colour = {
+	Necrosis.Config.Sphere.Colour = {
 		"Rosa",
 		"Azul",
 		"Naranja",
@@ -229,7 +225,7 @@ function Necrosis:Localization_Dialog_Es()
 		"666",
 		"X"
 	}
-	self.Config.Sphere.Count = {
+	Necrosis.Config.Sphere.Count = {
 		"Fragmentos de Alma",
 		"Piedras de invocaci\195\179n de Demonios",
 		"Temporizador de Resurrecci\195\179n",
@@ -237,7 +233,7 @@ function Necrosis:Localization_Dialog_Es()
 		"Salud"
 	}
 
-	self.Config.Buttons = {
+	Necrosis.Config.Buttons = {
 		["Rotation des boutons"] = "Rotaci\195\179n de los botones",
 		["Fixer les boutons autour de la sphere"] = "Fijar los botones alrededor de la Esfera",
 		["Utiliser mes propres montures"] = "Use my own mounts",
@@ -245,7 +241,7 @@ function Necrosis:Localization_Dialog_Es()
 		["Monture - Clic gauche"] = "Left click",
 		["Monture - Clic droit"] = "Right click",
 	}
-	self.Config.Buttons.Name = {
+	Necrosis.Config.Buttons.Name = {
 		"Mostrar bot\195\179n Piedra de Fuego",
 		"Mostrar bot\195\179n Piedra de Hechizo",
 		"Mostrar bot\195\179n Piedra de Salud",
@@ -256,7 +252,7 @@ function Necrosis:Localization_Dialog_Es()
 		"Mostrar bot\195\179n del men\195\186 Maldici\195\179n",
 	}
 
-	self.Config.Menus = {
+	Necrosis.Config.Menus = {
 		["Options Generales"] = "Opciones Generales",
 		["Menu des Buffs"] = "Men\195\186 de Hechizos",
 		["Menu des Demons"] = "Men\195\186 de Demonios",
@@ -268,25 +264,25 @@ function Necrosis:Localization_Dialog_Es()
 		["Changer la symetrie verticale des boutons"] = "Cambiar la simetr\195\173a vertical de los botones",
 		["Taille du bouton Banir"] = "Tama\195\177o del bot\195\179n Desterrar",
 	}
-	self.Config.Menus.Orientation = {
+	Necrosis.Config.Menus.Orientation = {
 		"Horizontal",
 		"Hacia arriba",
 		"Hacia abajo"
 	}
 
-	self.Config.Timers = {
+	Necrosis.Config.Timers = {
 		["Type de timers"] = "Tipo de temporizadores",
 		["Afficher le bouton des timers"] = "Mostrar el bot\195\179n de los temporizadores",
 		["Afficher les timers sur la gauche du bouton"] = "Mostrar los temporizadores a la izquierda del bot\195\179n",
 		["Afficher les timers de bas en haut"] = "Los temporizadores se incrementan ascendentemente",
 	}
-	self.Config.Timers.Type = {
+	Necrosis.Config.Timers.Type = {
 		"Ninguno",
 		"Modo Gr\195\161fico",
 		"Modo texto"
 	}
 
-	self.Config.Misc = {
+	Necrosis.Config.Misc = {
 		["Deplace les fragments"] = "Poner los Fragmentos en la bolsa seleccionada.",
 		["Detruit les fragments si le sac plein"] = "Destruir nuevos fragmentos si la bolsa est\195\161 llena",
 		["Choix du sac contenant les fragments"] = "Selecci\195\179n de Contenedor de Fragmentos de Alma",
@@ -296,4 +292,117 @@ function Necrosis:Localization_Dialog_Es()
 		["Taille des boutons caches"] = "Tama\195\177o de los botones de aviso"
 	}
 
+	-- Chat messages
+
+	Necrosis.Speech.TP = {
+		[1] = {
+			"<after>\194\161 Compa\195\177\195\173a de Taxi Arcanum ! Estoy invocando a <target>, por favor cliquead en el portal.",
+		},
+		[2] = {
+			"<after>Bienvenido a bordo, <target>, est\195\161 usted volando con ~Sucuiberia~ con destino <player>...",
+			"<after>\194\161 Las Azafatas de Vuelo y sus l\195\161tigos est\195\161n a su disposici\195\179n durante el trayecto !",
+		},
+		[3] = {
+			"<after>\194\161 Si haces click en el portal, alguien llamado <target> aparecer\195\161 y har\195\161 el trabajo por t\195\173 !",
+		},
+		[4] = {
+			"<after>\194\161 Si no quieres que una criatura espatarrada, parecida a un escupitajo y asm\195\161tica aparezca de este portal, cliquea en \195\169l para ayudar a <target> a encontrar un camino en el Infierno tan r\195\161pido como sea posible!",
+		},
+	}
+
+	Necrosis.Speech.Rez = {
+		[1] = {
+			"<after>Si os agrada la idea de un suicidio en masa, ahora <target> puede auto-resucitar, as\195\173 todos contentos. Adelante.",
+		},
+		[2]= {
+			"<after><target> puede ponerse ausente para irse a tomar una tacita de caf\195\169 o lo que sea, la piedra de alma est\195\161 preparada para el wipe...",
+		},
+	}
+	
+	Necrosis.Speech.RoS = {
+		[1] = {
+			"Let us use the souls of our fallen enemies to give us vitality",
+		},
+		[2] = {
+			"My soul, their soul, doesn't matter, just take one",
+		},
+	}
+
+	Necrosis.Speech.ShortMessage = {
+		{{"<after>--> <target> ha recibido la piedra del alma durante 15 minutos <--"}},
+		{{"<after><TP> Invocando a <target>, por favor cliquead en el portal <TP>"}},
+		{{"Summoning a Ritual of Souls"}},
+	}
+
+	Necrosis.Speech.Demon = {
+		-- Imp
+		[1] = {
+			[1] = {
+				"\194\161 Bien, cutre y molesto Diablillo, ahora deja de enfurru\195\177arte y ven a ayudar ! \194\161 Y ES UNA ORDEN !",
+			},
+			[2] = {
+				"\194\161<pet>! \194\161 A MIS PIES ! \194\161 YA !",
+			},
+		},
+		-- Voidwalker
+		[2] = {
+			[1] = {
+				"Ups, Probablemente necesitar\195\169 a un idiota para que le zurren en mi lugar...",
+				"\194\161 <pet>, por favor ayuda !",
+			},
+		},
+		-- Succubus
+		[3] = {
+			[1] = {
+				"\194\161 <pet> nena, por favor ay\195\186dame coraz\195\179n !",
+			},
+		},
+		-- Felhunter
+		[4] = {
+			[1] = {
+				"\194\161 <pet> ! \194\161 <pet> ! \194\161 Ven chico, ven aqu\195\173 ! \194\161 <pet> !",
+			},
+		},
+		-- Felguard
+		[5] = {
+			[1] = {
+				"<emote> is concentrating hard on Demoniac knowledge...",
+				"I'll give you a soul if you come to me, Felguard ! Please hear my command !",
+				"<after>Obey now, <pet> !",
+				"<after><emote>looks in a bag, then throws a mysterious shard at <pet>",
+				"<sacrifice>Please return in the Limbs you are from, Demon, and give me your power in exchange !"
+			},
+		},
+		-- Sentences for the first summon : When Necrosis do not know the name of your demons yet
+		[6] = {
+			[1] = {
+				"\194\191Pescar? Si, me encanta pescar... \194\161 Mira !",
+				"Cierro los ojos, muevo mis dedos as\195\173... y voila ! S\195\173, s\195\173, es un pescado, \194\161 Te lo juro !",
+			},
+			[2] = {
+				"\194\161 De todas formas os odio a todos ! No os necesito, tengo amigos.... \194\161 Poderosos amigos !",
+				"\194\161 VEN A MI, CRIATURA DE INFIERNO Y PESADILLA !",
+			},
+		},
+		-- Sentences for the stead summon
+		[7] = {
+			[1] = {
+				"\194\161 Eh, llego tarde ! \194\161 Busquemos un caballo que queme rueda !",
+			},
+			[2] = {
+				"\194\161 Estoy invocando a un corcel de pesadilla !",
+				"\194\161 MUAHAHAHAHA !",
+			},
+		},
+	}
+
 end
+
+-- Caracteres especiales espa�oles :
+-- � = \195\161 ---- � = \195\161
+-- � = \195\169 ---- � = \195\137
+-- � = \195\173 ---- � = \195\141
+-- � = \195\179 ---- � = \195\147
+-- � = \195\186 ---- � = \195\154
+-- � = \195\177 ---- � = \195\145
+-- � = \194\161 ---- � = \194\191

@@ -38,20 +38,16 @@
 -- ENGLISH  VERSION TEXTS --
 ------------------------------------------------
 
-function Necrosis:Localization_Dialog_Ru()
+function Localization.ruRU()
 
-	function Necrosis:Localization()
-		self:Localization_Speech_Ru()
-	end
-
-	self.HealthstoneCooldown = "Готовность Камня здоровья"
+	Necrosis.HealthstoneCooldown = "Готовность Камня здоровья"
 	
-	self.Localize = {
+	Necrosis.Localize = {
 		["Utilisation"] = "Use",
 		["Echange"] = "Trade",
 	}
 
-	self.TooltipData = {
+	Necrosis.TooltipData = {
 		["Main"] = {
 			Label = "|c00FFFFFFNecrosis|r",
 			Stone = {
@@ -145,7 +141,7 @@ function Necrosis:Localization_Dialog_Ru()
 		["DominationCooldown"] = "[Правый Клик] Быстрый вызов",
 	}
 
-	self.Sound = {
+	Necrosis.Sound = {
 		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-Ru.mp3",
 		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\SoulstoneEnd-Ru.mp3",
 		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\EnslaveDemonEnd-Ru.mp3",
@@ -153,13 +149,13 @@ function Necrosis:Localization_Dialog_Ru()
 		["Backlash"] = "Interface\\AddOns\\Necrosis\\sounds\\Backlash-Ru.mp3",
 	}
 
-	self.ProcText = {
+	Necrosis.ProcText = {
 		["ShadowTrance"] = "<white>Т<lightPurple1>е<lightPurple2>н<purple>е<darkPurple1>в<darkPurple2>о<darkPurple1>й Т<purple>р<lightPurple2>а<lightPurple1>н<white>с",
 		["Backlash"] = "<white>О<lightPurple1>т<lightPurple2>в<purple>е<darkPurple1>т<darkPurple2>н<darkPurple1>ы<darkPurple2>й У<purple>д<lightPurple2>а<lightPurple1>р"
 	}
 
 
-	self.ChatMessage = {
+	Necrosis.ChatMessage = {
 		["Bag"] = {
 			["FullPrefix"] = "Ваша ",
 			["FullSuffix"] = " полна!",
@@ -187,7 +183,7 @@ function Necrosis:Localization_Dialog_Ru()
 
 
 	-- Gestion XML - Menu de configuration
-	self.Config.Panel = {
+	Necrosis.Config.Panel = {
 		"Настройки Сообщений",
 		"Настройки Сферы",
 		"Настройки Кнопок",
@@ -196,7 +192,7 @@ function Necrosis:Localization_Dialog_Ru()
 		"Разное"
 	}
 
-	self.Config.Messages = {
+	Necrosis.Config.Messages = {
 		["Position"] = "<- Сообщения Necrosis будут расположены здесь ->",
 		["Afficher les bulles d'aide"] = "Показывать подсказки",
 		["Afficher les messages dans la zone systeme"] = "Показывать сообщения Necrosis в системном окне",
@@ -211,7 +207,7 @@ function Necrosis:Localization_Dialog_Ru()
 		["M'alerter quand j'entre en Transe"] = "Предупреждать о наступлении Теневого Транса"
 	}
 
-	self.Config.Sphere = {
+	Necrosis.Config.Sphere = {
 		["Taille de la sphere"] = "Размер кнопок Necrosis",
 		["Skin de la pierre Necrosis"] = "Вид Сферы",
 		["Evenement montre par la sphere"] = "На Сфере отображать",
@@ -219,7 +215,7 @@ function Necrosis:Localization_Dialog_Ru()
 		["Afficher le compteur numerique"] = "Показывать отсчет цифрами",
 		["Type de compteur numerique"] = "Показывать количество камней"
 	}
-	self.Config.Sphere.Colour = {
+	Necrosis.Config.Sphere.Colour = {
 		"Розовый",
 		"Синий",
 		"Оранжевый",
@@ -228,7 +224,7 @@ function Necrosis:Localization_Dialog_Ru()
 		"666",
 		"X"
 	}
-	self.Config.Sphere.Count = {
+	Necrosis.Config.Sphere.Count = {
 		"Осколки душ",
 		"Камни призыва демонов",
 		"Таймер оживления",
@@ -236,7 +232,7 @@ function Necrosis:Localization_Dialog_Ru()
 		"Здоровье"
 	}
 
-	self.Config.Buttons = {
+	Necrosis.Config.Buttons = {
 		["Rotation des boutons"] = "Вращение кнопок",
 		["Fixer les boutons autour de la sphere"] = "Закрепить кнопки вокруг Сферы",
 		["Utiliser mes propres montures"] = "Использовать мой транспорт",
@@ -244,7 +240,7 @@ function Necrosis:Localization_Dialog_Ru()
 		["Monture - Clic gauche"] = "[Левый Клик]",
 		["Monture - Clic droit"] = "[Правый Клик]",
 	}
-	self.Config.Buttons.Name = {
+	Necrosis.Config.Buttons.Name = {
 		"Показывать кнопку Камня огня",
 		"Показывать кнопку Камня чар",
 		"Показывать кнопку Камня здоровья",
@@ -256,7 +252,7 @@ function Necrosis:Localization_Dialog_Ru()
 		"Показывать кнопку Метаморфозы",
 	}
 
-	self.Config.Menus = {
+	Necrosis.Config.Menus = {
 		["Options Generales"] = "Основные настройки",
 		["Menu des Buffs"] = "Меню заклинаний",
 		["Menu des Demons"] = "Меню Демонов",
@@ -268,25 +264,25 @@ function Necrosis:Localization_Dialog_Ru()
 		["Changer la symetrie verticale des boutons"] = "Изменить вертикальную симметрию кнопок (зеркальное\nотражение при выбранном размещении меню: Горизонтально)",
 		["Taille du bouton Banir"] = "Размер кнопки Изгнания",
 	}
-	self.Config.Menus.Orientation = {
+	Necrosis.Config.Menus.Orientation = {
 		"Горизонтально",
 		"Вверх",
 		"Вниз"
 	}
 
-	self.Config.Timers = {
+	Necrosis.Config.Timers = {
 		["Type de timers"] = "Тип таймера",
 		["Afficher le bouton des timers"] = "Показывать кнопку таймера заклинаний",
 		["Afficher les timers sur la gauche du bouton"] = "Показывать строки таймера слева от кнопки таймера",
 		["Afficher les timers de bas en haut"] = "Таймер растёт вверх",
 	}
-	self.Config.Timers.Type = {
+	Necrosis.Config.Timers.Type = {
 		"Нет таймера",
 		"Графический",
 		"Текстовый"
 	}
 
-	self.Config.Misc = {
+	Necrosis.Config.Misc = {
 		["Deplace les fragments"] = "Размещать осколки душ в выбранной сумке",
 		["Detruit les fragments si le sac plein"] = "Разрушать все новые осколки, если сумка полна",
 		["Choix du sac contenant les fragments"] = "Выбор контейнера для осколков душ",
@@ -295,4 +291,140 @@ function Necrosis:Localization_Dialog_Ru()
 		["Afficher les boutons caches"] = "Показать скрытые кнопки для их перемещения",
 		["Taille des boutons caches"] = "Размер скрытых кнопок"
 	}
+
+	-- Chat messages
+
+	Necrosis.Speech.TP = {
+		[1] = {
+			"<after>Для открытия межгалактических путей, нажмите на портал.",
+		},
+		[2] = {
+			"<after>Добро пожаловать на борт Темных Авиалиний!",
+			"<after>Напоминаем, что курение запрещено на всём протяжении полёта.",
+		},
+		[3] = {
+			"<after>Если вы нажмёте на портал, мы намного быстрее начнём веселиться!",
+		},
+		[4] = {
+			"<after>Если вы не хотите, чтобы из этого портала полезла демоническая гадость, нажмите на него скорее!",
+		},
+		[5] =  {
+			"<after>Камни здоровья=10г; Камни души=20г; Услуги Темных Авиалиний(так как вы за слишком ленивы чтобы добраться сюда самим)=10000г!",
+		},
+		[6] =  {
+			"<after>WTB людей, которые нажмут на портал, вместо того чтобы смотреть на него! :-/",
+		},
+	}
+
+	Necrosis.Speech.Rez = {
+		[1] = {
+			"<after>Если вы затаили идею массового суицида, смею вас расстроить! <target> сейчас может самостоятельно оживить свой труп и всё будет хорошо!",
+		},
+		[2]= {
+			"<after><target> теперь может отправиться гулять, выпить кофе или принять ванну. Сохраненная душонка может позволить ему разок сдохнуть...",
+		},
+		[3]= {
+			"<after>Хм... <target> предохранен, и может пуститься в разгул. Но, увы, не вы!",
+		},
+		[4]= {
+			"<after><target> предохранён! Чернокнижники за безопасный секс!",
+		},
+		[5]= {
+			"<after>Почему <target>, после наложения Камня души, всегда сразу уходит в AFK?!!!",
+		},
+	}
+
+	Necrosis.Speech.RoS = {
+		[1] = {
+			"Используйте души наших врагов..., чтобы стать сильнее!",
+		},
+		[2] = {
+			"Моя душа... твоя душа... не имеет значения! Возьми себе одну...",
+		},
+		[3] = {
+			"WTS Камни здоровья по 10г за штуку! Дешевле чем на аукционе!",
+		},
+		[4] = {
+			"Камень здоровья вряд ли сохранит вашу жизнь, но всё-таки возьмите один, на всякий случай, авось повезёт...",
+		},
+		[5] = {
+			"Если вы не будете рвать агро, то вам и камень здоровья не понадобится!",
+		},
+	}
+
+	Necrosis.Speech.ShortMessage = {
+		{{"<after>--> <target> теперь сохранен(а) на 15 минут <--"}},
+		{{"<after><TP> Призываю <target>. Пожалуйста, нажмите на портал! <TP>"}},
+		{{"Выполняется Ритуал душ"}},
+	}
+
+	Necrosis.Speech.Demon = {
+		-- Imp
+		[1] = {
+			[1] = {
+				"Ах ты позорный маленький бес... Прекрати шкодить и помоги мне! ЭТО ПРИКАЗ!",
+			},
+			[2] = {
+				"<pet>, бес! Приказываю служить мне!",
+			},
+		},
+		-- Voidwalker
+		[2] = {
+			[1] = {
+				"Упс... Похоже, мне нужен идиот, который бы прислуживал мне...",
+				"<pet>, мне нужна твоя помощь!",
+			},
+		},
+		-- Succubus
+		[3] = {
+			[1] = {
+				"<pet>, детка... Помоги мне, милая!",
+			},
+		},
+		-- Felhunter
+		[4] = {
+			[1] = {
+				"<pet>! <pet>! Ко мне, пёсик. К ноге, <pet>.",
+			},
+		},
+		-- Felguard
+		[5] = {
+			[1] = {
+				"<emote> концентрируется на своих Демонических знаниях...",
+				"Я отдам тебе душу, если ты явишься и будешь служить мне!",
+				"<after>Воскресни вновь, <pet>!",
+				"<after><emote>смотрит в сумку, затем кидает мистический осколок в <pet>",
+				"<sacrifice>Я возвращаю тебя туда, откуда ты пришел, демон... но в замен ты одашь мне свою силу!"
+			},
+		},
+		-- Sentences for the first summon : When Necrosis do not know the name of your demons yet
+		[6] = {
+			[1] = {
+				"Удить рыбу? Да, я люблю рыбалку... смотри...",
+				"Я закрываю свои глаза... Я опускаю свои пальцы ниже...",
+				"<after>И вуаля! Да, да, да! Это... рыбка.",
+			},
+			[2] = {
+				"Я ненавижу вас всех! Вы не нужны мне! У меня есть лишь один друг... сильный друг!",
+				"ПРИДИ КО МНЕ, СОЗДАНИЕ ДЬЯВОЛА И ТЬМЫ!",
+			},
+		},
+		-- Sentences for the stead summon
+		[7] = {
+			[1] = {
+				"Лошааааадкаааа! Лошааааадкаааа!",
+			},
+			[2] = {
+				"<emote> глумится...",
+				"Я призываю коня из глубин Ада!",
+			},
+			[3] = {
+				"Я призываю коня из самих глубин Ада! А чего добился ты?",
+			},
+			[4] = {
+				"Эй, дорогу, я опаздываю!",
+			},
+		}
+	}
+
 end

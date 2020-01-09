@@ -43,7 +43,6 @@ local _G = getfenv(0)
 
 --Creation of headers for timer groups || Création des entêtes des groupes de timers
 function Necrosis:CreateGroup(SpellGroup, index)
-
 	local texte = ""
 	if _G["NecrosisSpellTimer"..index] then
 		local f = _G["NecrosisSpellTimer"..index]
@@ -179,7 +178,7 @@ function Necrosis:AddFrame(FrameName)
 
 	StatusBar:SetWidth(150)
 	StatusBar:SetHeight(10)
-	StatusBar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+	StatusBar:SetStatusBarTexture(GraphicsHelper:GetWoWTexture("TargetingFrame", "UI-StatusBar"))
 	StatusBar:SetStatusBarColor(1, 1, 0)
 	StatusBar:SetFrameLevel(StatusBar:GetFrameLevel() - 1)
 	StatusBar:ClearAllPoints()
@@ -191,7 +190,7 @@ function Necrosis:AddFrame(FrameName)
 
 	texture:SetWidth(32)
 	texture:SetHeight(32)
-	texture:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
+	texture:SetTexture(GraphicsHelper:GetWoWTexture("CastingBar", "UI-CastingBar-Spark"))
 	texture:SetBlendMode("ADD")
 	texture:ClearAllPoints()
 	texture:SetPoint("CENTER", StatusBar, "LEFT", 0, 0)

@@ -44,6 +44,7 @@ local _G = getfenv(0)
 -- Displays the resurrection timer in the sphere || Permet l'affichage du timer de rez dans la Sphere
 function Necrosis:RezTimerUpdate(SpellTimer, LastUpdate)
 	local Time, TimeMax, Minutes, Secondes
+
 	for index, valeur in ipairs(SpellTimer) do
 		if valeur.Name == Necrosis.Spell[11].Name then
 			Time = valeur.Time
@@ -53,7 +54,7 @@ function Necrosis:RezTimerUpdate(SpellTimer, LastUpdate)
 	end
 	if not Time then
 		NecrosisShardCount:SetText("???")
-		NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\Shard")
+		NecrosisButton:SetNormalTexture(GraphicsHelper:GetTexture("Shard"))
 		return LastUpdate
 	end
 
@@ -74,16 +75,16 @@ function Necrosis:RezTimerUpdate(SpellTimer, LastUpdate)
 		if (Minutes >= 16) then
 			if not (LastUpdate == "Turquoise\\Shard"..(Minutes - 15)) then
 				LastUpdate = "Turquoise\\Shard"..(Minutes - 15)
-				NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\"..LastUpdate)
+				NecrosisButton:SetNormalTexture(GraphicsHelper:GetTexture(LastUpdate))
 			end
 		elseif (Minutes >= 1 or Secondes >= 33) then
 			if not (LastUpdate == "Orange\\Shard"..(Minutes + 1)) then
 				LastUpdate = "Orange\\Shard"..(Minutes + 1)
-				NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\"..LastUpdate)
+				NecrosisButton:SetNormalTexture(GraphicsHelper:GetTexture(LastUpdate))
 			end
 		elseif not (LastUpdate == "Rose\\Shard"..Secondes) then
 			LastUpdate = "Rose\\Shard"..Secondes
-			NecrosisButton:SetNormalTexture("Interface\\AddOns\\Necrosis\\UI\\"..LastUpdate)
+			NecrosisButton:SetNormalTexture(GraphicsHelper:GetTexture(LastUpdate))
 		end
 	end
 

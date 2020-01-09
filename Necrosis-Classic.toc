@@ -1,0 +1,66 @@
+## Interface: 11302
+## Title: Necrosis-Classic
+## Title-ruRU: Necrosis-Classic (Русский)
+## Title-frFR: Necrosis-Classic (Français)
+## Notes: Warlock UI & Shard Management
+## Notes-frFR: Gestion graphique des shards.
+## Notes-ruRU: Менеджер заклинаний, камней и демонов для чернокнижника.
+## Version: 5.4
+## Author: kricklen
+## DefaultState: Enabled
+## X-Website: https://github.com/kricklen/Necrosis-classic
+## X-Original-Author: Lomig, robert388@hotmail.com
+## X-Original-Website: http://necrosis.larmes-cenarius.net/  [does not work anymore]
+## X-Localizations: enUS, enGB, deDE, frFR, koKR, zhCN, zhTW, esES, ruRU
+## X-Category: Warlock
+## LoadOnDemand: 0
+## SavedVariablesPerCharacter: NecrosisConfig
+
+Necrosis.xml
+
+InitializeNamespaces.lua
+GraphicsHelper.lua
+EventHub.lua
+
+Gui\ViewModels\MessagesModel.lua
+
+Localization\Functions-fr.lua
+Localization\Functions-en.lua
+Localization\Functions-de.lua
+Localization\Functions-es.lua
+Localization\Functions-tw.lua
+Localization\Functions-cn.lua
+Localization\Functions-ru.lua
+
+Localization\Localization.frFR.lua
+Localization\Localization.enUS.lua
+Localization\Localization.deDE.lua
+Localization\Localization.esES.lua
+Localization\Localization.zhCN.lua
+Localization\Localization.zhTW.lua
+Localization\Localization.ruRU.lua
+
+Localization\Localization.lua
+
+Initialize.lua
+Message.lua
+Spells.lua
+
+Timers\Functions.lua
+Timers\GraphicalTimers.lua
+Timers\OtherTimers.lua
+
+Bindings.lua
+
+XML\Attributes.lua
+XML\XML.lua
+
+XML\Panel.lua
+XML\Options-Messages.lua
+XML\Options-Sphere.lua
+XML\Options-Buttons.lua
+XML\Options-Menus.lua
+XML\Options-Timers.lua
+XML\Options-Misc.lua
+
+Necrosis.lua

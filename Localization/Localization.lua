@@ -33,17 +33,41 @@
 -- Version $LastChangedDate: 2010-08-04 12:04:27 +1000 (Wed, 04 Aug 2010) $
 ------------------------------------------------------------------------------------------------------
 
-Necrosis = {}
-
-Necrosis.Data = {
-	Version = GetAddOnMetadata("Necrosis", "Version"),
-	AppName = "Necrosis LdC",
-	LastConfig = 20191125
+-- Available languages and translated texts
+Localization.Languages = {
+    ["frFR"] = {
+        ["code"] = "frFR",
+        ["lang"] = "Français",
+        ["init"] = Localization.frFR
+    },
+    ["enUS"] = {
+        ["code"] = "enUS",
+        ["lang"] = "English",
+        ["init"] = Localization.enUS
+    },
+    ["deDE"] = {
+        ["code"] = "deDE",
+        ["lang"] = "Deutsch",
+        ["init"] = Localization.deDE
+    },
+    ["zhTW"] = {
+        ["code"] = "zhTW",
+        ["lang"] = "Taiwan",
+        ["init"] = Localization.zhTW
+    },
+    ["zhCN"] = {
+        ["code"] = "zhCN",
+        ["lang"] = "Chinese",
+        ["init"] = Localization.zhCN
+    },
+    ["esES"] = {
+        ["code"] = "esES",
+        ["lang"] = "Español",
+        ["init"] = Localization.esES
+    },
+    ["ruRU"] = {
+        ["code"] = "ruRU",
+        ["lang"] = "Русский",
+        ["init"] = Localization.ruRU
+    }
 }
-Necrosis.Data.Label = Necrosis.Data.AppName.." "..Necrosis.Data.Version
-
-Necrosis.Speech = {}
-Necrosis.Unit = {}
-Necrosis.Translation = {}
-
-Necrosis.Config = {}

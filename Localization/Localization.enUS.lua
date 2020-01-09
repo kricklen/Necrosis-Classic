@@ -38,20 +38,16 @@
 -- ENGLISH  VERSION TEXTS --
 ------------------------------------------------
 
-function Necrosis:Localization_Dialog_En()
+function Localization.enUS()
 
-	function Necrosis:Localization()
-		self:Localization_Speech_En()
-	end
-
-	self.HealthstoneCooldown = "Healthstone Cooldown"
+	Necrosis.HealthstoneCooldown = "Healthstone Cooldown"
 	
-	self.Localize = {
+	Necrosis.Localize = {
 		["Utilisation"] = "Use",
 		["Echange"] = "Trade",
 	}
 
-	self.TooltipData = {
+	Necrosis.TooltipData = {
 		["Main"] = {
 			Label = "|c00FFFFFFNecrosis|r",
 			Stone = {
@@ -145,7 +141,7 @@ function Necrosis:Localization_Dialog_En()
 		["DominationCooldown"] = "Right click for fast summon",
 	}
 
-	self.Sound = {
+	Necrosis.Sound = {
 		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-En.mp3",
 		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\SoulstoneEnd-En.mp3",
 		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\EnslaveDemonEnd-En.mp3",
@@ -153,13 +149,13 @@ function Necrosis:Localization_Dialog_En()
 		["Backlash"] = "Interface\\AddOns\\Necrosis\\sounds\\Backlash-Fr.mp3",
 	}
 
-	self.ProcText = {
+	Necrosis.ProcText = {
 		["ShadowTrance"] = "<white>S<lightPurple1>h<lightPurple2>a<purple>d<darkPurple1>o<darkPurple2>w T<darkPurple1>r<purple>a<lightPurple2>n<lightPurple1>c<white>e",
 		["Backlash"] = "<white>B<lightPurple1>a<lightPurple2>c<purple>k<darkPurple1>l<darkPurple2>a<darkPurple1>s<purple>h"
 	}
 
 
-	self.ChatMessage = {
+	Necrosis.ChatMessage = {
 		["Bag"] = {
 			["FullPrefix"] = "Your ",
 			["FullSuffix"] = " is full!",
@@ -187,7 +183,7 @@ function Necrosis:Localization_Dialog_En()
 
 
 	-- Gestion XML - Menu de configuration
-	self.Config.Panel = {
+	Necrosis.Config.Panel = {
 		"Message Settings",
 		"Sphere Settings",
 		"Button Settings",
@@ -196,7 +192,7 @@ function Necrosis:Localization_Dialog_En()
 		"Miscellaneous"
 	}
 
-	self.Config.Messages = {
+	Necrosis.Config.Messages = {
 		["Position"] = "<- Necrosis system messages will appear here ->",
 		["Afficher les bulles d'aide"] = "Show tooltips",
 		["Afficher les messages dans la zone systeme"] = "Show Necrosis messages in the system frame",
@@ -211,7 +207,7 @@ function Necrosis:Localization_Dialog_En()
 		["M'alerter quand j'entre en Transe"] = "Warn me when I enter a Trance State"
 	}
 
-	self.Config.Sphere = {
+	Necrosis.Config.Sphere = {
 		["Taille de la sphere"] = "Size of the Necrosis button",
 		["Skin de la pierre Necrosis"] = "Skin of the Sphere",
 		["Evenement montre par la sphere"] = "Event shown by the Sphere",
@@ -219,7 +215,7 @@ function Necrosis:Localization_Dialog_En()
 		["Afficher le compteur numerique"] = "Show the digital counter",
 		["Type de compteur numerique"] = "Stone type counted"
 	}
-	self.Config.Sphere.Colour = {
+	Necrosis.Config.Sphere.Colour = {
 		"Pink",
 		"Blue",
 		"Orange",
@@ -228,7 +224,7 @@ function Necrosis:Localization_Dialog_En()
 		"666",
 		"X"
 	}
-	self.Config.Sphere.Count = {
+	Necrosis.Config.Sphere.Count = {
 		"Soulshards",
 		"Demon summoning stones",
 		"Resurrection Timer",
@@ -236,7 +232,7 @@ function Necrosis:Localization_Dialog_En()
 		"Health"
 	}
 
-	self.Config.Buttons = {
+	Necrosis.Config.Buttons = {
 		["Rotation des boutons"] = "Buttons rotation",
 		["Fixer les boutons autour de la sphere"] = "Stick buttons around the Sphere",
 		["Utiliser mes propres montures"] = "Use my own mounts",
@@ -244,7 +240,7 @@ function Necrosis:Localization_Dialog_En()
 		["Monture - Clic gauche"] = "Left click",
 		["Monture - Clic droit"] = "Right click",
 	}
-	self.Config.Buttons.Name = {
+	Necrosis.Config.Buttons.Name = {
 		"Show Firestone button",
 		"Show Spellstone button",
 		"Show Healthstone button",
@@ -255,7 +251,7 @@ function Necrosis:Localization_Dialog_En()
 		"Show Curse menu button",
 	}
 
-	self.Config.Menus = {
+	Necrosis.Config.Menus = {
 		["Options Generales"] = "General Options",
 		["Menu des Buffs"] = "Spell Menu",
 		["Menu des Demons"] = "Demons Menu",
@@ -267,25 +263,25 @@ function Necrosis:Localization_Dialog_En()
 		["Changer la symetrie verticale des boutons"] = "Change the vertical symmetry of buttons",
 		["Taille du bouton Banir"] = "Size of the Banish button",
 	}
-	self.Config.Menus.Orientation = {
+	Necrosis.Config.Menus.Orientation = {
 		"Horizontal",
 		"Upwards",
 		"Downwards"
 	}
 
-	self.Config.Timers = {
+	Necrosis.Config.Timers = {
 		["Type de timers"] = "Timer type",
 		["Afficher le bouton des timers"] = "Show the Spell Timer Button",
 		["Afficher les timers sur la gauche du bouton"] = "Show timers on the left side of the button",
 		["Afficher les timers de bas en haut"] = "Timers grow upwards",
 	}
-	self.Config.Timers.Type = {
+	Necrosis.Config.Timers.Type = {
 		"No Timer",
 		"Graphical",
 		"Textual"
 	}
 
-	self.Config.Misc = {
+	Necrosis.Config.Misc = {
 		["Deplace les fragments"] = "Put shards in the selected bag.",
 		["Detruit les fragments si le sac plein"] = "Destroy all new shards if the bag is full.",
 		["Choix du sac contenant les fragments"] = "Selection of Soul Shard Container",
@@ -295,4 +291,134 @@ function Necrosis:Localization_Dialog_En()
 		["Taille des boutons caches"] = "Size of hidden buttons"
 	}
 
+	-- Chat messages
+	Necrosis.Speech.TP = {
+		[1] = {
+			"<after>Arcanum Taxi Cab! Please click on the portal so we can get this show on the road.",
+		},
+		[2] = {
+			"<after>Welcome aboard ~Succubus Air Lines~...",
+			"<after>Air Hostesses and their lashes are at your service during your trip!",
+		},
+		[3] = {
+			"<after>If you click on the portal, we might get this party started a lot quicker!",
+		},
+		[4] = {
+			"<after>Fools! Dont just stand there looking at the portal - click on it so we can summon those scrubs!",
+		},
+		[5] =  {
+			"<after>Healthstones=10g, Soulstones=20g, Summons(cos you're too lazy to fly here)=10000g!",
+		},
+		[6] =  {
+			"<after>WTB people that click on the portal instead of looking at it :/",
+		},
+	}
+
+	Necrosis.Speech.Rez = {
+		[1] = {
+			"<after>If you cherish the idea of a mass suicide, <target> can now self-resurrect, so all should be fine. Go ahead.",
+		},
+		[2]= {
+			"<after><target> can go afk to drink a cup of coffee or something, soulstone is in place to allow for the wipe...",
+		},
+		[3]= {
+			"<after>Hmmm... <target> is soulstoned... full of confidence tonight aren't we!!",
+		},
+		[4]= {
+			"<after><target> is Stoned... duuuude heavy!",
+		},
+		[5]= {
+			"<after>Why does <target> always go afk when they are soulstoned?!!!",
+		},
+	}
+
+	Necrosis.Speech.RoS = {
+		[1] = {
+			"Let us use the souls of our fallen enemies to give us vitality",
+		},
+		[2] = {
+			"My soul, their soul, doesn't matter, just take one",
+		},
+		[3] = {
+			"WTS healthstones 10g each!! Cheaper than AH!",
+		},
+		[4] = {
+			"This healthstone probably wont save your life, but take one anyway!",
+		},
+		[5] = {
+			"If you dont pull aggro, then you wont need a healthstone!",
+		},
+	}
+
+	Necrosis.Speech.ShortMessage = {
+		{{"<after>{X} --> <target> is soulstoned! <-- {X}"}},
+		{{"<after>{X} --> Summoning <target> - please click on the portal <-- {X}"}},
+		{{"Casting Ritual of Souls"}},
+	}
+
+	Necrosis.Speech.Demon = {
+		-- Imp
+		[1] = {
+			[1] = {
+				"You crappy nasty little Imp, stop sulking and get over here to help! AND THAT'S AN ORDER!",
+			},
+			[2] = {
+				"<pet>! HEEL! NOW!",
+			},
+		},
+		-- Voidwalker
+		[2] = {
+			[1] = {
+				"Oops, I'll probably need an idiot to be knocked for me...",
+				"<pet>, please help!",
+			},
+		},
+		-- Succubus
+		[3] = {
+			[1] = {
+				"<pet> baby, please help me sweetheart!",
+			},
+		},
+		-- Felhunter
+		[4] = {
+			[1] = {
+				"<pet> ! <pet>! Come on boy, come here! <pet>!",
+			},
+		},
+		-- Felguard
+		[5] = {
+			[1] = {
+				"<emote> is concentrating hard on Demoniac knowledge...",
+				"I'll give you a soul if you come to me, Felguard! Please hear my command!",
+				"<after>Obey now, <pet>!",
+				"<after><emote>looks in a bag, then throws a mysterious shard at <pet>",
+				"<sacrifice>Please return in the Limbs you are from, Demon, and give me your power in exchange!"
+			},
+		},
+		-- Sentences for the first summon : When Necrosis do not know the name of your demons yet
+		[6] = {
+			[1] = {
+				"Fishing? Yes I love fishing... Look!",
+				"I close my eyes, I move my fingers like that...",
+				"<after>And voila! Yes, yes, it is a fish, I can swear you!",
+			},
+			[2] = {
+				"Anyway I hate you all! I don't need you, I have friends.... powerful friends!",
+				"COME TO ME, CREATURE OF HELL AND NIGHTMARE!",
+			},
+		},
+		-- Sentences for the stead summon
+		[7] = {
+			[1] = {
+				"Hey, I'm late! Let's find a horse that roxes!",
+			},
+			[2] = {
+				"<emote> is giggling gloomily...",
+				"<yell>I am summoning a steed from nightmare!",
+			},
+			[3] = {
+				"I call forth the flames of feet to make my travels swift!",
+			},
+		}
+	}
 end

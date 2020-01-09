@@ -33,6 +33,9 @@
 -- Version $LastChangedDate: 2009-12-10 17:09:53 +1100 (Thu, 10 Dec 2009) $
 ------------------------------------------------------------------------------------------------------
 
+
+
+
 -- On définit _G comme étant le tableau contenant toutes les frames existantes.
 local _G = getfenv(0)
 
@@ -44,35 +47,37 @@ function Necrosis:Initialize(Config)
 
 	-- Initilialisation des Textes (VO / VF / VA / VCT / VCS / VE)
 	if NecrosisConfig.Version then
-		if (NecrosisConfig.Language == "enUS") or (NecrosisConfig.Language == "enGB") then
-			self:Localization_Dialog_En()
+		if NecrosisConfig.Language == "frFR" then
+			Localization.frFR()
 		elseif (NecrosisConfig.Language == "deDE") then
-			self:Localization_Dialog_De()
+			Localization.deDE()
 		elseif (NecrosisConfig.Language == "zhTW") then
-			self:Localization_Dialog_Tw()
+			Localization.zhTW()
 		elseif (NecrosisConfig.Language == "zhCN") then
-			self:Localization_Dialog_Cn()
+			Localization.zhCN()
 		elseif (NecrosisConfig.Language == "esES") then
-			self:Localization_Dialog_Es()
+			Localization.esES()
 		elseif (NecrosisConfig.Language == "ruRU") then
-			self:Localization_Dialog_Ru()
+			Localization.ruRU()
 		else
-			self:Localization_Dialog_Fr()
+			-- Default to English
+			Localization.enUS()
 		end
-	elseif GetLocale() == "enUS" or GetLocale() == "enGB" then
-		self:Localization_Dialog_En()
+	elseif GetLocale() == "frFR" then
+		Localization.frFR()
 	elseif GetLocale() == "deDE" then
-		self:Localization_Dialog_De()
+		Localization.deDE()
 	elseif GetLocale() == "zhTW" then
-		self:Localization_Dialog_Tw()
+		Localization.zhTW()
 	elseif GetLocale() == "zhCN" then
-		self:Localization_Dialog_Cn()
-	elseif  GetLocale() == "esES" then
-		self:Localization_Dialog_Es()
-	elseif  GetLocale() == "ruRU" then
-		self:Localization_Dialog_Ru()
+		Localization.zhCN()
+	elseif GetLocale() == "esES" then
+		Localization.esES()
+	elseif GetLocale() == "ruRU" then
+		Localization.ruRU()
 	else
-		self:Localization_Dialog_Fr()
+		-- Default to English
+		Localization.enUS()
 	end
 
 	-- On charge (ou on crée la configuration pour le joueur et on l'affiche sur la console
@@ -159,7 +164,7 @@ function Necrosis:Initialize(Config)
 		self:SoulshardSwitch("CHECK")
 	end
 	-- Initialisation des fichiers de langues -- Mise en place ponctuelle du SMS
-	self:Localization()
+	--self:Localization()
 	if NecrosisConfig.SM then
 		self.Speech.Rez = self.Speech.ShortMessage[1]
 		self.Speech.TP = self.Speech.ShortMessage[2]

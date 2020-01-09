@@ -40,20 +40,16 @@
 --  艾娜羅沙@奧妮克希亞/TW
 ------------------------------------------------
 
-function Necrosis:Localization_Dialog_Cn()
+function Localization.zhCN()
 
-	function Necrosis:Localization()
-		self:Localization_Speech_Cn();
-	end
-
-	self.HealthstoneCooldown = "治疗石冷却时间"
+	Necrosis.HealthstoneCooldown = "治疗石冷却时间"
 	
-	self.Localize = {
+	Necrosis.Localize = {
 		["Utilisation"] = "Use",
 		["Echange"] = "Trade",
 	}
 
-	self.TooltipData = {
+	Necrosis.TooltipData = {
 		["Main"] = {
 			Label = "|c00FFFFFFNecrosis|r",
 			Stone = {
@@ -147,7 +143,7 @@ function Necrosis:Localization_Dialog_Cn()
 		["DominationCooldown"] = "右键快速召唤",
 	}
 
-	self.Sound = {
+	Necrosis.Sound = {
 		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-En.mp3",
 		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\SoulstoneEnd-En.mp3",
 		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\EnslaveDemonEnd-En.mp3",
@@ -161,7 +157,7 @@ function Necrosis:Localization_Dialog_Cn()
 	}
 
 
-	self.ChatMessage = {
+	Necrosis.ChatMessage = {
 		["Bag"] = {
 			["FullPrefix"] = "你的 ",
 			["FullSuffix"] = " 满了 !",
@@ -188,7 +184,7 @@ function Necrosis:Localization_Dialog_Cn()
 	}
 
 	-- Gestion XML - Menu de configuration
-	self.Config.Panel = {
+	Necrosis.Config.Panel = {
 		"信息设置",
 		"Sphere Settings",
 		"按钮设置",
@@ -197,7 +193,7 @@ function Necrosis:Localization_Dialog_Cn()
 		"Miscellanious"
 	}
 
-	self.Config.Messages = {
+	Necrosis.Config.Messages = {
 		["Position"] = "<- 这儿将显示Necrosis的信息 ->",
 		["Afficher les bulles d'aide"] = "显示提示",
 		["Afficher les messages dans la zone systeme"] = "宣告Necrosis信息作为系统信息",
@@ -212,7 +208,7 @@ function Necrosis:Localization_Dialog_Cn()
 		["M'alerter quand j'entre en Transe"] = "当我获得暗影冥思效果时提醒我。"
 	}
 
-	self.Config.Sphere = {
+	Necrosis.Config.Sphere = {
 		["Taille de la sphere"] = "Necrosis按钮的大小",
 		["Skin de la pierre Necrosis"] = "Necrosis球体的皮肤",
 		["Evenement montre par la sphere"] = "图形显示",
@@ -221,7 +217,7 @@ function Necrosis:Localization_Dialog_Cn()
 		["Type de compteur numerique"] = "石头类型"
 	}
 
-	self.Config.Sphere.Colour = {
+	Necrosis.Config.Sphere.Colour = {
 		"粉红色",
 		"蓝色",
 		"橙色",
@@ -230,7 +226,7 @@ function Necrosis:Localization_Dialog_Cn()
 		"666",
 		"X"
 	}
-	self.Config.Sphere.Count = {
+	Necrosis.Config.Sphere.Count = {
 		"灵魂碎片",
 		"恶魔召唤石",
 		"灵魂石冷却计时",
@@ -238,7 +234,7 @@ function Necrosis:Localization_Dialog_Cn()
 		"Health"
 	}
 
-	self.Config.Buttons = {
+	Necrosis.Config.Buttons = {
 		["Rotation des boutons"] = "Buttons rotation",
 		["Fixer les boutons autour de la sphere"] = "Stick buttons around the Sphere",
 		["Utiliser mes propres montures"] = "Use my own mounts",
@@ -246,7 +242,7 @@ function Necrosis:Localization_Dialog_Cn()
 		["Monture - Clic gauche"] = "Left click",
 		["Monture - Clic droit"] = "Right click",
 	}
-	self.Config.Buttons.Name = {
+	Necrosis.Config.Buttons.Name = {
 		"显示火焰石按钮",
 		"显示法术石按钮",
 		"显示治疗石按钮",
@@ -257,7 +253,7 @@ function Necrosis:Localization_Dialog_Cn()
 		"显示诅咒菜单按钮",
 	}
 
-	self.Config.Menus = {
+	Necrosis.Config.Menus = {
 		["Options Generales"] = "General Options",
 		["Menu des Buffs"] = "法术菜单",
 		["Menu des Demons"] = "恶魔菜单",
@@ -269,25 +265,25 @@ function Necrosis:Localization_Dialog_Cn()
 		["Changer la symetrie verticale des boutons"] = "Change the vertical simetry of buttons",
 		["Taille du bouton Banir"] = "放逐按钮大小",
 	}
-	self.Config.Menus.Orientation = {
+	Necrosis.Config.Menus.Orientation = {
 		"Horizontal",
 		"Upwards",
 		"Downwards"
 	}
 
-	self.Config.Timers = {
+	Necrosis.Config.Timers = {
 		["Type de timers"] = "Timer type",
 		["Afficher le bouton des timers"] = "Show the Spell Timer button",
 		["Afficher les timers sur la gauche du bouton"] = "计时器在按钮左边",
 		["Afficher les timers de bas en haut"] = "计时器向上升",
 	}
-	self.Config.Timers.Type = {
+	Necrosis.Config.Timers.Type = {
 		"No Timer",
 		"Graphical",
 		"Textual"
 	}
 
-	self.Config.Misc = {
+	Necrosis.Config.Misc = {
 		["Deplace les fragments"] = "将碎片放入选择的包。",
 		["Detruit les fragments si le sac plein"] = "如果包满摧毁所有新的碎片。",
 		["Choix du sac contenant les fragments"] = "选择灵魂碎片包",
@@ -297,4 +293,124 @@ function Necrosis:Localization_Dialog_Cn()
 		["Taille des boutons caches"] = "暗影冥思和反恐按钮的大小"
 	}
 
+	-- Chat messages
+
+	Necrosis.Speech.TP = {
+		[1] = {
+		  "<emote>开始在空中画出一道有着强烈光芒的符咒",
+			"<after>》<player>《正在召唤【<target>】，需要二名队友合作，请按右键点击传送门，召唤期间不要移动。",
+		},
+		[2] = {
+			"<after>》<player>《正在召唤【<target>】，请队友帮忙点击传送门，召唤期间请不要移动。",
+		},
+		[3] = {
+			"<after>欢迎【<target>】搭乘由<player>所驾驶的恶魔姊姊航空，请已到的乘客二名，帮按右键点击传送专用登机门，谢谢。",
+		},
+		[4] = {
+			"<after>》<player>《正在试着把【<target>】抓过来，需要二名队友一起围捕，围捕期间请勿移动，以及勿对<target>拍打喂食。",
+		},
+	}
+
+	Necrosis.Speech.Rez = {
+		[1] = {
+			"<after>【<target>】灵魂已经被绑定。",
+		},
+		[2]= {
+			"<after>【<target>】灵魂已经被锁进保险箱三十分钟。",
+		},
+		[3]= {
+			"<after>【<target>】的灵魂，已经寄放在天使姊姊的怀里三十分钟",
+		},
+	}
+
+	Necrosis.Speech.RoS = {
+		[1] = {
+			"Let us use the souls of our fallen enemies to give us vitality",
+		},
+		[2] = {
+			"My soul, their soul, doesn't matter, just take one",
+		},
+	}
+
+	Necrosis.Speech.ShortMessage = {
+		{{"<after>■【<target>】的灵魂，已被绑定３０分钟■"}},
+		{{"<after><TP>正在召唤【<target>】，请帮忙点击传送门<TP>"}},
+		{{"Summoning a Ritual of Souls"}},
+	}
+
+	Necrosis.Speech.Demon = {
+		-- Imp
+		[1] = {
+			[1] = {
+				"小鬼头<pet>，现在正是需要你的时候了，出来吧！",
+			},
+			[2] = {
+				"<pet>！应侬之求，速速现身！",
+			},
+			[3] = {
+				"决定了，是你了！<pet>！",
+			},
+		},
+		-- Voidwalker
+		[2] = {
+			[1] = {
+				"我正在招唤蓝色大沙包来帮我挡怪。",
+				"正在召宠：<pet>",
+			},
+			[2] = {
+				"决定了，是你了！<pet>！",
+				"<after><emote>把灵魂碎片丢向空中，召唤出了<pet>",
+			},
+		},
+		-- Succubus
+		[3] = {
+			[1] = {
+				"出来吧<pet>，我渴望看到鞭子鞭人的那种那火辣辣的快感!!",
+			},
+			[2] = {
+				"决定了，是你了！<pet>！",
+				"<after><emote>把灵魂碎片丢向空中，召唤出了<pet>",
+			},
+			[3] = {
+				"亲爱的女王大人<pet>，欢迎来到这个世界！",
+				"<after><emote>向<pet>送出一个飞吻",
+			},
+		},
+		-- Felhunter
+		[4] = {
+			[1] = {
+				"正在呼叫不用喂食物的狗狗中！",
+			},
+			[2] = {
+				"决定了，是你了！<pet>！",
+				"<after><emote>把灵魂碎片丢向空中，召唤出了<pet>",
+			},
+		},
+		-- Felguard
+		[5] = {
+			[1] = {
+				"<emote>正在脑海中思索着，相当困难的有关于恶魔的知识...",
+				"献上吾之灵魂，恶魔守卫，请您听见我、理解我的愿望！",
+				"<after>以侬之名，命你现身，<pet>！",
+				"<after><emote>从包包中取出灵魂碎片，并且把它掷向<pet>",
+				"<sacrifice>回到你原来的地方吧！但是以你必须给我你的力量用做交换！！"
+			},
+		},
+		-- Sentences for the first summon : When Necrosis do not know the name of your demons yet
+		[6] = {
+			[1] = {
+				"正在从异界钓出宠物中...",
+				"<after><emote>把灵魂碎片丢向空中，召唤出了<pet>",
+			},
+		},
+		-- Sentences for the stead summon
+		[7] = {
+			[1] = {
+				"<emote>正在帮座骑鞍上风火轮...",
+			},
+			[2] = {
+				"午夜的梦魇，出来吧!",
+			},
+		}
+	}
 end

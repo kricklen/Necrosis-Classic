@@ -39,20 +39,16 @@
 艾娜羅沙@奧妮克希亞
 --]]
 
-function Necrosis:Localization_Dialog_Tw()
+function Localization.zhTW()
 
-	function Necrosis:Localization()
-	  self:Localization_Speech_Tw()
-	end
-
-	self.HealthstoneCooldown = "治療石冷卻時間"
+	Necrosis.HealthstoneCooldown = "治療石冷卻時間"
 	
-	self.Localize = {
+	Necrosis.Localize = {
 		["Utilisation"] = "使用",
 		["Echange"] = "交易",
 	}
 
-	self.TooltipData = {
+	Necrosis.TooltipData = {
 		["Main"] = {
 			Label = "|c00FFFFFFNecrosis|r",
 			Stone = {
@@ -146,7 +142,7 @@ function Necrosis:Localization_Dialog_Tw()
 		["DominationCooldown"] = "右鍵快速召喚",
 	}
 
-	self.Sound = {
+	Necrosis.Sound = {
 		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-En.mp3",
 		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\SoulstoneEnd-En.mp3",
 		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\EnslaveDemonEnd-En.mp3",
@@ -154,12 +150,12 @@ function Necrosis:Localization_Dialog_Tw()
 		["Backlash"] = "Interface\\AddOns\\Necrosis\\sounds\\Backlash-En.mp3",
 	}
 
-	self.ProcText = {
+	Necrosis.ProcText = {
 		["ShadowTrance"] = "你沒有任何的暗影箭法術。",
 		["Backlash"] = "<white>暗<lightPurple1>影<lightPurple2>冥<purple>思<darkPurple1>！<darkPurple2>暗<darkPurple1>影<purple>冥<lightPurple2>思<lightPurple1>！<white>！"
 	}
 
-	self.ChatMessage = {
+	Necrosis.ChatMessage = {
 		["Bag"] = {
 			["FullPrefix"] = "你的",
 			["FullSuffix"] = " 滿了！",
@@ -186,7 +182,7 @@ function Necrosis:Localization_Dialog_Tw()
 	}
 
 	-- Gestion XML - Menu de configuration
-	self.Config.Panel = {
+	Necrosis.Config.Panel = {
 		"資訊設定",
 		"球體設定",
 		"按鈕設定",
@@ -195,7 +191,7 @@ function Necrosis:Localization_Dialog_Tw()
 		"雜項設定"
 	}
 
-	self.Config.Messages = {
+	Necrosis.Config.Messages = {
 		["Position"] = "<- 這裡將顯示Necrosis的系統訊息 ->",
 		["Afficher les bulles d'aide"] = "顯示提示",
 		["Afficher les messages dans la zone systeme"] = "宣告Necrosis訊息為系統訊息",
@@ -210,7 +206,7 @@ function Necrosis:Localization_Dialog_Tw()
 		["M'alerter quand j'entre en Transe"] = "提醒獲得暗影冥思效果"
 	}
 
-	self.Config.Sphere = {
+	Necrosis.Config.Sphere = {
 		["Taille de la sphere"] = "Necrosis按鈕的大小",
 		["Skin de la pierre Necrosis"] = "Necrosis球體的外觀",
 		["Evenement montre par la sphere"] = "球體事件顯示",
@@ -218,7 +214,7 @@ function Necrosis:Localization_Dialog_Tw()
 		["Afficher le compteur numerique"] = "顯示碎片數量",
 		["Type de compteur numerique"] = "計算石頭類型"
 	}
-	self.Config.Sphere.Colour = {
+	Necrosis.Config.Sphere.Colour = {
 		"粉紅色",
 		"藍色",
 		"橘色",
@@ -227,7 +223,7 @@ function Necrosis:Localization_Dialog_Tw()
 		"666",
 		"X"
 	}
-	self.Config.Sphere.Count = {
+	Necrosis.Config.Sphere.Count = {
 		"靈魂碎片",
 		"惡魔召喚石",
 		"靈魂石冷卻計時",
@@ -235,7 +231,7 @@ function Necrosis:Localization_Dialog_Tw()
 		"體力"
 	}
 
-	self.Config.Buttons = {
+	Necrosis.Config.Buttons = {
 		["Rotation des boutons"] = "旋轉按鈕",
 		["Fixer les boutons autour de la sphere"] = "將按鈕固定於球體週圍",
 		["Utiliser mes propres montures"] = "使用自己的坐騎",
@@ -243,7 +239,7 @@ function Necrosis:Localization_Dialog_Tw()
 		["Monture - Clic gauche"] = "坐騎 - 左鍵",
 		["Monture - Clic droit"] = "坐騎 - 右鍵",
 	}
-	self.Config.Buttons.Name = {
+	Necrosis.Config.Buttons.Name = {
 		"顯示火焰石按鈕",
 		"顯示法術石按鈕",
 		"顯示治療石按鈕",
@@ -254,7 +250,7 @@ function Necrosis:Localization_Dialog_Tw()
 		"顯示詛咒功能表按鈕",
 	}
 
-	self.Config.Menus = {
+	Necrosis.Config.Menus = {
 		["Options Generales"] = "一般選單",
 		["Menu des Buffs"] = "法術增益選單",
 		["Menu des Demons"] = "惡魔選單",
@@ -266,25 +262,25 @@ function Necrosis:Localization_Dialog_Tw()
 		["Changer la symetrie verticale des boutons"] = "改變按鈕對稱性",
 		["Taille du bouton Banir"] = "放逐按鈕大小",
 	}
-	self.Config.Menus.Orientation = {
+	Necrosis.Config.Menus.Orientation = {
 		"水平",
 		"往上",
 		"往下"
 	}
 
-	self.Config.Timers = {
+	Necrosis.Config.Timers = {
 		["Type de timers"] = "計時器種類",
 		["Afficher le bouton des timers"] = "顯示計時器按鈕",
 		["Afficher les timers sur la gauche du bouton"] = "計時器在按鈕左邊",
 		["Afficher les timers de bas en haut"] = "計時器向上增加",
 	}
-	self.Config.Timers.Type = {
+	Necrosis.Config.Timers.Type = {
 		"無計時器",
 		"圖型",
 		"文字"
 	}
 
-	self.Config.Misc = {
+	Necrosis.Config.Misc = {
 		["Deplace les fragments"] = "將碎片放入選擇的包包",
 		["Detruit les fragments si le sac plein"] = "如果包包滿了，摧毀所有新的碎片",
 		["Choix du sac contenant les fragments"] = "選擇靈魂碎片包包",
@@ -292,6 +288,136 @@ function Necrosis:Localization_Dialog_Tw()
 		["Verrouiller Necrosis sur l'interface"] = "鎖定Necrosis主體及周圍的按鈕",
 		["Afficher les boutons caches"] = "顯示隱藏的按鈕以便能拖曳它",
 		["Taille des boutons caches"] = "暗影冥思和反恐按鈕的大小"
+	}
+
+	-- Chat messages
+
+	Necrosis.Speech.TP = {
+		[1] = {
+			"開始準備召喚<target>。",
+			"<emote>畫出一道門，透發著詭異的能量波動。",
+			"<after>正在召喚【<target>】，麻煩隊友幫忙點擊傳送門，召喚期間請不要移動。",
+		},
+		[2] = {
+			"開始準備召喚<target>。",
+			"<emote>畫出一道門，透發著詭異的能量波動。",
+			"<after>正在試著把【<target>】抓過來，麻煩隊友幫忙圍捕，圍捕期間勿對<target>拍打餵食。",
+		},
+		[3] = {
+			"開始準備召喚<target>。",
+			"<emote>畫出一道門，透發著詭異的能量波動。",
+			"<after>儂正在召喚【<target>】，請戰友手持三柱香，幫點傳送門。儂命汝速速現身答禮。",
+		},
+		[4] = {
+			"開始準備召喚<target>。",
+			"<emote>畫出一道門，透發著詭異的能量波動。",
+			"<after>正在傳訊被告【<target>】，請目擊證人幫點傳送門，以便被告到事故現場來模擬案發經過。",
+		},
+	}
+
+	Necrosis.Speech.Rez = {
+		[1]= {
+			"<emote>向<target>做了一個複雜的結印。",
+			"<after>【<target>】的靈魂已經被鎖進保險箱三十分鐘。",
+		},
+		[2]= {
+			"<emote>向<target>做了一個複雜的結印。",
+			"<after>【<target>】的靈魂已經寄放在天使姊姊的懷裡三十分鐘。",
+		},
+		[3]= {
+			"<emote>向<target>做了一個複雜的結印。",
+			"<after>【<target>】的靈魂已經借給惡魔姊姊把玩三十分鐘。",
+		},
+	}
+	
+	Necrosis.Speech.RoS = {
+		[1] = {
+			"糖果: 誰膽敢召喚我！你連自己補血的能力都沒有嗎？",
+		},
+		[2] = {
+			"媽媽說帶乖乖桶來發有助人際發展。^O^",
+		},
+	}
+
+	Necrosis.Speech.ShortMessage = {
+		{{"<after>【<target>】的靈魂，已被綁定３０分鐘。"}},
+		{{"<after><TP>正在召喚【<target>】，請幫忙點擊傳送門。<TP>"}},
+	}
+
+	Necrosis.Speech.Demon = {
+		-- Imp
+		[1] = {
+			[1] = {
+				"小鬼頭<pet>，現在正是需要你的時候了，出來吧！",
+			},
+			[2] = {
+				"<pet>！應儂之求，速速現身！",
+			},
+			[3] = {
+				"決定了，是你了！<pet>！",
+			},
+		},
+		-- Voidwalker
+		[2] = {
+			[1] = {
+				"我正在招喚藍色大沙包來幫我擋怪。",
+				"正在召寵：<pet>",
+			},
+			[2] = {
+				"決定了，是你了！<pet>！",
+				"<after><emote>把靈魂碎片丟向空中，召喚出了<pet>",
+			},
+		},
+		-- Succubus
+		[3] = {
+			[1] = {
+				"出來吧<pet>，我渴望看到鞭子鞭人的那種那火辣辣的快感...囧",
+			},
+			[2] = {
+				"決定了，是你了！<pet>！",
+				"<after><emote>把靈魂碎片丟向空中，召喚出了<pet>",
+			},
+			[3] = {
+				"親愛的女王大人<pet>，歡迎來到這個世界！",
+				"<after><emote>向<pet>送出一個飛吻",
+			},
+		},
+		-- Felhunter
+		[4] = {
+			[1] = {
+				"正在呼叫不用餵食物的狗狗中！",
+			},
+			[2] = {
+				"決定了，是你了！<pet>！",
+				"<after><emote>把靈魂碎片丟向空中，召喚出了<pet>",
+			},
+		},
+		-- Felguard
+		[5] = {
+			[1] = {
+				"<emote>正在腦海中思索著，相當困難的有關於惡魔的知識...",
+				"獻上吾之靈魂，惡魔守衛，請您聽見我、理解我的願望！",
+				"<after>以儂之名，命你現身，<pet>！",
+				"<after><emote>從包包中取出靈魂碎片，並且把它擲向<pet>",
+				"<sacrifice>回到你原來的地方吧！但是以你必須給我你的力量用做交換！！"
+			},
+		},
+		-- Sentences for the first summon : When Necrosis do not know the name of your demons yet
+		[6] = {
+			[1] = {
+				"<emote>正在從異界釣出寵物中...",
+				"<after><emote>把靈魂碎片丟向空中，召喚出了<pet>",
+			},
+		},
+		-- Sentences for the stead summon
+		[7] = {
+			[1] = {
+				"<emote>正在幫座騎鞍上風火輪...",
+			},
+			[2] = {
+				"午夜的夢魘，出來吧!",
+			},
+		}
 	}
 
 end

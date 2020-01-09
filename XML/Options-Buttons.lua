@@ -46,7 +46,6 @@ local NECROSIS_PAGE_NUMBER = "Page %s of %s";
 
 --We create or display the configuration panel of the sphere ||  On crée ou on affiche le panneau de configuration de la sphere
 function Necrosis:SetButtonsConfig()
-
 	local frame = _G["NecrosisButtonsConfig"]
 	if not frame then
 		-- Création de la fenêtre
@@ -301,11 +300,12 @@ function Necrosis:SetButtonsConfig()
 		frame:Show()
 		frame:ClearAllPoints()
 		frame:SetPoint("RIGHT", NecrosisCompanionPageNumber, "LEFT", -10, 0)
-		frame:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Up")
-		frame:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Down")
-		frame:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-PrevPage-Disabled")
-		frame:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight")
-		frame:GetHighlightTexture():SetBlendMode("ADD")
+		frame:SetNormalTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-PrevPage-Up"))
+		frame:SetPushedTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-PrevPage-Down"))
+		frame:SetDisabledTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-PrevPage-Disabled"))
+		-- frame:SetHighlightTexture(GraphicsHelper.GetWoWTexture("Buttons", "UI-Common-MouseHilight"))
+		-- frame:SetHighlightTexture(GraphicsHelper.GetWoWTexture("Buttons", "ButtonHilight-Square"))
+		-- frame:GetHighlightTexture():SetBlendMode("ADD")
 		frame:SetScript("OnClick", function()
 			 Necrosis:SetCompanionPage(NecrosisMountsSelectionFrame.pageMount - 1);
 		end);
@@ -317,11 +317,12 @@ function Necrosis:SetButtonsConfig()
 		frame:Show()
 		frame:ClearAllPoints()
 		frame:SetPoint("LEFT", NecrosisCompanionPageNumber, "RIGHT", 10, 0)
-		frame:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
-		frame:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
-		frame:SetDisabledTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Disabled")
-		frame:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight")
-		frame:GetHighlightTexture():SetBlendMode("ADD")
+		frame:SetNormalTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Up"))
+		frame:SetPushedTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Down"))
+		frame:SetDisabledTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Disabled"))
+		-- frame:SetHighlightTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-Common-MouseHilight"))
+		-- frame:SetHighlightTexture(GraphicsHelper:GetWoWTexture("Buttons", "ButtonHilight-Square"))
+		-- frame:GetHighlightTexture():SetBlendMode("ADD")
 		frame:SetScript("OnClick", function()
 			 Necrosis:SetCompanionPage((NecrosisMountsSelectionFrame.pageMount or 0)+1);
 		end);
