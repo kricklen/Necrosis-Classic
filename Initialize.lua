@@ -164,9 +164,8 @@ function Necrosis:Initialize(Config)
 		self:SoulshardSwitch("CHECK")
 	end
 	-- Initialisation des fichiers de langues -- Mise en place ponctuelle du SMS
-	--self:Localization()
 	if NecrosisConfig.SM then
-		self.Speech.Rez = self.Speech.ShortMessage[1]
+--		self.Speech.Rez = self.Speech.ShortMessage[1]
 		self.Speech.TP = self.Speech.ShortMessage[2]
 	end
 end

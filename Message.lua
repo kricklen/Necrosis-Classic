@@ -36,6 +36,7 @@
 -- One defines G as being the table containing all the existing frames.
 local _G = getfenv(0)
 
+local msgTableAfter = nil
 ------------------------------------------------------------------------------------------------------
 -- Message handler (CONSOLE, CHAT, MESSAGE SYSTEM)
 ------------------------------------------------------------------------------------------------------
@@ -202,25 +203,26 @@ function Necrosis:Speech_It(Spell, Speeches, metatable)
 		end
 	-- messages to be posted while casting 'Soulstone' on a friendly target
 	elseif Spell.Name == Necrosis.Spell[11].Name and not (Spell.TargetName == UnitName("player")) then
-		Speeches.SpellSucceed.Rez = setmetatable({}, metatable)
-		if (NecrosisConfig.ChatMsg or NecrosisConfig.SM) and self.Speech.Rez then
-			local tempnum = math.random(1, #self.Speech.Rez)
-			while tempnum == Speeches.LastSpeech.Rez and #self.Speech.Rez >= 2 do
-				tempnum = math.random(1, #self.Speech.Rez)
-			end
-			Speeches.LastSpeech.Rez = tempnum
-			for i in ipairs(self.Speech.Rez[tempnum]) do
-				if self.Speech.Rez[tempnum][i]:find("<after>") then
-					Speeches.SpellSucceed.Rez:insert(self.Speech.Rez[tempnum][i])
-				elseif self.Speech.Rez[tempnum][i]:find("<emote>") then
-					self:Msg(self:MsgReplace(self.Speech.Rez[tempnum][i], Spell.TargetName), "EMOTE")
-				elseif self.Speech.Rez[tempnum][i]:find("<yell>") then
-					self:Msg(self:MsgReplace(self.Speech.Rez[tempnum][i], Spell.TargetName), "YELL")
-				else
-					self:Msg(self:MsgReplace(self.Speech.Rez[tempnum][i], Spell.TargetName), "WORLD")
-				end
-			end
-		end
+		msgTableAfter = Messages.CastSoulstone()
+		-- Speeches.SpellSucceed.Rez = setmetatable({}, metatable)
+		-- if (NecrosisConfig.ChatMsg or NecrosisConfig.SM) and self.Speech.Rez then
+		-- 	local tempnum = math.random(1, #self.Speech.Rez)
+		-- 	while tempnum == Speeches.LastSpeech.Rez and #self.Speech.Rez >= 2 do
+		-- 		tempnum = math.random(1, #self.Speech.Rez)
+		-- 	end
+		-- 	Speeches.LastSpeech.Rez = tempnum
+		-- 	for i in ipairs(self.Speech.Rez[tempnum]) do
+		-- 		if self.Speech.Rez[tempnum][i]:find("<after>") then
+		-- 			Speeches.SpellSucceed.Rez:insert(self.Speech.Rez[tempnum][i])
+		-- 		elseif self.Speech.Rez[tempnum][i]:find("<emote>") then
+		-- 			self:Msg(self:MsgReplace(self.Speech.Rez[tempnum][i], Spell.TargetName), "EMOTE")
+		-- 		elseif self.Speech.Rez[tempnum][i]:find("<yell>") then
+		-- 			self:Msg(self:MsgReplace(self.Speech.Rez[tempnum][i], Spell.TargetName), "YELL")
+		-- 		else
+		-- 			self:Msg(self:MsgReplace(self.Speech.Rez[tempnum][i], Spell.TargetName), "WORLD")
+		-- 		end
+		-- 	end
+		-- end
 	-- messages to be posted while casting 'Ritual of Summoning'
 	elseif Spell.Name == Necrosis.Spell[37].Name then
 		Speeches.SpellSucceed.TP = setmetatable({}, metatable)
@@ -309,6 +311,12 @@ end
 ------------------------------------------------------------------------------------------------------
 function Necrosis:Speech_Then(Spell, DemonName, Speech)
 -- TODO need to be fixed ..
+	if (msgTableAfter) then
+print("Posting messages after spellcast: "..tostring(#msgTableAfter))
+		Messages._PostChatMessages(msgTableAfter)
+		msgTableAfter = nil
+	end
+
 	-- messages to be posted after a mount is summoned.
 	if (Spell.Name == Necrosis.Spell[1].Name or Spell.Name == Necrosis.Spell[2].Name) then
 		for i in ipairs(Speech.Steed) do
@@ -394,3 +402,159 @@ function Necrosis:Speech_Then(Spell, DemonName, Speech)
 
 	return Speech
 end
+
+Messages = {
+	LastSoulstoneMessageNumber = false,
+
+	CastSoulstone =
+		function()
+			local msgStack
+			if NecrosisConfig.ChatMsg then
+				if NecrosisConfig.SM then
+					-- Check if any short Soulstone messages are available
+					if (not Necrosis.Speech.ShortMessage[1]) then
+						print("No Necrosis.Speech.ShortMessage[1] entries available, aborting...")
+						return nil
+					end
+					msgStack = Necrosis.Speech.ShortMessage[1]
+				else
+					-- Check if any normal Soulstone messages are available
+					if (not Necrosis.Speech.Rez) then
+						print("No Necrosis.Speech.Rez entries available, aborting...")
+						return nil
+					end
+					-- Take a random message, if possible not the same as last time
+					local tempnum = _GetRandomMessageNumber(self.LastSoulstoneMessageNumber, Necrosis.Speech.Rez)
+					self.LastSoulstoneMessageNumber = tempnum
+					msgStack = Necrosis.Speech.Rez[tempnum]
+				end
+				local msgTableBefore, msgTableAfter = self._PrepareMessageTables(msgStack, Spell.TargetName)
+				self._PostChatMessages(msgTableBefore)
+				-- Other messages are posted after the spell finishes
+				return msgTableAfter
+			end
+		end,
+
+	_GetRandomMessageNumber =
+		function(lastNumber, msgTable)
+			local tmp = 0
+			repeat 
+				tmp = math.random(1, #msgTable)
+print("_GetRandomMessageNumber: "..tostring(tmp)..", "..tostring(#msgTable))
+			until (tmp != lastNumber or #msgTable > 1)
+			return tmp
+		end,
+
+	_PrepareMessageTables =
+		function(msgStack, targetName, pet)
+			local msgTableBefore, msgTableAfter = {}
+			for i in ipairs(msgStack) do
+				-- Check if the message should be posted before or after spellcast
+				if string.starts(msgStack[i], "<after>") then
+					table.insert(msgTableAfter, self._ParseChannelAndMessageData(string.gsub(msgStack[i], "<after>", "", 1), targetName))
+				else
+					table.insert(msgTableBefore, self._ParseChannelAndMessageData(msgStack[i], targetName))
+				end
+			end
+			return msgTableBefore, msgTableAfter
+		end,
+
+	_ParseChannelAndMessageData =
+		function(msg, tagetName, petType)
+			if string.starts(msg, "<emote>") then
+				return {type = "EMOTE", msg = self._ReplaceMessagePlaceholders(msgStack[i], targetName, petType)}
+			end
+			if string.starts(msg, "<yell>") then
+				return {type = "YELL", msg = self._ReplaceMessagePlaceholders(msgStack[i], targetName, petType)}
+			end
+			return {type = "WORLD", msg = self._ReplaceMessagePlaceholders(msgStack[i], targetName, petType)}
+		end,
+
+	------------------------------------------------------------------------------------------------------
+	-- Replace user-friendly string variables in the invocation messages
+	------------------------------------------------------------------------------------------------------
+	_ReplaceMessagePlaceholders =
+		function(msg, target, pet)
+			msg = msg:gsub("<player>", UnitName("player"))
+			msg = msg:gsub("<emote>", "")
+			msg = msg:gsub("<after>", "")
+			msg = msg:gsub("<sacrifice>", "")
+			msg = msg:gsub("<yell>", "")
+			if target then
+				msg = msg:gsub("<target>", target)
+			end
+			if pet and NecrosisConfig.PetName[pet] then
+				msg = msg:gsub("<pet>", NecrosisConfig.PetName[pet])
+			end
+			return msg
+		end,
+
+	_PostChatMessages =
+		function(msgTable)
+			for i,data in ipairs(msgTable) do
+				-- dispatch the message to the appropriate chat channel depending on the message type
+				if (data.type == "WORLD") then
+					local groupMembersCount = GetNumGroupMembers()
+					if (groupMembersCount > 5) then
+						-- send to all raid members
+						SendChatMessage(data.msg, "RAID")
+					elseif (groupMembersCount > 0) then
+						-- send to party members
+						SendChatMessage(data.msg, "PARTY")
+					else
+						-- not in a group so lets use the 'say' channel
+						SendChatMessage(data.msg, "SAY")
+					end
+				elseif (data.type == "PARTY") then
+					SendChatMessage(data.msg, "PARTY")
+				elseif (data.type == "RAID") then
+					SendChatMessage(data.msg, "RAID")
+				elseif (data.type == "SAY") then
+					SendChatMessage(data.msg, "SAY")
+				elseif (data.type == "EMOTE") then
+					SendChatMessage(data.msg, "EMOTE")
+				elseif (data.type == "YELL") then
+					SendChatMessage(data.msg, "YELL")
+				else
+					-- Add some color to our message :D
+					local msg = self.ColorizeMessage(data.msg)
+					local intro = "|CFFFF00FFNe|CFFFF50FFcr|CFFFF99FFos|CFFFFC4FFis|CFFFFFFFF: "
+					if NecrosisConfig.ChatType then
+						-- ...... on the first chat frame
+						ChatFrame1:AddMessage(intro..msg, 1.0, 0.7, 1.0, 1.0, UIERRORS_HOLD_TIME)
+					else
+						-- ...... on the middle of the screen
+						UIErrorsFrame:AddMessage(intro..msg, 1.0, 0.7, 1.0, 1.0, UIERRORS_HOLD_TIME)
+					end
+				end
+			end
+		end,
+
+	-- Replace any color strings in the message with its associated value
+	ColorizeMessage =
+		function(msg)
+			if type(msg) == "string" then
+				msg = msg:gsub("<white>", "|CFFFFFFFF")
+				msg = msg:gsub("<lightBlue>", "|CFF99CCFF")
+				msg = msg:gsub("<brightGreen>", "|CFF00FF00")
+				msg = msg:gsub("<lightGreen2>", "|CFF66FF66")
+				msg = msg:gsub("<lightGreen1>", "|CFF99FF66")
+				msg = msg:gsub("<yellowGreen>", "|CFFCCFF66")
+				msg = msg:gsub("<lightYellow>", "|CFFFFFF66")
+				msg = msg:gsub("<darkYellow>", "|CFFFFCC00")
+				msg = msg:gsub("<lightOrange>", "|CFFFFCC66")
+				msg = msg:gsub("<dirtyOrange>", "|CFFFF9933")
+				msg = msg:gsub("<darkOrange>", "|CFFFF6600")
+				msg = msg:gsub("<redOrange>", "|CFFFF3300")
+				msg = msg:gsub("<red>", "|CFFFF0000")
+				msg = msg:gsub("<lightRed>", "|CFFFF5555")
+				msg = msg:gsub("<lightPurple1>", "|CFFFFC4FF")
+				msg = msg:gsub("<lightPurple2>", "|CFFFF99FF")
+				msg = msg:gsub("<purple>", "|CFFFF50FF")
+				msg = msg:gsub("<darkPurple1>", "|CFFFF00FF")
+				msg = msg:gsub("<darkPurple2>", "|CFFB700B7")
+				msg = msg:gsub("<close>", "|r")
+			end
+			return msg
+		end
+}

@@ -1,7 +1,4 @@
-Gui = {
-	Views = {},
-	ViewModels = {}
-}
+Gui = {}
 
 Localization = {}
 
