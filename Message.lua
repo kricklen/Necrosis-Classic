@@ -429,6 +429,7 @@ Messages = {
 					msgStack = Necrosis.Speech.Rez[tempnum]
 				end
 				local msgTableBefore, msgTableAfter = self._PrepareMessageTables(msgStack, Spell.TargetName)
+				-- Post immediate messages before the spell is cast
 				self._PostChatMessages(msgTableBefore)
 				-- Other messages are posted after the spell finishes
 				return msgTableAfter
@@ -462,12 +463,12 @@ print("_GetRandomMessageNumber: "..tostring(tmp)..", "..tostring(#msgTable))
 	_ParseChannelAndMessageData =
 		function(msg, tagetName, petType)
 			if string.starts(msg, "<emote>") then
-				return {type = "EMOTE", msg = self._ReplaceMessagePlaceholders(msgStack[i], targetName, petType)}
+				return {type = "EMOTE", msg = self._ReplaceMessagePlaceholders(msg, targetName, petType)}
 			end
 			if string.starts(msg, "<yell>") then
-				return {type = "YELL", msg = self._ReplaceMessagePlaceholders(msgStack[i], targetName, petType)}
+				return {type = "YELL", msg = self._ReplaceMessagePlaceholders(msg, targetName, petType)}
 			end
-			return {type = "WORLD", msg = self._ReplaceMessagePlaceholders(msgStack[i], targetName, petType)}
+			return {type = "WORLD", msg = self._ReplaceMessagePlaceholders(msg, targetName, petType)}
 		end,
 
 	------------------------------------------------------------------------------------------------------
@@ -517,7 +518,7 @@ print("_GetRandomMessageNumber: "..tostring(tmp)..", "..tostring(#msgTable))
 					SendChatMessage(data.msg, "YELL")
 				else
 					-- Add some color to our message :D
-					local msg = self.ColorizeMessage(data.msg)
+					local msg = self._ColorizeMessage(data.msg)
 					local intro = "|CFFFF00FFNe|CFFFF50FFcr|CFFFF99FFos|CFFFFC4FFis|CFFFFFFFF: "
 					if NecrosisConfig.ChatType then
 						-- ...... on the first chat frame
@@ -531,7 +532,7 @@ print("_GetRandomMessageNumber: "..tostring(tmp)..", "..tostring(#msgTable))
 		end,
 
 	-- Replace any color strings in the message with its associated value
-	ColorizeMessage =
+	_ColorizeMessage =
 		function(msg)
 			if type(msg) == "string" then
 				msg = msg:gsub("<white>", "|CFFFFFFFF")
