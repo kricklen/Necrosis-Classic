@@ -38,12 +38,12 @@
 -- CREATION DE LA FRAME DES OPTIONS
 ------------------------------------------------------------------------------------------------------
 
-Gui.Views.SphereConfig = {
+Gui.SphereView = {
 	Frame = false
 }
 
 -- On crée ou on affiche le panneau de configuration de la sphere
-function Gui.Views.SphereConfig:Show()
+function Gui.SphereView:Show()
 
 	if not self.Frame then
 		-- Création de la fenêtre
@@ -141,21 +141,21 @@ function Gui.Views.SphereConfig:Show()
 
 		-- Handler to update texts when language changes
 		local function updateTexts()
-			Gui.Views.SphereConfig.slSphereSizeText:SetText(Necrosis.Config.Sphere["Taille de la sphere"])
-			Gui.Views.SphereConfig.lblSkins:SetText(Necrosis.Config.Sphere["Skin de la pierre Necrosis"])
+			Gui.SphereView.slSphereSizeText:SetText(Necrosis.Config.Sphere["Taille de la sphere"])
+			Gui.SphereView.lblSkins:SetText(Necrosis.Config.Sphere["Skin de la pierre Necrosis"])
 			UIDropDownMenu_SetText(
-				Gui.Views.SphereConfig.ddSkins,
-				Necrosis.Config.Sphere.Colour[UIDropDownMenu_GetSelectedID(Gui.Views.SphereConfig.ddSkins)]
+				Gui.SphereView.ddSkins,
+				Necrosis.Config.Sphere.Colour[UIDropDownMenu_GetSelectedID(Gui.SphereView.ddSkins)]
 			)
-			Gui.Views.SphereConfig.lblEvents:SetText(Necrosis.Config.Sphere["Evenement montre par la sphere"])
-			Gui.Views.SphereConfig.lblSpells:SetText(Necrosis.Config.Sphere["Sort caste par la sphere"])
-			Necrosis.Spell_Init(Gui.Views.SphereConfig.ddSpells)
+			Gui.SphereView.lblEvents:SetText(Necrosis.Config.Sphere["Evenement montre par la sphere"])
+			Gui.SphereView.lblSpells:SetText(Necrosis.Config.Sphere["Sort caste par la sphere"])
+			Necrosis.Spell_Init(Gui.SphereView.ddSpells)
 			-- UIDropDownMenu_SetText(
 			-- 	NecrosisSpellSelection,
 			-- 	Necrosis.Spell[spell[UIDropDownMenu_GetSelectedID(NecrosisSpellSelection)]].Name
 			-- )
-			Gui.Views.SphereConfig.cbShowCount:SetText(Necrosis.Config.Sphere["Afficher le compteur numerique"])
-			Gui.Views.SphereConfig.lblCount:SetText(Necrosis.Config.Sphere["Type de compteur numerique"])
+			Gui.SphereView.cbShowCount:SetText(Necrosis.Config.Sphere["Afficher le compteur numerique"])
+			Gui.SphereView.lblCount:SetText(Necrosis.Config.Sphere["Type de compteur numerique"])
 		end
 		EventHub:RegisterLanguageChangedHandler(updateTexts)
 

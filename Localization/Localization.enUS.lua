@@ -316,6 +316,7 @@ function Localization.enUS()
 
 	Necrosis.Speech.Rez = {
 		[1] = {
+			"<target>, don't run away!",
 			"<after>If you cherish the idea of a mass suicide, <target> can now self-resurrect, so all should be fine. Go ahead.",
 		},
 		[2]= {
@@ -351,9 +352,21 @@ function Localization.enUS()
 	}
 
 	Necrosis.Speech.ShortMessage = {
-		{{"<after>{X} --> <target> is soulstoned! <-- {X}"}},
-		{{"<after>{X} --> Summoning <target> - please click on the portal <-- {X}"}},
-		{{"Casting Ritual of Souls"}},
+		-- Soulstone
+		{
+			-- {"<after>{X} --> <target> is soulstoned! <-- {X}"},
+			-- {"<after>{S} --> <target> is soulstoned! <-- {S}"}
+			{"{X} --> <target> test 123! <-- {X}", "abc"},
+			{"{S} --> <target> test 456! <-- {S}"}
+		},
+		-- Ritual of Summoning
+		{
+			{"<after>{X} --> Summoning <target> - please click on the portal <-- {X}"}
+		},
+		-- Ritual of Souls
+		{
+			{"Casting Ritual of Souls"}
+		},
 	}
 
 	Necrosis.Speech.Demon = {

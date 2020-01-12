@@ -4,7 +4,7 @@ GraphicsHelper = {}
 GraphicsHelper.__index = GraphicsHelper
 
 function GraphicsHelper:GetTexture(name)
-    return "Interface\\Addons\\Necrosis\\UI\\"..name
+    return "Interface\\Addons\\Necrosis-Classic\\UI\\"..name
 end
 
 function GraphicsHelper:GetWoWTexture(category, name)
@@ -75,4 +75,15 @@ function GraphicsHelper:CreateSlider(parentFrame, name, min, max, step, height, 
 	sl:ClearAllPoints()
 	sl:SetPoint("TOPLEFT", x, y)
     return sl
+end
+
+function GraphicsHelper:CreateButton(parentFrame, text, x, y, onClickFunction)
+	local btn = CreateFrame("Button", nil, parentFrame, "OptionsButtonTemplate")
+	btn:SetText(text)
+	btn:EnableMouse(true)
+	btn:Show()
+	btn:ClearAllPoints()
+	btn:SetPoint("TOPRIGHT", x, y)
+	btn:SetScript("OnClick", onClickFunction)
+	return btn
 end

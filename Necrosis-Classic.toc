@@ -1,4 +1,4 @@
-## Interface: 11302
+## Interface: 11303
 ## Title: Necrosis-Classic
 ## Title-ruRU: Necrosis-Classic (Русский)
 ## Title-frFR: Necrosis-Classic (Français)
@@ -16,13 +16,18 @@
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: NecrosisConfig
 
+#11302
+
 Necrosis.xml
 
 InitializeNamespaces.lua
 GraphicsHelper.lua
 EventHub.lua
 
-Gui\ViewModels\MessagesModel.lua
+Gui\MessagesView.lua
+Gui\MessagesViewModel.lua
+Gui\SphereView.lua
+Gui\SphereViewModel.lua
 
 Localization\Functions-fr.lua
 Localization\Functions-en.lua
@@ -56,8 +61,8 @@ XML\Attributes.lua
 XML\XML.lua
 
 XML\Panel.lua
-XML\Options-Messages.lua
-XML\Options-Sphere.lua
+#XML\Options-Messages.lua
+#XML\Options-Sphere.lua
 XML\Options-Buttons.lua
 XML\Options-Menus.lua
 XML\Options-Timers.lua
