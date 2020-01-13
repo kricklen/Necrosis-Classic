@@ -351,65 +351,80 @@ function Localization.enUS()
 		},
 	}
 
+	Necrosis.Speech.Mount = {
+		-- Sentences for the stead summon
+		[1] = {
+			"Hey, I'm late! Let's find a horse that roxes!",
+		},
+		[2] = {
+			"<emote> is giggling gloomily...",
+			"<yell>I am summoning a steed from nightmare!",
+		},
+		[3] = {
+			"I call forth the flames of feet to make my travels swift!",
+		}
+	}
+
 	Necrosis.Speech.ShortMessage = {
 		-- Soulstone
-		{
+		Soulstone = {
 			-- {"<after>{X} --> <target> is soulstoned! <-- {X}"},
 			-- {"<after>{S} --> <target> is soulstoned! <-- {S}"}
 			{"{X} --> <target> test 123! <-- {X}", "abc"},
 			{"{S} --> <target> test 456! <-- {S}"}
 		},
 		-- Ritual of Summoning
-		{
+		RitualOfSummoning = {
 			{"<after>{X} --> Summoning <target> - please click on the portal <-- {X}"}
 		},
 		-- Ritual of Souls
-		{
+		RitualOfSouls = {
 			{"Casting Ritual of Souls"}
 		},
+		-- Summon mount
+		Mount = {
+			{"Come forth my steed!"}
+		},
+		Demon = {
+			{"Summoning <pet>"}
+		},
+		DemonicSacrifice = {
+			{"Sorry <pet>, i need your essence..."}
+		}
+	}
+
+	Necrosis.Speech.DemonicSacrifice = {
+		Imp = {
+			[1] = {
+				"Begone and give me your power!"
+			},
+		},
+		Voidwalker = {
+			[1] = {
+				"Return to the void and leave me your gift!"
+			},
+		},
+		Succubus = {
+			[1] = {
+				"Sorry <pet>, it would not have worked between us, but you still have something i can use..."
+			}
+		},
+		Felhunter = {
+			[1] = {
+				"Return to your world...",
+				"<after><emote> absorbs a cloud of nether."
+			},
+		},
+		Felguard = {
+			[1] = {
+				"Please return in the Limbs you are from, Demon, and give me your power in exchange!"
+			},
+		}
 	}
 
 	Necrosis.Speech.Demon = {
-		-- Imp
-		[1] = {
-			[1] = {
-				"You crappy nasty little Imp, stop sulking and get over here to help! AND THAT'S AN ORDER!",
-			},
-			[2] = {
-				"<pet>! HEEL! NOW!",
-			},
-		},
-		-- Voidwalker
-		[2] = {
-			[1] = {
-				"Oops, I'll probably need an idiot to be knocked for me...",
-				"<pet>, please help!",
-			},
-		},
-		-- Succubus
-		[3] = {
-			[1] = {
-				"<pet> baby, please help me sweetheart!",
-			},
-		},
-		-- Felhunter
-		[4] = {
-			[1] = {
-				"<pet> ! <pet>! Come on boy, come here! <pet>!",
-			},
-		},
-		-- Felguard
-		[5] = {
-			[1] = {
-				"<emote> is concentrating hard on Demoniac knowledge...",
-				"I'll give you a soul if you come to me, Felguard! Please hear my command!",
-				"<after>Obey now, <pet>!",
-				"<after><emote>looks in a bag, then throws a mysterious shard at <pet>",
-				"<sacrifice>Please return in the Limbs you are from, Demon, and give me your power in exchange!"
-			},
-		},
 		-- Sentences for the first summon : When Necrosis do not know the name of your demons yet
-		[6] = {
+		FirstTime = {
 			[1] = {
 				"Fishing? Yes I love fishing... Look!",
 				"I close my eyes, I move my fingers like that...",
@@ -420,17 +435,41 @@ function Localization.enUS()
 				"COME TO ME, CREATURE OF HELL AND NIGHTMARE!",
 			},
 		},
-		-- Sentences for the stead summon
-		[7] = {
+		-- Imp
+		Imp = {
 			[1] = {
-				"Hey, I'm late! Let's find a horse that roxes!",
+				"You crappy nasty little Imp, stop sulking and get over here to help! AND THAT'S AN ORDER!",
 			},
 			[2] = {
-				"<emote> is giggling gloomily...",
-				"<yell>I am summoning a steed from nightmare!",
+				"<pet>! HEEL! NOW!",
 			},
-			[3] = {
-				"I call forth the flames of feet to make my travels swift!",
+		},
+		-- Voidwalker
+		Voidwalker = {
+			[1] = {
+				"Oops, I'll probably need an idiot to be knocked for me...",
+				"<pet>, please help!",
+			},
+		},
+		-- Succubus
+		Succubus = {
+			[1] = {
+				"<pet> baby, please help me sweetheart!",
+			},
+		},
+		-- Felhunter
+		Felhunter = {
+			[1] = {
+				"<pet> ! <pet>! Come on boy, come here! <pet>!",
+			},
+		},
+		-- Felguard
+		Felguard = {
+			[1] = {
+				"<emote> is concentrating hard on Demoniac knowledge...",
+				"I'll give you a soul if you come to me, Felguard! Please hear my command!",
+				"<after>Obey now, <pet>!",
+				"<after><emote>looks in a bag, then throws a mysterious shard at <pet>"
 			},
 		}
 	}

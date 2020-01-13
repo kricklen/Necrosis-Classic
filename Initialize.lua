@@ -85,9 +85,9 @@ function Necrosis:Initialize(Config)
 		NecrosisConfig = {}
 		NecrosisConfig = Config
 		NecrosisConfig.Version = Necrosis.Data.LastConfig
-		self:Msg(self.ChatMessage.Interface.DefaultConfig, "USER")
+		self.Chat:_Msg(self.ChatMessage.Interface.DefaultConfig, "USER")
 	else
-		self:Msg(self.ChatMessage.Interface.UserConfig, "USER")
+		self.Chat:_Msg(self.ChatMessage.Interface.UserConfig, "USER")
 	end
 
 	self:CreateWarlockUI()
@@ -96,7 +96,7 @@ function Necrosis:Initialize(Config)
 	-- Exécution des fonctions de démarrage
 	-----------------------------------------------------------
 	-- Affichage d'un message sur la console
-	self:Msg(self.ChatMessage.Interface.Welcome, "USER")
+	self.Chat:_Msg(self.ChatMessage.Interface.Welcome, "USER")
 	-- Création de la liste des sorts disponibles
 	for index in ipairs(self.Spell) do
 		self.Spell[index].ID = nil
@@ -183,7 +183,7 @@ function Necrosis.SlashHandler(arg1)
 		ReloadUI()
 	elseif arg1:lower():find("glasofruix") then
 		NecrosisConfig.Smooth = not NecrosisConfig.Smooth
-		Necrosis:Msg("SpellTimer smoothing  : <lightBlue>Toggled")
+		Necrosis.Chat:_Msg("SpellTimer smoothing  : <lightBlue>Toggled")
 	else
 		Necrosis:OpenConfigPanel()
 	end

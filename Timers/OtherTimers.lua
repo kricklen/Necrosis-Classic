@@ -109,7 +109,7 @@ function Necrosis:TextTimerUpdate(SpellTimer, SpellGroup)
 	for index in ipairs(SpellTimer) do
 		-- Changement de la couleur suivant le temps restant
 		local percent = (floor(SpellTimer[index].TimeMax - Now) / SpellTimer[index].Time)*100
-		local color = NecrosisTimerColor(percent)
+		local color = self:NecrosisTimerColor(percent)
 
 		-- Affichage de l'entête si on change de groupe
 		if not (SpellTimer[index].Group == LastGroup) and SpellTimer[index].Group > 3 then
@@ -157,6 +157,31 @@ function Necrosis:TextTimerUpdate(SpellTimer, SpellGroup)
 			display = display.."\n";
 		end
 	end
-	display = self:MsgAddColor(display)
+	display = self.Chat:_ColorizeMessage(display)
 	NecrosisListSpells:SetText(display)
+end
+
+-- Adjusts the timer color based on the percentage of time left.
+function Necrosis:NecrosisTimerColor(percent)
+	local color = "<brightGreen>"
+	if (percent < 10) then
+		color = "<red>"
+	elseif (percent < 20) then
+		color = "<redOrange>"
+	elseif (percent < 30) then
+		color = "<darkOrange>"
+	elseif (percent < 40) then
+		color = "<dirtyOrange>"
+	elseif (percent < 50) then
+		color = "<darkYellow>"
+	elseif (percent < 60) then
+		color = "<lightYellow>"
+	elseif (percent < 70) then
+		color = "<yellowGreen>"
+	elseif (percent < 80) then
+		color = "<lightGreen1>"
+	elseif (percent < 90) then
+		color = "<lightGreen2>"
+	end
+	return color
 end

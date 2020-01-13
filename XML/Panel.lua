@@ -50,7 +50,7 @@ function Necrosis:OpenConfigPanel()
 	-- Help messages are displayed
 	if self.ChatMessage.Help[1] then
 		for i = 1, #self.ChatMessage.Help, 1 do
-			self:Msg(self.ChatMessage.Help[i], "USER")
+			self.Chat:_Msg(self.ChatMessage.Help[i], "USER")
 		end
 	end
 

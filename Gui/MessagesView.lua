@@ -96,7 +96,7 @@ end
 
 function _mv:cbChatType_Click()
 	NecrosisConfig.ChatType = not self:GetChecked()
-	Necrosis:Msg(Necrosis.Config.Messages.Position)
+	Necrosis.Chat:_Msg(Necrosis.Config.Messages.Position)
 end
 
 function _mv:cbSpeech_Click()

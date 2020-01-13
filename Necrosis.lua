@@ -360,6 +360,7 @@ function Necrosis:OnLoad(event)
 
 			-- Detecting the type of demon present at the connection || Détection du Type de démon présent à la connexion
 			Local.Summon.DemonType = UnitCreatureFamily("pet")
+			print("Necrosis:OnLoad: Local.Summon.DemonType = "..Local.Summon.DemonType)
 		end
 	end
 end
@@ -399,7 +400,7 @@ function Necrosis:OnUpdate(something, elapsed)
 						local StoneFade = false
 						-- If the timer was that of Soul Stone, warn the Warlock || Si le timer était celui de la Pierre d'âme, on prévient le Démoniste
 						if Local.TimerManagement.SpellTimer[index].Name == self.Spell[11].Name then
-							self:Msg(self.ChatMessage.Information.SoulstoneEnd)
+							self.Chat:_Msg(self.ChatMessage.Information.SoulstoneEnd)
 							if NecrosisConfig.Sound then PlaySoundFile(self.Sound.SoulstoneEnd) end
 							StoneFade = true
 						elseif Local.TimerManagement.SpellTimer[index].Name == self.Spell[9].Name then
@@ -623,7 +624,7 @@ function Necrosis:OnEvent(self, event,...)
 			Necrosis:SelfEffect("DEBUFF", Effect)
 		-- Debian Detection || Détection du Déban
 		elseif subevent == "SPELL_AURA_REMOVED" and destGUID == UnitGUID("focus") and Local.TimerManagement.Banish and Effect == Necrosis.Spell[9].Name then
-			Necrosis:Msg("BAN ! BAN ! BAN !")
+			Necrosis.Chat:_Msg("BAN ! BAN ! BAN !")
 			Necrosis:RetraitTimerParNom(Necrosis.Spell[9], Local.TimerManagement)
 				Local.TimerManagement.Banish = false
 		-- Resist / immune detection || Détection des résists / immunes
@@ -719,13 +720,14 @@ function Necrosis:ChangeDemon()
 			Local.Summon.DemonEnslaved = false
 			Local.TimerManagement = self:RetraitTimerParNom(self.Spell[10].Name, Local.TimerManagement)
 			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.EnslaveEnd) end
-			self:Msg(self.ChatMessage.Information.EnslaveBreak, "USER")
+			self.Chat:_Msg(self.ChatMessage.Information.EnslaveBreak, "USER")
 		end
 	end
 
 	-- If the demon is not enslaved we define its title, and we update its name in Necrosis || Si le démon n'est pas asservi on définit son titre, et on met à jour son nom dans Necrosis
 	Local.Summon.LastDemonType = Local.Summon.DemonType
 	Local.Summon.DemonType = UnitCreatureFamily("pet")
+	print("Necrosis:ChangeDemon(): UnitCreatureFamily = "..tostring(Local.Summon.DemonType))
 	for i = 1, #self.Translation.DemonName, 1 do
 		if Local.Summon.DemonType == self.Translation.DemonName[i] and not (NecrosisConfig.PetName[i] or (UnitName("pet") == UNKNOWNOBJECT)) then
 			NecrosisConfig.PetName[i] = UnitName("pet")
@@ -778,13 +780,13 @@ function Necrosis:SelfEffect(action, nom)
 		-- If Backlash, to display the icon and we proc the sound || si Contrecoup, pouf on affiche l'icone et on proc le son
 		-- If By-effect, one-on-one icon and one proc the sound || if By-effect, pouf one posts the icon and one proc the sound
 		elseif nom == Necrosis.Translation.Proc.Backlash and NecrosisConfig.ShadowTranceAlert then
-			self:Msg(self.ProcText.Backlash, "USER")
+			self.Chat:_Msg(self.ProcText.Backlash, "USER")
 			if NecrosisConfig.Sound then PlaySoundFile(Necrosis.Sound.Backlash) end
 			NecrosisBacklashButton:Show()
 		-- If Twilight, to display the icon and sound || si Crépuscule, pouf on affiche l'icone et on proc le son
 		-- If Twilight / Nightfall, puff one posts the icon and one proc the sound || if Twilight/Nightfall, pouf one posts the icon and one proc the sound
 		elseif nom == Necrosis.Translation.Proc.ShadowTrance and NecrosisConfig.ShadowTranceAlert then
-			self:Msg(self.ProcText.ShadowTrance, "USER")
+			self.Chat:_Msg(self.ProcText.ShadowTrance, "USER")
 			if NecrosisConfig.Sound then PlaySoundFile(Necrosis.Sound.ShadowTrance) end
 			NecrosisShadowTranceButton:Show()
 		end
@@ -1956,9 +1958,9 @@ function Necrosis:BagExplore(arg)
 		end
 		if Local.Soulshard.Count > AncienCompte and Local.Soulshard.Count == CompteMax then
 			if (NecrosisConfig.SoulshardDestroy) then
-				self:Msg(self.ChatMessage.Bag.FullPrefix..GetBagName(NecrosisConfig.SoulshardContainer)..self.ChatMessage.Bag.FullDestroySuffix)
+				self.Chat:_Msg(self.ChatMessage.Bag.FullPrefix..GetBagName(NecrosisConfig.SoulshardContainer)..self.ChatMessage.Bag.FullDestroySuffix)
 			else
-				self:Msg(self.ChatMessage.Bag.FullPrefix..GetBagName(NecrosisConfig.SoulshardContainer)..self.ChatMessage.Bag.FullSuffix)
+				self.Chat:_Msg(self.ChatMessage.Bag.FullPrefix..GetBagName(NecrosisConfig.SoulshardContainer)..self.ChatMessage.Bag.FullSuffix)
 			end
 		end
 	end
@@ -2389,7 +2391,7 @@ function Necrosis:ShowAntiFearWarning()
 		-- Antifear button is currently not visible, we have to change that
 		if not Local.Warning.Antifear.Actif then
 			Local.Warning.Antifear.Actif = true
-			self:Msg(self.ChatMessage.Information.FearProtect, "USER")
+			self.Chat:_Msg(self.ChatMessage.Information.FearProtect, "USER")
 			NecrosisAntiFearButton:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear"..Local.Warning.Antifear.Icon[Actif].."-02"))
 			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.Fear) end
 			ShowUIPanel(NecrosisAntiFearButton)
