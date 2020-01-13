@@ -38,7 +38,7 @@
 -- CREATING THE OPTIONS FRAME
 ------------------------------------------------------------------------------------------------------
 
-Gui.MessagesView = {
+Necrosis.Gui.MessagesView = {
 	Frame = false,
 	
 	ddLanguage = false,
@@ -56,7 +56,7 @@ Gui.MessagesView = {
 }
 
 -- Use a local variable for easier referencing
-local _mv = Gui.MessagesView
+local _mv = Necrosis.Gui.MessagesView
 
 -- Handler to initialize language dropdown
 function _mv.LanguageDropDownInit(dd)

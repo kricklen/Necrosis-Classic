@@ -527,6 +527,10 @@ function Necrosis.Chat:_Msg(msg, channel)
 			channel = "SAY"
 		end
 	end
+-- try this
+	pcall(SendChatMessage, msg, _G.PARTY)
+-- and check this: https://wow.gamepedia.com/Viewing_Blizzard%27s_interface_code
+
 	print("Necrosis.Chat:_Msg: "..channel..", "..msg)
 	if (channel == "PARTY") then
 		SendChatMessage(msg, _G.PARTY)
