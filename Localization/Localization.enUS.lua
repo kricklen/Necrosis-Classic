@@ -204,7 +204,8 @@ function Localization.enUS()
 		["Activer les sons"] = "Activate sounds",
 		["Alerter quand la cible est insensible a la peur"] = "Warn when the target cannot be feared",
 		["Alerter quand la cible peut etre banie ou asservie"] = "Warn when the target is banishable or enslavable",
-		["M'alerter quand j'entre en Transe"] = "Warn me when I enter a Trance State"
+		["M'alerter quand j'entre en Transe"] = "Warn me when I enter a Trance State",
+		DemonicSacrifice = "Activate random speeches for demonic sacrifice"
 	}
 
 	Necrosis.Config.Sphere = {
@@ -291,6 +292,16 @@ function Localization.enUS()
 		["Taille des boutons caches"] = "Size of hidden buttons"
 	}
 
+	Necrosis.Translation.DemonType = {
+		Imp 		= "Imp",
+		Voidwalker 	= "Voidwalker",
+		Succubus 	= "Succubus",
+		Felhunter 	= "Felhunter",
+		Felguard 	= "Felguard",
+		Inferno 	= "Inferno",
+		Doomguard 	= "Doomguard"
+	}
+	
 	-- Chat messages
 	Necrosis.Speech.TP = {
 		[1] = {
@@ -396,7 +407,8 @@ function Localization.enUS()
 	Necrosis.Speech.DemonicSacrifice = {
 		Imp = {
 			[1] = {
-				"Begone and give me your power!"
+				"<emote>shoos at <pet>.",
+				"<after><emote>starts to glow faintly."
 			},
 		},
 		Voidwalker = {
@@ -438,11 +450,10 @@ function Localization.enUS()
 		-- Imp
 		Imp = {
 			[1] = {
-				"You crappy nasty little Imp, stop sulking and get over here to help! AND THAT'S AN ORDER!",
-			},
-			[2] = {
-				"<pet>! HEEL! NOW!",
-			},
+				--"You crappy nasty little Imp, stop sulking and get over here to help! AND THAT'S AN ORDER!",
+				"<emote>makes some strange gestures...",
+				"<after><emote>smirks slightly."
+			}
 		},
 		-- Voidwalker
 		Voidwalker = {

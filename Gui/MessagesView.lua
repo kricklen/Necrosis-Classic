@@ -49,6 +49,7 @@ Necrosis.Gui.MessagesView = {
 	cbDemonMessages = false,
 	cbMountMessages = false,
 	cbRoSMessages = false,
+	cbDemonicSacrifice = false,
 	cbSound = false,
 	cbAntiFearAlert = false,
 	cbBanishAlert = false,
@@ -110,11 +111,6 @@ end
 
 function _mv:cbShortMessages_Click()
 	NecrosisConfig.SM = self:GetChecked()
-	if NecrosisConfig.SM then
-		_mv:EnableShortMessages()
-	else
-		_mv:EnableMessages()
-	end
 end
 
 function _mv:cbDemonMessages_Click()
@@ -127,6 +123,10 @@ end
 
 function _mv:cbRoSMessages_Click()
 	NecrosisConfig.RoSSummon = self:GetChecked()
+end
+
+function _mv:cbDemonicSacrifice_Click()
+	NecrosisConfig.DemonicSacrifice = self:GetChecked()
 end
 
 function _mv:cbSound_Click()
@@ -150,6 +150,7 @@ function _mv:DisableMessages()
 	self.cbDemonMessages:Disable()
 	self.cbMountMessages:Disable()
 	self.cbRoSMessages:Disable()
+	self.cbDemonicSacrifice:Disable()
 end
 
 function _mv:EnableMessages()
@@ -157,16 +158,7 @@ function _mv:EnableMessages()
 	self.cbDemonMessages:Enable()
 	self.cbMountMessages:Enable()
 	self.cbRoSMessages:Enable()
-end
-
-function _mv:EnableShortMessages()
-	self.cbShortMessages:Enable()
-	self.cbDemonMessages:Disable()
-	self.cbDemonMessages:SetChecked(false)
-	self.cbMountMessages:Disable()
-	self.cbMountMessages:SetChecked(false)
-	self.cbRoSMessages:Disable()
-	self.cbRoSMessages:SetChecked(false)
+	self.cbDemonicSacrifice:Enable()
 end
 
 -- Handler to update texts when language changes
@@ -178,6 +170,7 @@ function _mv.UpdateTexts()
     _mv.cbDemonMessages:SetText(Necrosis.Config.Messages["Activer egalement les messages pour les Demons"])
     _mv.cbMountMessages:SetText(Necrosis.Config.Messages["Activer egalement les messages pour les Montures"])
     _mv.cbRoSMessages:SetText(Necrosis.Config.Messages["Activer egalement les messages pour le Rituel des ames"])
+    _mv.cbDemonicSacrifice:SetText(Necrosis.Config.Messages["DemonicSacrifice"])
     _mv.cbSound:SetText(Necrosis.Config.Messages["Activer les sons"])
     _mv.cbAntiFearAlert:SetText(Necrosis.Config.Messages["Alerter quand la cible est insensible a la peur"])
     _mv.cbBanishAlert:SetText(Necrosis.Config.Messages["Alerter quand la cible peut etre banie ou asservie"])
@@ -214,7 +207,7 @@ function _mv:Show()
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["Afficher les messages dans la zone systeme"],
-				0, -56,
+				0, -50,
 				self.cbChatType_Click
 			)
 		self.cbChatType:SetChecked(not NecrosisConfig.ChatType)
@@ -224,23 +217,17 @@ function _mv:Show()
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["Activer les messages aleatoires de TP et de Rez"],
-				0, -84,
+				0, -72,
 				self.cbSpeech_Click
 			)
 		self.cbSpeech:SetChecked(NecrosisConfig.ChatMsg)
-
-		self.btnSpeechTest = GraphicsHelper:CreateButton(self.Frame, "Test", 0, -84, 
-		function()
-			print("test chat")
-			Necrosis.Chat:_Msg("test", "WORLD")
-		end)
 
 		-- Activate short messages
 		self.cbShortMessages =
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["Utiliser des messages courts"],
-				20, -112,
+				20, -94,
 				self.cbShortMessages_Click
 			)
 		self.cbShortMessages:SetChecked(NecrosisConfig.SM)
@@ -250,7 +237,7 @@ function _mv:Show()
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["Activer egalement les messages pour les Demons"],
-				20, -140,
+				20, -116,
 				self.cbDemonMessages_Click
 			)
 		self.cbDemonMessages:SetChecked(NecrosisConfig.DemonSummon)
@@ -260,7 +247,7 @@ function _mv:Show()
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["Activer egalement les messages pour les Montures"],
-				20, -168,
+				20, -138,
 				self.cbMountMessages_Click
 			)
 		self.cbMountMessages:SetChecked(NecrosisConfig.SteedSummon)
@@ -270,17 +257,27 @@ function _mv:Show()
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["Activer egalement les messages pour le Rituel des ames"],
-				20, -196,
+				20, -160,
 				self.cbRoSMessages_Click
 			)
 		self.cbRoSMessages:SetChecked(NecrosisConfig.RoSSummon)
+
+		-- Demonic Sacrifice messages
+		self.cbDemonicSacrifice =
+			GraphicsHelper:CreateCheckButton(
+				self.Frame,
+				Necrosis.Config.Messages["DemonicSacrifice"],
+				20, -182,
+				self.cbDemonicSacrifice_Click
+			)
+		self.cbDemonicSacrifice:SetChecked(NecrosisConfig.DemonicSacrifice)
 
 		-- Sound alerts
 		self.cbSound =
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["Activer les sons"],
-				0, -224,
+				0, -204,
 				self.cbSound_Click
 			)
 		self.cbSound:SetChecked(NecrosisConfig.Sound)
@@ -290,7 +287,7 @@ function _mv:Show()
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["Alerter quand la cible est insensible a la peur"],
-				0, -252,
+				0, -226,
 				self.cbAntiFearAlert_Click
 			)
 		self.cbAntiFearAlert:SetChecked(NecrosisConfig.AntiFearAlert)
@@ -300,7 +297,7 @@ function _mv:Show()
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["Alerter quand la cible peut etre banie ou asservie"],
-				0, -280,
+				0, -248,
 				self.cbBanishAlert_Click
 			)
 		self.cbBanishAlert:SetChecked(NecrosisConfig.BanishAlert)
@@ -310,7 +307,7 @@ function _mv:Show()
 			GraphicsHelper:CreateCheckButton(
 				self.Frame,
 				Necrosis.Config.Messages["M'alerter quand j'entre en Transe"],
-				0, -308,
+				0, -270,
 				self.cbTranceAlert_Click
 			)
 		self.cbTranceAlert:SetChecked(NecrosisConfig.ShadowTranceAlert)
@@ -321,8 +318,6 @@ function _mv:Show()
 		-- Apply initial configuration
 		if not NecrosisConfig.ChatMsg then
 			self:DisableMessages()
-		elseif NecrosisConfig.SM then
-			self:EnableShortMessages()
 		else
 			self:EnableMessages()
 		end

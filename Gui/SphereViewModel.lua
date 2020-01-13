@@ -1,3 +1,3 @@
-Gui.SphereViewModel = {
+Necrosis.Gui.SphereViewModel = {
     
 }

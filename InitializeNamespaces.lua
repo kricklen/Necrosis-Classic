@@ -1,8 +1,13 @@
-Gui = {}
-
 Localization = {}
 
-Necrosis = {}
+Necrosis = {
+	Config = {},
+	CurrentEnv = {},
+	Gui = {},
+	Speech = {},
+	Translation = {},
+	Unit = {}
+}
 
 Necrosis.Data = {
 	Version = GetAddOnMetadata("Necrosis-Classic", "Version"),
@@ -11,11 +16,6 @@ Necrosis.Data = {
 }
 Necrosis.Data.Label = Necrosis.Data.AppName.." "..Necrosis.Data.Version
 
-Necrosis.Speech = {}
-Necrosis.Unit = {}
-Necrosis.Translation = {}
-
-Necrosis.Config = {}
 
 -- Global variables || Variables globales
 NecrosisConfig = {}

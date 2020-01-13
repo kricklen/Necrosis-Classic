@@ -25,7 +25,7 @@ GraphicsHelper.lua
 EventHub.lua
 
 Gui\MessagesView.lua
-Gui\MessagesViewModel.lua
+#Gui\MessagesViewModel.lua
 Gui\SphereView.lua
 Gui\SphereViewModel.lua
 

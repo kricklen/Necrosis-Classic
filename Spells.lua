@@ -128,7 +128,7 @@ function Necrosis:SpellLocalize(tooltip)
 			[41] = {Name = GetSpellInfo(11689),	Mana = 50,				Length = 0,	     Type = 0}, -- Life Tap || Connexion
 			[42] = {Name = GetSpellInfo(133),	Mana = 50,				Length = 12,	Type = 2}, -- NOPE NOT IN Classic  Haunt || Hanter
 			[43] = {Name = GetSpellInfo(28610),	Mana = 50,				Length = 30,	Type = 0}, -- Shadow Ward || Gardien de l'ombre
-			[44] = {Name = GetSpellInfo(19443),	Mana = 50,				Length = 60,	Type = 3}, -- Sacrifice || Sacrifice démoniaque 
+			[44] = {Name = GetSpellInfo(18788),	Mana = 50,				Length = 60,	Type = 3}, -- Demonic Sacrifice || Sacrifice démoniaque 
 			[45] = {Name = GetSpellInfo(11661),	Mana = 50,				Length = 0,		Type = 0}, -- Shadow Bolt
 			[46] = {Name = GetSpellInfo(133),	Mana = 50,				Length = 18,	Type = 6}, -- NOPE NOT IN Classic  Unstable Affliction || Affliction instable
 			[47] = {Name = GetSpellInfo(133),	Mana = 50,				Length = 0,		Type = 0}, -- NOPE NOT IN Classic  Fel Armor || Gangrarmure

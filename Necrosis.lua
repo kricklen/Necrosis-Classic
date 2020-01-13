@@ -258,22 +258,22 @@ Local.TimerManagement = {
 	LastSpell = {}
 }
 
--- Variables of the invocation messages || Variables des messages d'invocation
-Local.SpeechManagement = {
-	-- Latest messages selected || Derniers messages sélectionnés
-	-- Added 'RoS = 0' by Draven (April 3rd, 2008) || Added 'RoS = 0' by Draven (April 3rd, 2008)
-	LastSpeech = {Pet = 0, Steed = 0, Rez = 0, TP = 0, RoS = 0},
-	-- Messages to use after the spell succeeds || Messages à utiliser après la réussite du sort
-	SpellSucceed = {
-		-- Added 'RoS = setmetatable ({}, metatable),' by Draven (April 3rd, 2008) || Added 'RoS = setmetatable({}, metatable),' by Draven (April 3rd, 2008)
-		RoS = setmetatable({}, metatable),
-		Pet = setmetatable({}, metatable),
-		Steed = setmetatable({}, metatable),
-		Rez = setmetatable({}, metatable),
-		TP = setmetatable({}, metatable),
-		Sacrifice = setmetatable({}, metatable)
-	},
-}
+-- -- Variables of the invocation messages || Variables des messages d'invocation
+-- Local.SpeechManagement = {
+-- 	-- Latest messages selected || Derniers messages sélectionnés
+-- 	-- Added 'RoS = 0' by Draven (April 3rd, 2008) || Added 'RoS = 0' by Draven (April 3rd, 2008)
+-- 	LastSpeech = {Pet = 0, Steed = 0, Rez = 0, TP = 0, RoS = 0},
+-- 	-- Messages to use after the spell succeeds || Messages à utiliser après la réussite du sort
+-- 	SpellSucceed = {
+-- 		-- Added 'RoS = setmetatable ({}, metatable),' by Draven (April 3rd, 2008) || Added 'RoS = setmetatable({}, metatable),' by Draven (April 3rd, 2008)
+-- 		RoS = setmetatable({}, metatable),
+-- 		Pet = setmetatable({}, metatable),
+-- 		Steed = setmetatable({}, metatable),
+-- 		Rez = setmetatable({}, metatable),
+-- 		TP = setmetatable({}, metatable),
+-- 		Sacrifice = setmetatable({}, metatable)
+-- 	},
+-- }
 
 -- Variables used for managing summoning and stone buttons || Variables utilisées pour la gestion des boutons d'invocation et d'utilisation des pierres
 Local.Stone = {
@@ -334,7 +334,7 @@ Local.LastUpdate = {0, 0}
 function Necrosis:OnLoad(event)
 	if event == "SPELLS_CHANGED" then
 		local _, Class = UnitClass("player")
-			if Class == "WARLOCK" then
+		if Class == "WARLOCK" then
 
 			for index in ipairs(Necrosis.Spell) do
 				Necrosis.Spell[index].ID = nil
@@ -359,8 +359,8 @@ function Necrosis:OnLoad(event)
 			end
 
 			-- Detecting the type of demon present at the connection || Détection du Type de démon présent à la connexion
-			Local.Summon.DemonType = UnitCreatureFamily("pet")
-			print("Necrosis:OnLoad: Local.Summon.DemonType = "..Local.Summon.DemonType)
+			self.CurrentEnv.DemonType = UnitCreatureFamily("pet")
+			Local.Summon.DemonType = self.CurrentEnv.DemonType
 		end
 	end
 end
@@ -522,13 +522,13 @@ function Necrosis:OnEvent(self, event,...)
 	-- We also save the name of the target of the spell as well as its level || On sauve également le nom de la cible du sort ainsi que son niveau
 	elseif (event == "UNIT_SPELLCAST_SENT") then
 
-		-- print('spellcast send : arg 1 =   ' .. arg1 )
-		-- print('spellcast send : arg 2 =   ' .. arg2 )
-		-- print('spellcast send : arg 3 =   ' .. arg3 )
-		-- print('spellcast send : arg 4 =   ' .. arg4 )
-		-- print('spellcast send : arg 5 =   ' .. arg5 )
-		-- print('spellcast send : arg 6 =   ' .. arg6 )
-		_, Local.SpellCasted.Name, Local.SpellCasted.Rank, Local.SpellCasted.TargetName = arg1, arg2, arg3, arg4
+		-- print('spellcast send : arg 1 =   ' .. tostring(arg1) )
+		-- print('spellcast send : arg 2 =   ' .. tostring(arg2) )
+		-- print('spellcast send : arg 3 =   ' .. tostring(arg3) )
+		-- print('spellcast send : arg 4 =   ' .. tostring(arg4) )
+		-- print('spellcast send : arg 5 =   ' .. tostring(arg5) )
+		-- print('spellcast send : arg 6 =   ' .. tostring(arg6) )
+		--_, Local.SpellCasted.Name, Local.SpellCasted.Rank, Local.SpellCasted.TargetName = arg1, arg2, arg3, arg4
 		-- local castedSpellName, castedSpellRank = GetSpellInfo(696)
 		Local.SpellCasted.TargetName = arg2
 		Local.SpellCasted.TargetGUID = UnitGUID("target")
@@ -538,7 +538,6 @@ function Necrosis:OnEvent(self, event,...)
 
 		if not Local.SpellCasted.TargetGUID then
 			Local.SpellCasted.TargetGUID = ""
-
 		end
 
 		if (not Local.SpellCasted.TargetName or Local.SpellCasted.TargetName == "") and UnitName("target") then
@@ -551,7 +550,7 @@ function Necrosis:OnEvent(self, event,...)
 		if not Local.SpellCasted.TargetLevel then
 			Local.SpellCasted.TargetLevel = ""
 		end
-		Local.SpeechManagement = Necrosis:Speech_It(Local.SpellCasted, Local.SpeechManagement, metatable)
+		Necrosis:Speech_It(Local.SpellCasted)
 
 	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
 	elseif (event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == player then
@@ -725,9 +724,17 @@ function Necrosis:ChangeDemon()
 	end
 
 	-- If the demon is not enslaved we define its title, and we update its name in Necrosis || Si le démon n'est pas asservi on définit son titre, et on met à jour son nom dans Necrosis
-	Local.Summon.LastDemonType = Local.Summon.DemonType
-	Local.Summon.DemonType = UnitCreatureFamily("pet")
-	print("Necrosis:ChangeDemon(): UnitCreatureFamily = "..tostring(Local.Summon.DemonType))
+	Local.Summon.LastDemonType = self.CurrentEnv.DemonType
+	self.CurrentEnv.DemonType = UnitCreatureFamily("pet")
+	Local.Summon.DemonType = self.CurrentEnv.DemonType
+
+	if self.CurrentEnv.DemonType then
+		NecrosisConfig.PetName[self.CurrentEnv.DemonType] = UnitName("pet")
+	else
+		print("Demon vanished")
+		-- Demon vanished, might have been a corpse already
+	end
+
 	for i = 1, #self.Translation.DemonName, 1 do
 		if Local.Summon.DemonType == self.Translation.DemonName[i] and not (NecrosisConfig.PetName[i] or (UnitName("pet") == UNKNOWNOBJECT)) then
 			NecrosisConfig.PetName[i] = UnitName("pet")
@@ -827,7 +834,7 @@ function Necrosis:SpellManagement()
 	if (Local.SpellCasted.Name) then
 		-- print ('casting on target '..Local.SpellCasted.TargetName)
 		-- Messages Posts Cast (Démons et TP)
-		Local.SpeechManagement.SpellSucceed = self:Speech_Then(Local.SpellCasted, Local.SpeechManagement.DemonName, Local.SpeechManagement.SpellSucceed)
+		self:Speech_Then()
 
 		-- Special case: Haunt refreshes Corruption (if present) on a target
 		-- if (Local.SpellCasted.Name == self.Spell[42].Name) then
@@ -1008,6 +1015,7 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 
 	-- We look at whether corrupt domination, shadow guard or curse amplification are up (for tooltips) ||On regarde si la domination corrompue, le gardien de l'ombre ou l'amplification de malédiction sont up (pour tooltips)
 	local start, duration, start2, duration2, start3, duration3
+
 	if self.Spell[15].ID then
 		start, duration = GetSpellCooldown(self.Spell[15].ID, BOOKTYPE_SPELL)
 	else
@@ -2180,6 +2188,11 @@ function Necrosis:SpellSetup()
 			spellName = self.Translation.Misc.Create .. " " .. self.Translation.Item.Healthstone
 		end
 		if(spellName:find(self.Translation.Misc.Create .. " " .. self.Translation.Item.Soulstone) )then
+
+			print("Necrosis:SpellSetup(): "..spellName..", "..spellID..", "..self.Translation.Misc.Create..", "..self.Translation.Item.Soulstone)
+			local infoType, infoId = GetSpellBookItemInfo(spellName)
+print("Info: "..tostring(infoType)..", "..tostring(infoId))
+
 			subSpellName= Necrosis:StoneToRank(spellName)
 			spellName = self.Translation.Misc.Create .. " " .. self.Translation.Item.Soulstone
 		end

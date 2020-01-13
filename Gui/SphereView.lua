@@ -38,25 +38,65 @@
 -- CREATION DE LA FRAME DES OPTIONS
 ------------------------------------------------------------------------------------------------------
 
-Gui.SphereView = {
+Necrosis.Gui.SphereView = {
+	ButtonX = false,
+	ButtonY = false,
 	Frame = false
 }
 
+local _sv = Necrosis.Gui.SphereView
+
+function _sv:slSphereSize_OnEnter()
+	_sv.ButtonX, _sv.ButtonY = NecrosisButton:GetCenter()
+	_sv.ButtonX = _sv.ButtonX * (NecrosisConfig.NecrosisButtonScale / 100)
+	_sv.ButtonY = _sv.ButtonY * (NecrosisConfig.NecrosisButtonScale / 100)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetText(self:GetValue().." %")
+end
+
+function _sv:slSphereSize_OnValueChanged()
+	if not (self:GetValue() == NecrosisConfig.NecrosisButtonScale) then
+		NecrosisButton:ClearAllPoints()
+		GameTooltip:SetText(self:GetValue().." %")
+		NecrosisConfig.NecrosisButtonScale = self:GetValue()
+		NecrosisButton:SetPoint("CENTER", "UIParent", "BOTTOMLEFT",
+			_sv.ButtonX / (NecrosisConfig.NecrosisButtonScale / 100),
+			_sv.ButtonY / (NecrosisConfig.NecrosisButtonScale / 100))
+		NecrosisButton:SetScale(NecrosisConfig.NecrosisButtonScale / 100)
+		Necrosis:ButtonSetup()
+	end
+end
+
+function _sv.cbShowCount_Click()
+	NecrosisConfig.ShowCount = self:GetChecked()
+	Necrosis:BagExplore()
+end
+
+-- Handler to update texts when language changes
+function _sv.UpdateTexts()
+	_sv.slSphereSizeText:SetText(Necrosis.Config.Sphere["Taille de la sphere"])
+	_sv.lblSkins:SetText(Necrosis.Config.Sphere["Skin de la pierre Necrosis"])
+	UIDropDownMenu_SetText(
+		_sv.ddSkins,
+		Necrosis.Config.Sphere.Colour[UIDropDownMenu_GetSelectedID(_sv.ddSkins)]
+	)
+	_sv.lblEvents:SetText(Necrosis.Config.Sphere["Evenement montre par la sphere"])
+	_sv.lblSpells:SetText(Necrosis.Config.Sphere["Sort caste par la sphere"])
+	Necrosis.Spell_Init(_sv.ddSpells)
+	-- UIDropDownMenu_SetText(
+	-- 	NecrosisSpellSelection,
+	-- 	Necrosis.Spell[spell[UIDropDownMenu_GetSelectedID(NecrosisSpellSelection)]].Name
+	-- )
+	_sv.cbShowCount:SetText(Necrosis.Config.Sphere["Afficher le compteur numerique"])
+	_sv.lblCount:SetText(Necrosis.Config.Sphere["Type de compteur numerique"])
+end
+
 -- On crée ou on affiche le panneau de configuration de la sphere
-function Gui.SphereView:Show()
+function _sv:Show()
 
 	if not self.Frame then
 		-- Création de la fenêtre
 		self.Frame = GraphicsHelper:CreateDialog(NecrosisGeneralFrame)
-		-- self.Frame = CreateFrame("Frame", nil, NecrosisGeneralFrame)
-		-- self.Frame:SetFrameStrata("DIALOG")
-		-- self.Frame:SetMovable(false)
-		-- self.Frame:EnableMouse(true)
-		-- self.Frame:SetHeight(324)
-		-- self.Frame:SetWidth(340)
-		-- self.Frame:Show()
-		-- self.Frame:ClearAllPoints()
-		-- self.Frame:SetPoint("CENTER", 0, 8)
 
 		-- Création du slider de scale de Necrosis
 		self.slSphereSize = GraphicsHelper:CreateSlider(
@@ -66,6 +106,7 @@ function Gui.SphereView:Show()
 			15, 150,
 			80, -20
 		)
+		-- Set special controls that are created automatically with the slider
 		self.slSphereSizeText = slSphereSizeText
 		self.slSphereSizeLow = slSphereSizeLow
 		self.slSphereSizeHigh = slSphereSizeHigh
@@ -74,31 +115,9 @@ function Gui.SphereView:Show()
 		self.slSphereSizeLow:SetText("50 %")
 		self.slSphereSizeHigh:SetText("200 %")
 
-		local NBx, NBy
 		self.slSphereSize:SetScript("OnLeave", function() GameTooltip:Hide() end)
-		self.slSphereSize:SetScript(
-			"OnEnter",
-			function(self)
-				NBx, NBy = NecrosisButton:GetCenter()
-				NBx = NBx * (NecrosisConfig.NecrosisButtonScale / 100)
-				NBy = NBy * (NecrosisConfig.NecrosisButtonScale / 100)
-				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-				GameTooltip:SetText(self:GetValue().." %")
-			end
-		)
-		self.slSphereSize:SetScript(
-			"OnValueChanged",
-			function(self)
-				if not (self:GetValue() == NecrosisConfig.NecrosisButtonScale) then
-					NecrosisButton:ClearAllPoints()
-					GameTooltip:SetText(self:GetValue().." %")
-					NecrosisConfig.NecrosisButtonScale = self:GetValue()
-					NecrosisButton:SetPoint("CENTER", "UIParent", "BOTTOMLEFT", NBx / (NecrosisConfig.NecrosisButtonScale / 100), NBy / (NecrosisConfig.NecrosisButtonScale / 100))
-					NecrosisButton:SetScale(NecrosisConfig.NecrosisButtonScale / 100)
-					Necrosis:ButtonSetup()
-				end
-			end
-		)
+		self.slSphereSize:SetScript("OnEnter", _sv.slSphereSize_OnEnter)
+		self.slSphereSize:SetScript("OnValueChanged", _sv.slSphereSize_OnValueChanged)
 
 		-- Skin de la sphère
 		self.ddSkins, self.lblSkins = GraphicsHelper:CreateDropDown(
@@ -126,10 +145,7 @@ function Gui.SphereView:Show()
 			self.Frame,
 			Necrosis.Config.Sphere["Afficher le compteur numerique"],
 			0, -144,
-			function(self)
-				NecrosisConfig.ShowCount = self:GetChecked()
-				Necrosis:BagExplore()
-			end
+			_sv.cbShowCount_Click
 		)
 
 		-- Evenement montré par le compteur
@@ -139,28 +155,9 @@ function Gui.SphereView:Show()
 			0, -172
 		)
 
-		-- Handler to update texts when language changes
-		local function updateTexts()
-			Gui.SphereView.slSphereSizeText:SetText(Necrosis.Config.Sphere["Taille de la sphere"])
-			Gui.SphereView.lblSkins:SetText(Necrosis.Config.Sphere["Skin de la pierre Necrosis"])
-			UIDropDownMenu_SetText(
-				Gui.SphereView.ddSkins,
-				Necrosis.Config.Sphere.Colour[UIDropDownMenu_GetSelectedID(Gui.SphereView.ddSkins)]
-			)
-			Gui.SphereView.lblEvents:SetText(Necrosis.Config.Sphere["Evenement montre par la sphere"])
-			Gui.SphereView.lblSpells:SetText(Necrosis.Config.Sphere["Sort caste par la sphere"])
-			Necrosis.Spell_Init(Gui.SphereView.ddSpells)
-			-- UIDropDownMenu_SetText(
-			-- 	NecrosisSpellSelection,
-			-- 	Necrosis.Spell[spell[UIDropDownMenu_GetSelectedID(NecrosisSpellSelection)]].Name
-			-- )
-			Gui.SphereView.cbShowCount:SetText(Necrosis.Config.Sphere["Afficher le compteur numerique"])
-			Gui.SphereView.lblCount:SetText(Necrosis.Config.Sphere["Type de compteur numerique"])
-		end
 		EventHub:RegisterLanguageChangedHandler(updateTexts)
 
 		local function initDropdowns()
-print("initDropdowns")
 			UIDropDownMenu_Initialize(self.ddSkins, Necrosis.Skin_Init)
 			UIDropDownMenu_Initialize(self.ddEvents, Necrosis.Event_Init)
 			UIDropDownMenu_Initialize(self.ddSpells, Necrosis.Spell_Init)
