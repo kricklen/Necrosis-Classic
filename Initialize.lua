@@ -185,7 +185,7 @@ function Necrosis.SlashHandler(arg1)
 		NecrosisConfig.Smooth = not NecrosisConfig.Smooth
 		Necrosis.Chat:_Msg("SpellTimer smoothing  : <lightBlue>Toggled")
 	else
-		Necrosis:OpenConfigPanel()
+		Necrosis.Gui.MainWindow:Show()
 	end
 end
 

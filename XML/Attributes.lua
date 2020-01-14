@@ -355,7 +355,7 @@ function Necrosis:MainButtonAttribute()
 	NecrosisButton:SetAttribute("type2", "Open")
 	NecrosisButton.Open = function()
 		if not InCombatLockdown() then
-			Necrosis:OpenConfigPanel()
+			Necrosis.Gui.MainWindow:Show()
 		end
 	end
 

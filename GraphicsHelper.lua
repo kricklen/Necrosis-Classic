@@ -11,6 +11,17 @@ function GraphicsHelper:GetWoWTexture(category, name)
     return "Interface\\"..category.."\\"..name
 end
 
+function GraphicsHelper:CreateTexture(parentFrame, type, height, width, texturePath, anchor, x, y)
+	local tx = parentFrame:CreateTexture(nil, type)
+	tx:SetWidth(width)
+	tx:SetHeight(height)
+	tx:SetTexture(texturePath)
+	tx:Show()
+	tx:ClearAllPoints()
+	tx:SetPoint(anchor, x, y)
+	return tx
+end
+
 -- Create a dialog frame for the options panels
 function GraphicsHelper:CreateDialog(parentFrame)
 	local dia = CreateFrame("Frame", nil, parentFrame)
