@@ -44,12 +44,19 @@ local NECROSIS_PAGE_NUMBER = "Page %s of %s";
 -- CREATING THE FRAME OF THE OPTIONS || CREATION DE LA FRAME DES OPTIONS
 ------------------------------------------------------------------------------------------------------
 
+Necrosis.Gui.ButtonsView = {
+	Frame = false
+}
+
+local _bv = Necrosis.Gui.ButtonsView
+
 --We create or display the configuration panel of the sphere ||  On crée ou on affiche le panneau de configuration de la sphere
-function Necrosis:SetButtonsConfig()
+function _bv:Show()
 	local frame = _G["NecrosisButtonsConfig"]
 	if not frame then
 		-- Création de la fenêtre
 		frame = CreateFrame("Frame", "NecrosisButtonsConfig", NecrosisGeneralFrame)
+		self.Frame = frame
 		frame:SetFrameStrata("DIALOG")
 		frame:SetMovable(false)
 		frame:EnableMouse(true)
@@ -494,14 +501,14 @@ function Necrosis:SetButtonsConfig()
 		FontString:ClearAllPoints()
 		FontString:SetPoint("RIGHT", NecrosisSelectedMountLeft, "LEFT", -10, 0)
 		FontString:SetTextColor(1, 1, 1)
-		FontString:SetText(self.Config.Buttons["Monture - Clic gauche"])
+		FontString:SetText(Necrosis.Config.Buttons["Monture - Clic gauche"])
 
 		local FontString = frame:CreateFontString("NecrosisRightMountText", "OVERLAY", "GameFontNormalSmall")
 		FontString:Show()
 		FontString:ClearAllPoints()
 		FontString:SetPoint("LEFT", NecrosisSelectedMountRight, "RIGHT", 10, 0)
 		FontString:SetTextColor(1, 1, 1)
-		FontString:SetText(self.Config.Buttons["Monture - Clic droit"])
+		FontString:SetText(Necrosis.Config.Buttons["Monture - Clic droit"])
 		
 	end
 	
@@ -509,10 +516,10 @@ function Necrosis:SetButtonsConfig()
 	-- NecrosisMountsSelectionFrame.idMount = GetCompanionInfo("MOUNT", 1); //TODO broke ? 
 	
 	-- set to 1st page
-	Necrosis:SetCompanionPage(0)
+	_bv:SetCompanionPage(0)
 
 	-- make sure our mount buttons are updated
-	Necrosis:UpdateMountButtons()
+	_bv:UpdateMountButtons()
 	
 	-- the spellID's (not creatureID's) for the selected left & right mounts are stored in savedvariables
 	-- if nothing is specified (empty / reset config) then use felsteed (5784) and dreadsteed (23161) as the default spellids
@@ -534,22 +541,28 @@ function Necrosis:SetButtonsConfig()
 	local boutons = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu"}
 	for i in ipairs(boutons) do
 		_G["NecrosisShow"..boutons[i]]:SetChecked(NecrosisConfig.StonePosition[i] > 0)
-		_G["NecrosisShow"..boutons[i]]:SetText(self.Config.Buttons.Name[i])
+		_G["NecrosisShow"..boutons[i]]:SetText(Necrosis.Config.Buttons.Name[i])
 	end
 
-	NecrosisButtonsConfig1Text:SetText(self.Config.Buttons["Choix des boutons a afficher"])
-	NecrosisButtonsConfig2Text:SetText(self.Config.Menus["Options Generales"])
-	NecrosisRotationText:SetText(self.Config.Buttons["Rotation des boutons"])
-	NecrosisLockButtons:SetText(self.Config.Buttons["Fixer les boutons autour de la sphere"])
+	NecrosisButtonsConfig1Text:SetText(Necrosis.Config.Buttons["Choix des boutons a afficher"])
+	NecrosisButtonsConfig2Text:SetText(Necrosis.Config.Menus["Options Generales"])
+	NecrosisRotationText:SetText(Necrosis.Config.Buttons["Rotation des boutons"])
+	NecrosisLockButtons:SetText(Necrosis.Config.Buttons["Fixer les boutons autour de la sphere"])
 
 	local frame = _G["NecrosisButtonsConfig"]
 	frame:Show()
 end
 
+function _bv:Hide()
+	if self.Frame then
+		HideUIPanel(self.Frame)
+	end
+end
+
 ------------------------------------------------------------------------------------------------------
 -- MOUNT FUNCTIONS
 ------------------------------------------------------------------------------------------------------
-function Necrosis:SetCompanionPage(num)
+function _bv:SetCompanionPage(num)
 	NecrosisMountsSelectionFrame.pageMount = num;
 	
 	num = num + 1;	--For easier usage
@@ -570,11 +583,11 @@ function Necrosis:SetCompanionPage(num)
 		NecrosisCompanionNextButton:Enable();
 	end
 	
-	Necrosis:UpdateMountButtons();
+	_bv:UpdateMountButtons();
 	--PetPaperDollFrame_UpdateCompanionCooldowns();
 end
 
-function Necrosis:UpdateMountButtons()
+function _bv:UpdateMountButtons()
 	local button, iconTexture, id;
 	local creatureID, creatureName, spellID, icon, active;
 	local offset, selected;

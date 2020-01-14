@@ -299,6 +299,11 @@ function _tv:Show()
 	self.Frame:Show()
 end
 
+function _tv:Hide()
+	if self.Frame then
+		HideUIPanel(self.Frame)
+	end
+end
 
 ------------------------------------------------------------------------------------------------------
 -- FONCTIONS NECESSAIRES AUX DROPDOWNS

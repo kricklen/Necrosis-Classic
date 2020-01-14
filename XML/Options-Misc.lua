@@ -37,17 +37,23 @@
 -- On définit G comme étant le tableau contenant toutes les frames existantes.
 local _G = getfenv(0)
 
+Necrosis.Gui.MiscView = {
+	Frame = false
+}
+
+local _mv = Necrosis.Gui.MiscView
 
 ------------------------------------------------------------------------------------------------------
 -- CREATION DE LA FRAME DES OPTIONS
 ------------------------------------------------------------------------------------------------------
 
-function Necrosis:SetMiscConfig()
+function _mv:Show()
 
 	local frame = _G["NecrosisMiscConfig"]
 	if not frame then
 		-- Création de la fenêtre
 		frame = CreateFrame("Frame", "NecrosisMiscConfig", NecrosisGeneralFrame)
+		self.Frame = frame
 		frame:SetFrameStrata("DIALOG")
 		frame:SetMovable(false)
 		frame:EnableMouse(true)
@@ -334,13 +340,13 @@ function Necrosis:SetMiscConfig()
 	NecrosisLock:SetChecked(NecrosisConfig.NoDragAll)
 	NecrosisHiddenSize:SetValue(NecrosisConfig.ShadowTranceScale)
 
-	NecrosisMoveShard:SetText(self.Config.Misc["Deplace les fragments"])
-	NecrosisDestroyShardBag:SetText(self.Config.Misc["Detruit les fragments si le sac plein"])
-	NecrosisShardBagText:SetText(self.Config.Misc["Choix du sac contenant les fragments"])
-	NecrosisDestroyShard:SetText(self.Config.Misc["Nombre maximum de fragments a conserver"])
-	NecrosisLock:SetText(self.Config.Misc["Verrouiller Necrosis sur l'interface"])
-	NecrosisHiddenButtons:SetText(self.Config.Misc["Afficher les boutons caches"])
-	NecrosisHiddenSizeText:SetText(self.Config.Misc["Taille des boutons caches"])
+	NecrosisMoveShard:SetText(Necrosis.Config.Misc["Deplace les fragments"])
+	NecrosisDestroyShardBag:SetText(Necrosis.Config.Misc["Detruit les fragments si le sac plein"])
+	NecrosisShardBagText:SetText(Necrosis.Config.Misc["Choix du sac contenant les fragments"])
+	NecrosisDestroyShard:SetText(Necrosis.Config.Misc["Nombre maximum de fragments a conserver"])
+	NecrosisLock:SetText(Necrosis.Config.Misc["Verrouiller Necrosis sur l'interface"])
+	NecrosisHiddenButtons:SetText(Necrosis.Config.Misc["Afficher les boutons caches"])
+	NecrosisHiddenSizeText:SetText(Necrosis.Config.Misc["Taille des boutons caches"])
 
 	if NecrosisConfig.SoulshardSort then
 		NecrosisDestroyShardBag:Enable()
@@ -349,4 +355,10 @@ function Necrosis:SetMiscConfig()
 	end
 
 	frame:Show()
+end
+
+function _mv:Hide()
+	if self.Frame then
+		HideUIPanel(self.Frame)
+	end
 end

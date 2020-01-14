@@ -127,10 +127,7 @@ function _chat:BeforeSpellCast(Spell)
 		else
 			print("DemonicSacrifice speech disabled")
 		end
-	else
-		print("Necrosis:Speech_It: Spell cast: "..Spell.Name)
 	end
-	return Speeches
 end
 
 ------------------------------------------------------------------------------------------------------

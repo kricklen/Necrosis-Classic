@@ -145,38 +145,6 @@ function Necrosis:SpellLocalize(tooltip)
 			[58] = {Name = GetSpellInfo(133),	Mana = 50,				Length = 15,	Type = 3}, --  NOPE NOT IN Classic Challenging Howl || Hurlement de défi
 			[59] = {Name = GetSpellInfo(133),	Mana = 50,			    Length = 60,	Type = 3} --NOPE NOT IN Classic   Demonic Empowerment || Renforcement démoniaque
 		}
-		-- List of Soulstone spells, index = rank
-		Spell.Soulstone = {
-			[1] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
-			[2] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
-			[3] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
-			[4] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
-			[5] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
-		}
-		-- List of Healthstone spells, index = rank
-		Spell.Healthstone = {
-			[1] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
-			[2] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
-			[3] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
-			[4] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
-			[5] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
-		}
-		-- List of Spellstone spells, index = rank
-		Spell.Spellstone = {
-			[1] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
-			[2] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
-			[3] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
-			[4] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
-			[5] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
-		}
-		-- List of Firestone spells, index = rank
-		Spell.Firestone = {
-			[1] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
-			[2] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
-			[3] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
-			[4] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
-			[5] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
-		}
 		-- Type 0 = Pas de Timer || no timer
 		-- Type 1 = Timer permanent principal || Standing main timer
 		-- Type 2 = Timer permanent || main timer

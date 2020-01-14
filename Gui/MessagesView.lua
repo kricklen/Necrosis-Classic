@@ -325,3 +325,9 @@ function _mv:Show()
 
 	self.Frame:Show()
 end
+
+function _mv:Hide()
+	if self.Frame then
+		HideUIPanel(self.Frame)
+	end
+end

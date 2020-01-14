@@ -93,13 +93,6 @@ function _sv:cbShowCount_Click()
 	Necrosis:BagExplore()
 end
 
-function _sv:InitDropdowns()
-	UIDropDownMenu_Initialize(self.ddSkins, _sv.ddSkins_Init)
-	UIDropDownMenu_Initialize(self.ddEvents, _sv.ddEvents_Init)
-	UIDropDownMenu_Initialize(self.ddSpells, _sv.ddSpells_Init)
-	UIDropDownMenu_Initialize(self.ddCount, Necrosis.Count_Init)
-end
-
 -- Fonctions du Dropdown des skins
 function _sv.ddSkins_Init(dd)
 	local element = {}
@@ -135,9 +128,8 @@ function _sv.ddSpells_Init(dd)
 			arg1 = dd
 		})
 		if spellIndex == NecrosisConfig.MainSpell then
-			--UIDropDownMenu_SetSelectedID(dd, i)
 			UIDropDownMenu_SetSelectedValue(dd, spellIndex)
-			--UIDropDownMenu_SetText(dd, Necrosis.Spell[spellIndex].Name)
+			UIDropDownMenu_SetText(dd, Necrosis.Spell[spellIndex].Name)
 		end
 	end
 end
@@ -201,14 +193,14 @@ end
 function _sv.UpdateTexts()
 	_sv.slSphereSizeText:SetText(Necrosis.Config.Sphere["Taille de la sphere"])
 	_sv.lblSkins:SetText(Necrosis.Config.Sphere["Skin de la pierre Necrosis"])
-	_sv.ddSkins_Init(_sv.ddSkins)
+	UIDropDownMenu_Initialize(_sv.ddSkins, _sv.ddSkins_Init)
 	_sv.lblEvents:SetText(Necrosis.Config.Sphere["Evenement montre par la sphere"])
-	_sv.ddEvents_Init(_sv.ddEvents)
+	UIDropDownMenu_Initialize(_sv.ddEvents, _sv.ddEvents_Init)
 	_sv.lblSpells:SetText(Necrosis.Config.Sphere["Sort caste par la sphere"])
-	_sv.ddSpells_Init(_sv.ddSpells)
+	UIDropDownMenu_Initialize(_sv.ddSpells, _sv.ddSpells_Init)
 	_sv.cbShowCount:SetText(Necrosis.Config.Sphere["Afficher le compteur numerique"])
 	_sv.lblCount:SetText(Necrosis.Config.Sphere["Type de compteur numerique"])
-	_sv.ddCount_Init(_sv.ddCount)
+	UIDropDownMenu_Initialize(_sv.ddCount, _sv.ddCount_Init)
 end
 
 -- On crée ou on affiche le panneau de configuration de la sphere
@@ -245,7 +237,7 @@ function _sv:Show()
 			Necrosis.Config.Sphere["Skin de la pierre Necrosis"],
 			0, -60
 		)
-		self.ddSkins_Init(self.ddSkins)
+		UIDropDownMenu_Initialize(self.ddSkins, self.ddSkins_Init)
 
 		-- Evenement montré par la sphère
 		self.ddEvents, self.lblEvents = GraphicsHelper:CreateDropDown(
@@ -253,7 +245,7 @@ function _sv:Show()
 			Necrosis.Config.Sphere["Evenement montre par la sphere"],
 			0, -88
 		)
-		self.ddEvents_Init(self.ddEvents)
+		UIDropDownMenu_Initialize(self.ddEvents, self.ddEvents_Init)
 
 		-- Sort associé à la sphère
 		self.ddSpells, self.lblSpells = GraphicsHelper:CreateDropDown(
@@ -261,7 +253,7 @@ function _sv:Show()
 			Necrosis.Config.Sphere["Sort caste par la sphere"],
 			0, -116
 		)
-		self.ddSpells_Init(self.ddSpells)
+		UIDropDownMenu_Initialize(self.ddSpells, self.ddSpells_Init)
 
 		-- Affiche ou masque le compteur numérique
 		self.cbShowCount = GraphicsHelper:CreateCheckButton(
@@ -278,13 +270,18 @@ function _sv:Show()
 			Necrosis.Config.Sphere["Type de compteur numerique"],
 			0, -172
 		)
-		self.ddCount_Init(self.ddCount)
+		UIDropDownMenu_Initialize(self.ddCount, self.ddCount_Init)
 
-		EventHub:RegisterLanguageChangedHandler(self.updateTexts)
+		EventHub:RegisterLanguageChangedHandler(self.UpdateTexts)
 	end
 	self.Frame:Show()
 end
 
+function _sv:Hide()
+	if self.Frame then
+		HideUIPanel(self.Frame)
+	end
+end
 
 ------------------------------------------------------------------------------------------------------
 -- FONCTIONS NECESSAIRES AUX DROPDOWNS

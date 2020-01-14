@@ -63,7 +63,7 @@ function Necrosis:RezTimerUpdate(SpellTimer, LastUpdate)
 	Secondes = mod(Secondes, 60)
 
 	-- Le timer numérique
-	if NecrosisConfig.CountType == 3 then
+	if NecrosisConfig.CountType == "RezTimer" then
 		if (Minutes > 0) then
 			NecrosisShardCount:SetText(Minutes.." m")
 		else
@@ -71,7 +71,7 @@ function Necrosis:RezTimerUpdate(SpellTimer, LastUpdate)
 		end
 	end
 	-- Le timer graphique
-	if NecrosisConfig.Circle == 2 then
+	if NecrosisConfig.Circle == "RezTimer" then
 		if (Minutes >= 16) then
 			if not (LastUpdate == "Turquoise\\Shard"..(Minutes - 15)) then
 				LastUpdate = "Turquoise\\Shard"..(Minutes - 15)

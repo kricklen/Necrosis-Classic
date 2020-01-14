@@ -42,12 +42,19 @@ local _G = getfenv(0)
 -- CREATION DE LA FRAME DES OPTIONS
 ------------------------------------------------------------------------------------------------------
 
-function Necrosis:SetMenusConfig()
+Necrosis.Gui.MenusView = {
+	Frame = false
+}
+
+local _mv = Necrosis.Gui.MenusView
+
+function _mv:Show()
 
 	local frame = _G["NecrosisMenusConfig"]
 	if not frame then
 		-- Création de la fenêtre
 		frame = CreateFrame("Frame", "NecrosisMenusConfig", NecrosisGeneralFrame)
+		self.Frame = frame
 		frame:SetFrameStrata("DIALOG")
 		frame:SetMovable(false)
 		frame:EnableMouse(true)
@@ -422,7 +429,6 @@ function Necrosis:SetMenusConfig()
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 			GameTooltip:SetText(self:GetValue())
 			if _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:SetAttribute("state", "Bloque") end
-
 		end)
 		frame:SetScript("OnLeave", function()
 			GameTooltip:Hide()
@@ -456,7 +462,6 @@ function Necrosis:SetMenusConfig()
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 			GameTooltip:SetText(self:GetValue())
 			if _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:SetAttribute("state", "Bloque") end
-
 		end)
 		frame:SetScript("OnLeave", function()
 			GameTooltip:Hide()
@@ -484,7 +489,6 @@ function Necrosis:SetMenusConfig()
 		FontString:ClearAllPoints()
 		FontString:SetPoint("LEFT", NecrosisMenusConfig3, "BOTTOMLEFT", 35, 353)
 		FontString:SetTextColor(1, 1, 1)
-
 		UIDropDownMenu_SetWidth(frame, 125)
 
 		-- Choix du sens du menu
@@ -530,7 +534,6 @@ function Necrosis:SetMenusConfig()
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 			GameTooltip:SetText(self:GetValue())
 			if _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:SetAttribute("state", "Bloque") end
-
 		end)
 		frame:SetScript("OnLeave", function()
 			GameTooltip:Hide()
@@ -564,7 +567,6 @@ function Necrosis:SetMenusConfig()
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 			GameTooltip:SetText(self:GetValue())
 			if _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:SetAttribute("state", "Bloque") end
-
 		end)
 		frame:SetScript("OnLeave", function()
 			GameTooltip:Hide()
@@ -638,7 +640,6 @@ function Necrosis:SetMenusConfig()
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 			GameTooltip:SetText(self:GetValue())
 			if _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:SetAttribute("state", "Bloque") end
-
 		end)
 		frame:SetScript("OnLeave", function()
 			GameTooltip:Hide()
@@ -672,7 +673,6 @@ function Necrosis:SetMenusConfig()
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 			GameTooltip:SetText(self:GetValue())
 			if _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:SetAttribute("state", "Bloque") end
-
 		end)
 		frame:SetScript("OnLeave", function()
 			GameTooltip:Hide()
@@ -690,28 +690,28 @@ function Necrosis:SetMenusConfig()
 
 	end
 
-	UIDropDownMenu_Initialize(NecrosisBuffVector, self.BuffVector_Init)
-	UIDropDownMenu_Initialize(NecrosisDemonVector, self.DemonVector_Init)
-	UIDropDownMenu_Initialize(NecrosisCurseVector, self.CurseVector_Init)
+	UIDropDownMenu_Initialize(NecrosisBuffVector, _mv.BuffVector_Init)
+	UIDropDownMenu_Initialize(NecrosisDemonVector, _mv.DemonVector_Init)
+	UIDropDownMenu_Initialize(NecrosisCurseVector, _mv.CurseVector_Init)
 
-	NecrosisMenusConfig1Text:SetText(self.Config.Menus["Options Generales"])
-	NecrosisMenusConfig2Text:SetText(self.Config.Menus["Menu des Buffs"])
-	NecrosisMenusConfig3Text:SetText(self.Config.Menus["Menu des Demons"])
-	NecrosisMenusConfig4Text:SetText(self.Config.Menus["Menu des Maledictions"])
+	NecrosisMenusConfig1Text:SetText(Necrosis.Config.Menus["Options Generales"])
+	NecrosisMenusConfig2Text:SetText(Necrosis.Config.Menus["Menu des Buffs"])
+	NecrosisMenusConfig3Text:SetText(Necrosis.Config.Menus["Menu des Demons"])
+	NecrosisMenusConfig4Text:SetText(Necrosis.Config.Menus["Menu des Maledictions"])
 
-	NecrosisBlockedMenu:SetText(self.Config.Menus["Afficher les menus en permanence"])
-	NecrosisAutoMenu:SetText(self.Config.Menus["Afficher automatiquement les menus en combat"])
-	NecrosisCloseMenu:SetText(self.Config.Menus["Fermer le menu apres un clic sur un de ses elements"])
+	NecrosisBlockedMenu:SetText(Necrosis.Config.Menus["Afficher les menus en permanence"])
+	NecrosisAutoMenu:SetText(Necrosis.Config.Menus["Afficher automatiquement les menus en combat"])
+	NecrosisCloseMenu:SetText(Necrosis.Config.Menus["Fermer le menu apres un clic sur un de ses elements"])
 
-	NecrosisBuffVectorT:SetText(self.Config.Menus["Orientation du menu"])
-	NecrosisBuffSens:SetText(self.Config.Menus["Changer la symetrie verticale des boutons"])
-	NecrosisBanishSizeText:SetText(self.Config.Menus["Taille du bouton Banir"])
+	NecrosisBuffVectorT:SetText(Necrosis.Config.Menus["Orientation du menu"])
+	NecrosisBuffSens:SetText(Necrosis.Config.Menus["Changer la symetrie verticale des boutons"])
+	NecrosisBanishSizeText:SetText(Necrosis.Config.Menus["Taille du bouton Banir"])
 
-	NecrosisDemonVectorT:SetText(self.Config.Menus["Orientation du menu"])
-	NecrosisDemonSens:SetText(self.Config.Menus["Changer la symetrie verticale des boutons"])
+	NecrosisDemonVectorT:SetText(Necrosis.Config.Menus["Orientation du menu"])
+	NecrosisDemonSens:SetText(Necrosis.Config.Menus["Changer la symetrie verticale des boutons"])
 
-	NecrosisCurseVectorT:SetText(self.Config.Menus["Orientation du menu"])
-	NecrosisCurseSens:SetText(self.Config.Menus["Changer la symetrie verticale des boutons"])
+	NecrosisCurseVectorT:SetText(Necrosis.Config.Menus["Orientation du menu"])
+	NecrosisCurseSens:SetText(Necrosis.Config.Menus["Changer la symetrie verticale des boutons"])
 
 	NecrosisBlockedMenu:SetChecked(NecrosisConfig.BlockedMenu)
 	NecrosisAutoMenu:SetChecked(NecrosisConfig.AutomaticMenu)
@@ -719,13 +719,13 @@ function Necrosis:SetMenusConfig()
 
 	if not (NecrosisConfig.BuffMenuPos.x == 0) then
 		UIDropDownMenu_SetSelectedID(NecrosisBuffVector, 1)
-		UIDropDownMenu_SetText(NecrosisBuffVector, self.Config.Menus.Orientation[1])
+		UIDropDownMenu_SetText(NecrosisBuffVector, Necrosis.Config.Menus.Orientation[1])
 	elseif NecrosisConfig.BuffMenuPos.y > 0 then
 		UIDropDownMenu_SetSelectedID(NecrosisBuffVector, 2)
-		UIDropDownMenu_SetText(NecrosisBuffVector, self.Config.Menus.Orientation[2])
+		UIDropDownMenu_SetText(NecrosisBuffVector, Necrosis.Config.Menus.Orientation[2])
 	else
 		UIDropDownMenu_SetSelectedID(NecrosisBuffVector, 3)
-		UIDropDownMenu_SetText(NecrosisBuffVector, self.Config.Menus.Orientation[3])
+		UIDropDownMenu_SetText(NecrosisBuffVector, Necrosis.Config.Menus.Orientation[3])
 	end
 	NecrosisBuffSens:SetChecked(NecrosisConfig.BuffMenuPos.direction < 0)
 	NecrosisBanishSize:SetValue(NecrosisConfig.BanishScale)
@@ -734,13 +734,13 @@ function Necrosis:SetMenusConfig()
 
 	if not (NecrosisConfig.PetMenuPos.x == 0) then
 		UIDropDownMenu_SetSelectedID(NecrosisDemonVector, 1)
-		UIDropDownMenu_SetText(NecrosisDemonVector, self.Config.Menus.Orientation[1])
+		UIDropDownMenu_SetText(NecrosisDemonVector, Necrosis.Config.Menus.Orientation[1])
 	elseif NecrosisConfig.PetMenuPos.y > 0 then
 		UIDropDownMenu_SetSelectedID(NecrosisDemonVector, 2)
-		UIDropDownMenu_SetText(NecrosisDemonVector, self.Config.Menus.Orientation[2])
+		UIDropDownMenu_SetText(NecrosisDemonVector, Necrosis.Config.Menus.Orientation[2])
 	else
 		UIDropDownMenu_SetSelectedID(NecrosisDemonVector, 3)
-		UIDropDownMenu_SetText(NecrosisDemonVector, self.Config.Menus.Orientation[3])
+		UIDropDownMenu_SetText(NecrosisDemonVector, Necrosis.Config.Menus.Orientation[3])
 	end
 	NecrosisDemonSens:SetChecked(NecrosisConfig.PetMenuPos.direction < 0)
 	NecrosisDemonOx:SetValue(NecrosisConfig.PetMenuDecalage.x)
@@ -748,13 +748,13 @@ function Necrosis:SetMenusConfig()
 
 	if not (NecrosisConfig.CurseMenuPos.x == 0) then
 		UIDropDownMenu_SetSelectedID(NecrosisCurseVector, 1)
-		UIDropDownMenu_SetText(NecrosisCurseVector, self.Config.Menus.Orientation[1])
+		UIDropDownMenu_SetText(NecrosisCurseVector, Necrosis.Config.Menus.Orientation[1])
 	elseif NecrosisConfig.CurseMenuPos.y > 0 then
 		UIDropDownMenu_SetSelectedID(NecrosisCurseVector, 2)
-		UIDropDownMenu_SetText(NecrosisCurseVector, self.Config.Menus.Orientation[2])
+		UIDropDownMenu_SetText(NecrosisCurseVector, Necrosis.Config.Menus.Orientation[2])
 	else
 		UIDropDownMenu_SetSelectedID(NecrosisCurseVector, 3)
-		UIDropDownMenu_SetText(NecrosisCurseVector, self.Config.Menus.Orientation[3])
+		UIDropDownMenu_SetText(NecrosisCurseVector, Necrosis.Config.Menus.Orientation[3])
 	end
 	NecrosisCurseSens:SetChecked(NecrosisConfig.CurseMenuPos.direction < 0)
 	NecrosisCurseOx:SetValue(NecrosisConfig.CurseMenuDecalage.x)
@@ -771,25 +771,29 @@ function Necrosis:SetMenusConfig()
 	frame:Show()
 end
 
-
+function _mv:Hide()
+	if self.Frame then
+		HideUIPanel(self.Frame)
+	end
+end
 
 ------------------------------------------------------------------------------------------------------
 -- FONCTIONS NECESSAIRES AUX DROPDOWNS
 ------------------------------------------------------------------------------------------------------
 
 -- Fonctions du Dropdown des Buff
-function Necrosis.BuffVector_Init()
+function _mv.BuffVector_Init()
 	local element = {}
 
 	for i in ipairs(Necrosis.Config.Menus.Orientation) do
 		element.text = Necrosis.Config.Menus.Orientation[i]
 		element.checked = false
-		element.func = Necrosis.BuffVector_Click
+		element.func = _mv.BuffVector_Click
 		UIDropDownMenu_AddButton(element)
 	end
 end
 
-function Necrosis.BuffVector_Click(self)
+function _mv.BuffVector_Click(self)
 	local ID = self:GetID()
 
 	UIDropDownMenu_SetSelectedID(NecrosisBuffVector, ID)
@@ -807,18 +811,18 @@ function Necrosis.BuffVector_Click(self)
 end
 
 -- Fonctions du Dropdown des Démons
-function Necrosis.DemonVector_Init()
+function _mv.DemonVector_Init()
 	local element = {}
 
 	for i in ipairs(Necrosis.Config.Menus.Orientation) do
 		element.text = Necrosis.Config.Menus.Orientation[i]
 		element.checked = false
-		element.func = Necrosis.DemonVector_Click
+		element.func = _mv.DemonVector_Click
 		UIDropDownMenu_AddButton(element)
 	end
 end
 
-function Necrosis.DemonVector_Click(self)
+function _mv.DemonVector_Click(self)
 	local ID = self:GetID()
 
 	UIDropDownMenu_SetSelectedID(NecrosisDemonVector, ID)
@@ -836,18 +840,18 @@ function Necrosis.DemonVector_Click(self)
 end
 
 -- Fonctions du Dropdown des Malédictions
-function Necrosis.CurseVector_Init()
+function _mv.CurseVector_Init()
 	local element = {}
 
 	for i in ipairs(Necrosis.Config.Menus.Orientation) do
 		element.text = Necrosis.Config.Menus.Orientation[i]
 		element.checked = false
-		element.func = Necrosis.CurseVector_Click
+		element.func = _mv.CurseVector_Click
 		UIDropDownMenu_AddButton(element)
 	end
 end
 
-function Necrosis.CurseVector_Click(self)
+function _mv.CurseVector_Click(self)
 	local ID = self:GetID()
 
 	UIDropDownMenu_SetSelectedID(NecrosisCurseVector, ID)

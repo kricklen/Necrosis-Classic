@@ -432,7 +432,7 @@ function Necrosis:OnUpdate(something, elapsed)
 			Necrosis:ShowAntiFearWarning()
 		end
 		-- If configured, the Sphere is transfected into a Ground Chrono || Si configuré, on transfome la Sphere en Chrono de Rez
-		if (NecrosisConfig.CountType == 3 or NecrosisConfig.Circle == 2)
+		if (NecrosisConfig.CountType == "RezTimer" or NecrosisConfig.Circle == "RezTimer")
 			and (Local.Stone.Soul.Mode == 3 or Local.Stone.Soul.Mode == 4)
 			then
 				Local.LastSphereSkin = self:RezTimerUpdate(
@@ -1443,7 +1443,7 @@ end
 -- Update the sphere according to life || Update de la sphere en fonction de la vie
 function Necrosis:UpdateHealth()
 	local health = UnitHealth("player")
-	if NecrosisConfig.Circle == 4 then
+	if NecrosisConfig.Circle == "Health" then
 		local healthMax = UnitHealthMax("player")
 		if health == healthMax then
 			if not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor.."\\Shard32") then
@@ -1459,7 +1459,7 @@ function Necrosis:UpdateHealth()
 		end
 	end
 	-- If the inside of the stone shows life || Si l'intérieur de la pierre affiche la vie
-	if NecrosisConfig.CountType == 5 then
+	if NecrosisConfig.CountType == "Health" then
 		NecrosisShardCount:SetText(health)
 	end
 end
@@ -1472,7 +1472,7 @@ function Necrosis:UpdateMana()
 	local manaMax = UnitPowerMax("player", ptype)
 
 	-- If the perimeter of the stone shows the mana || Si le pourtour de la pierre affiche la mana
-	if NecrosisConfig.Circle == 3 then
+	if NecrosisConfig.Circle == "Mana" then
 		if mana == manaMax then
 			if not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor.."\\Shard32") then
 				Local.LastSphereSkin = NecrosisConfig.NecrosisColor.."\\Shard32"
@@ -1488,7 +1488,7 @@ function Necrosis:UpdateMana()
 	end
 
 	-- If the inside of the stone shows mana || Si l'intérieur de la pierre affiche la mana
-	if NecrosisConfig.CountType == 4 then
+	if NecrosisConfig.CountType == "Mana" then
 		NecrosisShardCount:SetText(mana)
 	end
 	-- If corrupt domination cooldown is gray || Si cooldown de domination corrompue on grise
@@ -1918,7 +1918,7 @@ function Necrosis:BagExplore(arg)
 	end
 
 	-- Updtae the main (sphere) button display || Affichage du bouton principal de Necrosis
-	if NecrosisConfig.Circle == 1 then
+	if NecrosisConfig.Circle == "Soulshards" then
 		if (Local.Soulshard.Count <= 32) then
 			if not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor.."\\Shard"..Local.Soulshard.Count) then
 				Local.LastSphereSkin = NecrosisConfig.NecrosisColor.."\\Shard"..Local.Soulshard.Count
@@ -1928,7 +1928,7 @@ function Necrosis:BagExplore(arg)
 			Local.LastSphereSkin = NecrosisConfig.NecrosisColor.."\\Shard32"
 			NecrosisButton:SetNormalTexture(GraphicsHelper:GetTexture(Local.LastSphereSkin))
 		end
-	elseif NecrosisConfig.Circle == 2 and (Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 2) then
+	elseif NecrosisConfig.Circle == "RezTimer" and (Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 2) then
 
 		if (Local.Soulshard.Count <= 32) then
 			if not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor:gsub("Turquoise", "Bleu"):gsub("Rose", "Bleu"):gsub("Orange", "Bleu").."\\Shard"..Local.Soulshard.Count) then
@@ -1941,9 +1941,9 @@ function Necrosis:BagExplore(arg)
 		end
 	end
 	if NecrosisConfig.ShowCount then
-		if NecrosisConfig.CountType == 2 then
+		if NecrosisConfig.CountType == "DemonStones" then
 			NecrosisShardCount:SetText(Local.Reagent.Infernal.." / "..Local.Reagent.Demoniac)
-		elseif NecrosisConfig.CountType == 1 then
+		elseif NecrosisConfig.CountType == "Soulshards" then
 			if Local.Soulshard.Count < 10 then
 				NecrosisShardCount:SetText("0"..Local.Soulshard.Count)
 			else
@@ -2163,7 +2163,6 @@ end
 -- My favourite feature! Create a list of spells known by the warlock sorted by name & rank || Ma fonction préférée ! Elle fait la liste des sorts connus par le démo, et les classe par rang.
 -- Select the highest available spell in the case of stones. || Pour les pierres, elle sélectionne le plus haut rang connu
 function Necrosis:SpellSetup()
---    print("SpellSetup")
 	local CurrentSpells = new("hash",
 		"ID", {},
 		"Name", {},
@@ -2188,11 +2187,6 @@ function Necrosis:SpellSetup()
 			spellName = self.Translation.Misc.Create .. " " .. self.Translation.Item.Healthstone
 		end
 		if(spellName:find(self.Translation.Misc.Create .. " " .. self.Translation.Item.Soulstone) )then
-
-			print("Necrosis:SpellSetup(): "..spellName..", "..spellID..", "..self.Translation.Misc.Create..", "..self.Translation.Item.Soulstone)
-			local infoType, infoId = GetSpellBookItemInfo(spellName)
-print("Info: "..tostring(infoType)..", "..tostring(infoId))
-
 			subSpellName= Necrosis:StoneToRank(spellName)
 			spellName = self.Translation.Misc.Create .. " " .. self.Translation.Item.Soulstone
 		end
@@ -2250,6 +2244,7 @@ print("Info: "..tostring(infoType)..", "..tostring(infoId))
 			end
 		end
 	end
+
 	del(CurrentSpells)
 
 	for spellID = 1, MAX_SPELLS, 1 do
