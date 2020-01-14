@@ -366,7 +366,7 @@ function _chat:_Msg(msg, channel)
 		SendChatMessage(msg, _G.RAID)
 	elseif (channel == "EMOTE") then
 		SendChatMessage(msg, _G.EMOTE)
-	-- SAY and YELL are protected functions and can't be called from an addon anymore
+	-- SAY and YELL are protected functions and can't be called without hardware event anymore
 	-- elseif (channel == "SAY") then
 	-- 	SendChatMessage(msg, _G.SAY)
 	-- elseif (channel == "YELL") then

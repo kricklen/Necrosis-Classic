@@ -217,20 +217,20 @@ function Localization.enUS()
 		["Type de compteur numerique"] = "Stone type counted"
 	}
 	Necrosis.Config.Sphere.Colour = {
-		"Pink",
-		"Blue",
-		"Orange",
-		"Turquoise",
-		"Purple",
-		"666",
-		"X"
+		["Rose"] = "Pink",
+		["Bleu"] = "Blue",
+		["Orange"] = "Orange",
+		["Turquoise"] = "Turquoise",
+		["Violet"] = "Purple",
+		["666"] = "666",
+		["X"] = "X"
 	}
 	Necrosis.Config.Sphere.Count = {
-		"Soulshards",
-		"Demon summoning stones",
-		"Resurrection Timer",
-		"Mana",
-		"Health"
+		["Soulshards"] = "Soulshards",
+		["DemonStones"] = "Demon summoning stones",
+		["RezTimer"] = "Resurrection Timer",
+		["Mana"] = "Mana",
+		["Health"] = "Health"
 	}
 
 	Necrosis.Config.Buttons = {

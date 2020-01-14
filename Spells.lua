@@ -116,16 +116,16 @@ function Necrosis:SpellLocalize(tooltip)
 			[29] = {Name = GetSpellInfo(17928),	Mana = 50,				Length = 40,	Type = 3}, -- Howl of Terror || Hurlement de terreur
 			[30] = {Name = GetSpellInfo(18540),	Mana = 50,				Length = 1800,	Type = 3}, -- Ritual of Doom || Rituel funeste
 			[31] = {Name = GetSpellInfo(11735),	Mana = 50,				Length = 0,		Type = 0}, -- Demon Armor || Armure démoniaque
-			[32] = {Name = GetSpellInfo(5697),	Mana = 50,				Length = 600,		Type = 0}, -- Unending Breath || Respiration interminable
+			[32] = {Name = GetSpellInfo(5697),	Mana = 50,				Length = 600,	Type = 0}, -- Unending Breath || Respiration interminable
 			[33] = {Name = GetSpellInfo(132),	Mana = 50,				Length = 0,		Type = 0}, -- Detect Invisibility || Détection de l'invisibilité
 			[34] = {Name = GetSpellInfo(126),	Mana = 50,				Length = 0,		Type = 0}, -- Eye of Kilrogg
 			[35] = {Name = GetSpellInfo(1098),	Mana = 50,				Length = 0,		Type = 0}, -- Enslave Demon
 			[36] = {Name = GetSpellInfo(696),	Mana = 50,				Length = 0,		Type = 0}, -- Demon Skin || Peau de démon 
-			[37] = {Name = GetSpellInfo(698),	Mana = 50,				Length = 120,		Type = 3}, -- Ritual of Summoning || Rituel d'invocation
+			[37] = {Name = GetSpellInfo(698),	Mana = 50,				Length = 120,	Type = 3}, -- Ritual of Summoning || Rituel d'invocation
 			[38] = {Name = GetSpellInfo(19028),	Mana = 50,				Length = 0,		Type = 0}, -- Soul Link || Lien spirituel
-			[39] = {Name = GetSpellInfo(133),	Mana = 50,				Length = 45,		Type = 3}, -- NOPE NOT IN Classic  Demon Charge || Charge démoniaque
+			[39] = {Name = GetSpellInfo(133),	Mana = 50,				Length = 45,	Type = 3}, -- NOPE NOT IN Classic  Demon Charge || Charge démoniaque
 			[40] = {Name = GetSpellInfo(18223),	Mana = 50,				Length = 12,	Type = 4}, -- Curse of Exhaustion || Malédiction de fatigue
-			[41] = {Name = GetSpellInfo(11689),	Mana = 50,				Length = 0,	     Type = 0}, -- Life Tap || Connexion
+			[41] = {Name = GetSpellInfo(11689),	Mana = 50,				Length = 0,	    Type = 0}, -- Life Tap || Connexion
 			[42] = {Name = GetSpellInfo(133),	Mana = 50,				Length = 12,	Type = 2}, -- NOPE NOT IN Classic  Haunt || Hanter
 			[43] = {Name = GetSpellInfo(28610),	Mana = 50,				Length = 30,	Type = 0}, -- Shadow Ward || Gardien de l'ombre
 			[44] = {Name = GetSpellInfo(18788),	Mana = 50,				Length = 60,	Type = 3}, -- Demonic Sacrifice || Sacrifice démoniaque 
@@ -144,6 +144,38 @@ function Necrosis:SpellLocalize(tooltip)
 			[57] = {Name = GetSpellInfo(133),	Mana = 50,				Length = 30,	Type = 3}, -- NOPE NOT IN Classic  Immolation Aura || Aura d'immolation
 			[58] = {Name = GetSpellInfo(133),	Mana = 50,				Length = 15,	Type = 3}, --  NOPE NOT IN Classic Challenging Howl || Hurlement de défi
 			[59] = {Name = GetSpellInfo(133),	Mana = 50,			    Length = 60,	Type = 3} --NOPE NOT IN Classic   Demonic Empowerment || Renforcement démoniaque
+		}
+		-- List of Soulstone spells, index = rank
+		Spell.Soulstone = {
+			[1] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
+			[2] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
+			[3] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
+			[4] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
+			[5] = {Name = GetSpellInfo(20755),	Id = 20755,	Mana = 50,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
+		}
+		-- List of Healthstone spells, index = rank
+		Spell.Healthstone = {
+			[1] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
+			[2] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
+			[3] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
+			[4] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
+			[5] = {Name = GetSpellInfo(5699),	Id = 5699,	Mana = 50,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
+		}
+		-- List of Spellstone spells, index = rank
+		Spell.Spellstone = {
+			[1] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
+			[2] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
+			[3] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
+			[4] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
+			[5] = {Name = GetSpellInfo(2362),	Id = 2362,	Mana = 50,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
+		}
+		-- List of Firestone spells, index = rank
+		Spell.Firestone = {
+			[1] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
+			[2] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
+			[3] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
+			[4] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
+			[5] = {Name = GetSpellInfo(17951),	Id = 17951,	Mana = 50,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
 		}
 		-- Type 0 = Pas de Timer || no timer
 		-- Type 1 = Timer permanent principal || Standing main timer

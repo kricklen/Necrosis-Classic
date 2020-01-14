@@ -25,9 +25,7 @@ GraphicsHelper.lua
 EventHub.lua
 
 Gui\MessagesView.lua
-#Gui\MessagesViewModel.lua
 Gui\SphereView.lua
-Gui\SphereViewModel.lua
 
 Localization\Functions-fr.lua
 Localization\Functions-en.lua
