@@ -550,7 +550,7 @@ function Necrosis:OnEvent(self, event,...)
 		if not Local.SpellCasted.TargetLevel then
 			Local.SpellCasted.TargetLevel = ""
 		end
-		Necrosis:Speech_It(Local.SpellCasted)
+		Necrosis.Chat:BeforeSpellCast(Local.SpellCasted)
 
 	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
 	elseif (event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == player then
@@ -834,7 +834,7 @@ function Necrosis:SpellManagement()
 	if (Local.SpellCasted.Name) then
 		-- print ('casting on target '..Local.SpellCasted.TargetName)
 		-- Messages Posts Cast (Démons et TP)
-		self:Speech_Then()
+		Necrosis.Chat:AfterSpellCast()
 
 		-- Special case: Haunt refreshes Corruption (if present) on a target
 		-- if (Local.SpellCasted.Name == self.Spell[42].Name) then

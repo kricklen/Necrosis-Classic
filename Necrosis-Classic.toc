@@ -8,21 +8,20 @@
 ## Version: 5.4
 ## Author: kricklen
 ## DefaultState: Enabled
-## X-Website: https://github.com/kricklen/Necrosis-classic
-## X-Original-Author: Lomig, robert388@hotmail.com
+## X-Website: https://github.com/kricklen/Necrosis-Classic
+## X-Original-Author: Lomig, Tarcalion, robert388@hotmail.com
 ## X-Original-Website: http://necrosis.larmes-cenarius.net/  [does not work anymore]
 ## X-Localizations: enUS, enGB, deDE, frFR, koKR, zhCN, zhTW, esES, ruRU
 ## X-Category: Warlock
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: NecrosisConfig
 
-#11302
-
 Necrosis.xml
 
 InitializeNamespaces.lua
 GraphicsHelper.lua
 EventHub.lua
+Chat.lua
 
 Gui\MessagesView.lua
 Gui\SphereView.lua
@@ -47,7 +46,7 @@ Localization\Localization.ruRU.lua
 Localization\Localization.lua
 
 Initialize.lua
-Message.lua
+#Chat.lua
 Spells.lua
 
 Timers\Functions.lua

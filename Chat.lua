@@ -58,7 +58,7 @@ local _chat = Necrosis.Chat
 ------------------------------------------------------------------------------------------------------
 -- Handles the posting of messages while casting a spell.
 ------------------------------------------------------------------------------------------------------
-function Necrosis:Speech_It(Spell)
+function _chat:BeforeSpellCast(Spell)
 	if not NecrosisConfig.ChatMsg then
 		-- Chat messages have been disabled
 		return nil
@@ -136,7 +136,7 @@ end
 ------------------------------------------------------------------------------------------------------
 -- Handles the posting of messages after a spell has been cast.
 ------------------------------------------------------------------------------------------------------
-function Necrosis:Speech_Then()
+function _chat:AfterSpellCast()
 	if (_chat.MsgTableAfter) then
 		_chat:_PostMessages(_chat.MsgTableAfter)
 		_chat.MsgTableAfter = nil

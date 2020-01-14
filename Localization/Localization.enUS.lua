@@ -277,9 +277,9 @@ function Localization.enUS()
 		["Afficher les timers de bas en haut"] = "Timers grow upwards",
 	}
 	Necrosis.Config.Timers.Type = {
-		"No Timer",
-		"Graphical",
-		"Textual"
+		Disabled	= "No Timer",
+		Graphical	= "Graphical",
+		Textual		= "Textual"
 	}
 
 	Necrosis.Config.Misc = {

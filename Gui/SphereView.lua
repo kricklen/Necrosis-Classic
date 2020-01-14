@@ -41,7 +41,9 @@
 Necrosis.Gui.SphereView = {
 	ButtonX = false,
 	ButtonY = false,
+
 	Frame = false,
+
 	slSphereSize = false,
 	slSphereSizeText = false,
 	slSphereSizeLow = false,
@@ -56,6 +58,7 @@ Necrosis.Gui.SphereView = {
 	cbShowCount = false,
 	lblCount = false,
 	ddCount = false,
+	
 	_Spells = {19, 31, 37, 41, 43, 44, 55},
 	_Skins = {"Rose", "Bleu", "Orange", "Turquoise", "Violet", "666", "X"},
 	_SphereEvents = {"Soulshards", "RezTimer", "Mana", "Health"},
