@@ -34,16 +34,17 @@
 -- $LastChangedDate: 2008-10-18 19:51:42 +1100 (Sat, 18 Oct 2008) $
 ------------------------------------------------------------------------------------------------------
 
--- On définit G comme étant le tableau contenant toutes les frames existantes.
-local _G = getfenv(0)
-
-
 ------------------------------------------------------------------------------------------------------
 -- CREATION DE LA FRAME DES OPTIONS
 ------------------------------------------------------------------------------------------------------
 
 Necrosis.Gui.TimersView = {
 	Frame = false,
+	ddTimers = false,
+	lblTimers = false,
+	cbEnableTimers = false,
+	cbTimersGrowUpwards = false,
+	cbTimersOnLeftSide = false,
 	Types = {"Disabled", "Graphical", "Textual"}
 }
 
@@ -88,15 +89,15 @@ end
 function _tv.ddTimers_Click(item, dd)
 	UIDropDownMenu_SetSelectedValue(dd, item.value)
 	NecrosisConfig.TimerType = item.value
-	if not (item.value == "Disabled") then
-		Necrosis:CreateTimerAnchor()
-	end
 	if item.value == "Disabled" then
 		_tv.DisableTimers()
-	elseif item.value == "Textual" then
-		_tv.EnableTextualTimers()
 	else
-		_tv.EnableGraphicalTimers()
+		Necrosis:CreateTimerAnchor()
+		if item.value == "Textual" then
+			_tv.EnableTextualTimers()
+		else
+			_tv.EnableGraphicalTimers()
+		end
 	end
 end
 
@@ -127,19 +128,19 @@ function _tv.EnableGraphicalTimers()
 	if _G["NecrosisListSpells"] then NecrosisListSpells:SetText("") end
 end
 
+function _tv.UpdateTexts()
+	UIDropDownMenu_Initialize(_tv.ddTimers, _tv.ddTimers_Init)
+	UIDropDownMenu_SetText(_tv.ddTimers, Necrosis.Config.Timers.Type[NecrosisConfig.TimerType])
+	_tv.lblTimers:SetText(Necrosis.Config.Timers["Type de timers"])
+	_tv.cbEnableTimers:SetText(Necrosis.Config.Timers["Afficher le bouton des timers"])
+	_tv.cbTimersGrowUpwards:SetText(Necrosis.Config.Timers["Afficher les timers de bas en haut"])
+	_tv.cbTimersOnLeftSide:SetText(Necrosis.Config.Timers["Afficher les timers sur la gauche du bouton"])
+end
+
 function _tv:Show()
 	if not self.Frame then
 		-- Création de la fenêtre
 		self.Frame = GraphicsHelper:CreateDialog(NecrosisGeneralFrame)
-		-- frame = CreateFrame("Frame", "NecrosisTimersConfig", NecrosisGeneralFrame)
-		-- frame:SetFrameStrata("DIALOG")
-		-- frame:SetMovable(false)
-		-- frame:EnableMouse(true)
-		-- frame:SetWidth(350)
-		-- frame:SetHeight(452)
-		-- frame:Show()
-		-- frame:ClearAllPoints()
-		-- frame:SetPoint("BOTTOMLEFT")
 
 		-- Choix du timer graphique
 		self.ddTimers, self.lblTimers = GraphicsHelper:CreateDropDown(
@@ -149,21 +150,8 @@ function _tv:Show()
 		)
 		UIDropDownMenu_Initialize(self.ddTimers, self.ddTimers_Init)
 		UIDropDownMenu_SetText(self.ddTimers, Necrosis.Config.Timers.Type[NecrosisConfig.TimerType])
-		-- frame = CreateFrame("Frame", "NecrosisTimerSelection", NecrosisTimersConfig, "UIDropDownMenuTemplate")
-		-- frame:Show()
-		-- frame:ClearAllPoints()
-		-- frame:SetPoint("RIGHT", NecrosisTimersConfig, "BOTTOMRIGHT", 40, 400)
-
-		-- local FontString = frame:CreateFontString("NecrosisTimerSelectionT", "OVERLAY", "GameFontNormalSmall")
-		-- FontString:Show()
-		-- FontString:ClearAllPoints()
-		-- FontString:SetPoint("LEFT", NecrosisTimersConfig, "BOTTOMLEFT", 35, 403)
-		-- FontString:SetTextColor(1, 1, 1)
-
-		-- UIDropDownMenu_SetWidth(frame, 125)
 
 		-- Affiche ou masque le bouton des timers
-		--parentFrame, text, x, y, onClickFunction
 		self.cbEnableTimers = GraphicsHelper:CreateCheckButton(
 			self.Frame,
 			Necrosis.Config.Timers["Afficher le bouton des timers"],
@@ -171,31 +159,6 @@ function _tv:Show()
 			self.cbEnableTimers_Click
 		)
 		self.cbEnableTimers:SetChecked(NecrosisConfig.ShowSpellTimers)
-
-		-- frame = CreateFrame("CheckButton", "NecrosisShowSpellTimerButton", NecrosisTimersConfig, "UICheckButtonTemplate")
-		-- frame:EnableMouse(true)
-		-- frame:SetWidth(24)
-		-- frame:SetHeight(24)
-		-- frame:Show()
-		-- frame:ClearAllPoints()
-		-- frame:SetPoint("LEFT", NecrosisTimersConfig, "BOTTOMLEFT", 25, 325)
-
-		-- frame:SetScript("OnClick", function(self)
-		-- 	NecrosisConfig.ShowSpellTimers = self:GetChecked()
-		-- 	if NecrosisConfig.ShowSpellTimers then
-		-- 		NecrosisSpellTimerButton:Show()
-		-- 	else
-		-- 		NecrosisSpellTimerButton:Hide()
-		-- 	end
-		-- end)
-
-		-- FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
-		-- FontString:Show()
-		-- FontString:ClearAllPoints()
-		-- FontString:SetPoint("LEFT", frame, "RIGHT", 5, 1)
-		-- FontString:SetTextColor(1, 1, 1)
-		-- frame:SetFontString(FontString)
-		-- -- frame:SetDisabledTextColor(0.75, 0.75, 0.75)
 
 		-- Affiche les timers sur la gauche du bouton
 		self.cbTimersOnLeftSide = GraphicsHelper:CreateCheckButton(
@@ -205,25 +168,6 @@ function _tv:Show()
 			self.cbTimersOnLeftSide_Click
 		)
 		self.cbTimersOnLeftSide:SetChecked(NecrosisConfig.SpellTimerPos == -1)
-		-- frame = CreateFrame("CheckButton", "NecrosisTimerOnLeft", NecrosisTimersConfig, "UICheckButtonTemplate")
-		-- frame:EnableMouse(true)
-		-- frame:SetWidth(24)
-		-- frame:SetHeight(24)
-		-- frame:Show()
-		-- frame:ClearAllPoints()
-		-- frame:SetPoint("LEFT", NecrosisTimersConfig, "BOTTOMLEFT", 25, 300)
-
-		-- frame:SetScript("OnClick", function(self)
-		-- 	Necrosis:SymetrieTimer(self:GetChecked())
-		-- end)
-
-		-- FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
-		-- FontString:Show()
-		-- FontString:ClearAllPoints()
-		-- FontString:SetPoint("LEFT", frame, "RIGHT", 5, 1)
-		-- FontString:SetTextColor(1, 1, 1)
-		-- frame:SetFontString(FontString)
-		-- -- frame:SetDisabledTextColor(0.75, 0.75, 0.75)
 
 		-- Affiche les timers de bas en haut
 		self.cbTimersGrowUpwards = GraphicsHelper:CreateCheckButton(
@@ -233,29 +177,9 @@ function _tv:Show()
 			self.cbTimersGrowUpwards_Click
 		)
 		self.cbTimersGrowUpwards:SetChecked(NecrosisConfig.SensListe == -1)
-		-- frame = CreateFrame("CheckButton", "NecrosisTimerUpward", NecrosisTimersConfig, "UICheckButtonTemplate")
-		-- frame:EnableMouse(true)
-		-- frame:SetWidth(24)
-		-- frame:SetHeight(24)
-		-- frame:Show()
-		-- frame:ClearAllPoints()
-		-- frame:SetPoint("LEFT", NecrosisTimersConfig, "BOTTOMLEFT", 25, 275)
 
-		-- frame:SetScript("OnClick", function(self)
-		-- 	if (self:GetChecked()) then
-		-- 		NecrosisConfig.SensListe = -1
-		-- 	else
-		-- 		NecrosisConfig.SensListe = 1
-		-- 	end
-		-- end)
-
-		-- FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
-		-- FontString:Show()
-		-- FontString:ClearAllPoints()
-		-- FontString:SetPoint("LEFT", frame, "RIGHT", 5, 1)
-		-- FontString:SetTextColor(1, 1, 1)
-		-- frame:SetFontString(FontString)
-		-- -- frame:SetDisabledTextColor(0.75, 0.75, 0.75)
+		-- Handler to update texts when language changes
+		EventHub:RegisterLanguageChangedHandler(self.UpdateTexts)
 
 		if NecrosisConfig.TimerType == 0 then
 			self.cbTimersGrowUpwards:Disable()
@@ -269,32 +193,6 @@ function _tv:Show()
 			self.cbTimersOnLeftSide:Enable()
 		end
 	end
-
-	-- UIDropDownMenu_Initialize(NecrosisTimerSelection, Necrosis.Timer_Init)
-
-	-- NecrosisTimerSelectionT:SetText(self.Config.Timers["Type de timers"])
-	-- NecrosisShowSpellTimerButton:SetText(self.Config.Timers["Afficher le bouton des timers"])
-	-- NecrosisTimerOnLeft:SetText(self.Config.Timers["Afficher les timers sur la gauche du bouton"])
-	-- NecrosisTimerUpward:SetText(self.Config.Timers["Afficher les timers de bas en haut"])
-
-	-- UIDropDownMenu_SetSelectedID(NecrosisTimerSelection, (NecrosisConfig.TimerType + 1))
-	-- UIDropDownMenu_SetText(NecrosisTimerSelection, Necrosis.Config.Timers.Type[NecrosisConfig.TimerType + 1])
-
-	-- NecrosisShowSpellTimerButton:SetChecked(NecrosisConfig.ShowSpellTimers)
-	-- NecrosisTimerOnLeft:SetChecked(NecrosisConfig.SpellTimerPos == -1)
-	-- NecrosisTimerUpward:SetChecked(NecrosisConfig.SensListe == -1)
-
-	-- if NecrosisConfig.TimerType == 0 then
-	-- 	NecrosisTimerUpward:Disable()
-	-- 	NecrosisTimerOnLeft:Disable()
-
-	-- elseif NecrosisConfig.TimerType == 2 then
-	-- 	NecrosisTimerUpward:Disable()
-	-- 	NecrosisTimerOnLeft:Enable()
-	-- else
-	-- 	NecrosisTimerOnLeft:Enable()
-	-- 	NecrosisTimerUpward:Enable()
-	-- end
 
 	self.Frame:Show()
 end
