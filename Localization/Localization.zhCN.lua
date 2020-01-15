@@ -218,20 +218,20 @@ function Localization.zhCN()
 	}
 
 	Necrosis.Config.Sphere.Colour = {
-		"粉红色",
-		"蓝色",
-		"橙色",
-		"青绿色",
-		"紫色",
-		"666",
-		"X"
+		["Rose"] 		= "粉红色",
+		["Bleu"] 		= "蓝色",
+		["Orange"] 		= "橙色",
+		["Turquoise"] 	= "青绿色",
+		["Violet"] 		= "紫色",
+		["666"] 		= "666",
+		["X"] 			= "X"
 	}
 	Necrosis.Config.Sphere.Count = {
-		"灵魂碎片",
-		"恶魔召唤石",
-		"灵魂石冷却计时",
-		"Mana",
-		"Health"
+		["Soulshards"] 	= "灵魂碎片",
+		["DemonStones"] = "恶魔召唤石",
+		["RezTimer"] 	= "灵魂石冷却计时",
+		["Mana"] 		= "Mana",
+		["Health"] 		= "Health"
 	}
 
 	Necrosis.Config.Buttons = {
@@ -278,9 +278,9 @@ function Localization.zhCN()
 		["Afficher les timers de bas en haut"] = "计时器向上升",
 	}
 	Necrosis.Config.Timers.Type = {
-		"No Timer",
-		"Graphical",
-		"Textual"
+		Disabled	= "No Timer",
+		Graphical	= "Graphical",
+		Textual		= "Textual"
 	}
 
 	Necrosis.Config.Misc = {

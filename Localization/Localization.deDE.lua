@@ -223,20 +223,20 @@ function Localization.deDE()
 		["Type de compteur numerique"] = "Anzeige w\195\164hlen:"
 	}
 	Necrosis.Config.Sphere.Colour = {
-		"Pink",
-		"Blau",
-		"Orange",
-		"T\195\188rkis",
-		"Lila",
-		"666",
-		"X"
+		["Rose"] 		= "Pink",
+		["Bleu"] 		= "Blau",
+		["Orange"] 		= "Orange",
+		["Turquoise"] 	= "T\195\188rkis",
+		["Violet"] 		= "Lila",
+		["666"] 		= "666",
+		["X"] 			= "X"
 	}
 	Necrosis.Config.Sphere.Count = {
-		"Seelensplitter",
-		"D\195\164monenen-Beschw\195\182rungs-Steine",
-		"Wiederbelebungs-Timer",
-		"Mana",
-		"Gesundheit"
+		["Soulshards"] 	= "Seelensplitter",
+		["DemonStones"] = "D\195\164monenen-Beschw\195\182rungs-Steine",
+		["RezTimer"] 	= "Wiederbelebungs-Timer",
+		["Mana"] 		= "Mana",
+		["Health"] 		= "Gesundheit"
 	}
 
 	Necrosis.Config.Buttons = {
@@ -283,9 +283,9 @@ function Localization.deDE()
 		["Afficher les timers de bas en haut"] = "Neue Timer oberhalb der bestehenden Timer anzeigen",
 	}
 	Necrosis.Config.Timers.Type = {
-		"Kein",
-		"Graphische",
-		"Texttimer"
+		Disabled	= "Kein",
+		Graphical	= "Graphische",
+		Textual		= "Texttimer"
 	}
 
 	Necrosis.Config.Misc = {

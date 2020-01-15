@@ -216,20 +216,20 @@ function Localization.ruRU()
 		["Type de compteur numerique"] = "Показывать количество камней"
 	}
 	Necrosis.Config.Sphere.Colour = {
-		"Розовый",
-		"Синий",
-		"Оранжевый",
-		"Бирюзовый",
-		"Пурпурный",
-		"666",
-		"X"
+		["Rose"] 		= "Розовый",
+		["Bleu"] 		= "Синий",
+		["Orange"] 		= "Оранжевый",
+		["Turquoise"] 	= "Бирюзовый",
+		["Violet"] 		= "Пурпурный",
+		["666"] 		= "666",
+		["X"] 			= "X"
 	}
 	Necrosis.Config.Sphere.Count = {
-		"Осколки душ",
-		"Камни призыва демонов",
-		"Таймер оживления",
-		"Мана",
-		"Здоровье"
+		["Soulshards"] 	= "Осколки душ",
+		["DemonStones"] = "Камни призыва демонов",
+		["RezTimer"] 	= "Таймер оживления",
+		["Mana"] 		= "Мана",
+		["Health"] 		= "Здоровье"
 	}
 
 	Necrosis.Config.Buttons = {
@@ -277,9 +277,9 @@ function Localization.ruRU()
 		["Afficher les timers de bas en haut"] = "Таймер растёт вверх",
 	}
 	Necrosis.Config.Timers.Type = {
-		"Нет таймера",
-		"Графический",
-		"Текстовый"
+		Disabled	= "Нет таймера",
+		Graphical	= "Графический",
+		Textual		= "Текстовый"
 	}
 
 	Necrosis.Config.Misc = {

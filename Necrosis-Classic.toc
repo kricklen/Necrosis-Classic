@@ -59,11 +59,12 @@ XML\XML.lua
 #XML\Options-Sphere.lua
 XML\Options-Buttons.lua
 XML\Options-Menus.lua
-XML\Options-Timers.lua
+#XML\Options-Timers.lua
 XML\Options-Misc.lua
 
 Gui\MessagesView.lua
 Gui\SphereView.lua
+Gui\TimersView.lua
 Gui\MainWindow.lua
 
 Necrosis.lua

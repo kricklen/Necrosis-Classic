@@ -215,20 +215,20 @@ function Localization.zhTW()
 		["Type de compteur numerique"] = "計算石頭類型"
 	}
 	Necrosis.Config.Sphere.Colour = {
-		"粉紅色",
-		"藍色",
-		"橘色",
-		"青綠色",
-		"紫色",
-		"666",
-		"X"
+		["Rose"] 		= "粉紅色",
+		["Bleu"] 		= "藍色",
+		["Orange"] 		= "橘色",
+		["Turquoise"] 	= "青綠色",
+		["Violet"] 		= "紫色",
+		["666"] 		= "666",
+		["X"] 			= "X"
 	}
 	Necrosis.Config.Sphere.Count = {
-		"靈魂碎片",
-		"惡魔召喚石",
-		"靈魂石冷卻計時",
-		"魔力",
-		"體力"
+		["Soulshards"] 	= "靈魂碎片",
+		["DemonStones"] = "惡魔召喚石",
+		["RezTimer"] 	= "靈魂石冷卻計時",
+		["Mana"] 		= "魔力",
+		["Health"] 		= "體力"
 	}
 
 	Necrosis.Config.Buttons = {
@@ -275,9 +275,9 @@ function Localization.zhTW()
 		["Afficher les timers de bas en haut"] = "計時器向上增加",
 	}
 	Necrosis.Config.Timers.Type = {
-		"無計時器",
-		"圖型",
-		"文字"
+		Disabled	= "無計時器",
+		Graphical	= "圖型",
+		Textual		= "文字"
 	}
 
 	Necrosis.Config.Misc = {

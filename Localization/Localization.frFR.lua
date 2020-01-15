@@ -216,20 +216,20 @@ function Localization.frFR()
 		["Type de compteur numerique"] = "Type de compteur num\195\169rique"
 	}
 	Necrosis.Config.Sphere.Colour = {
-		"Rose",
-		"Bleu",
-		"Orange",
-		"Turquoise",
-		"Violet",
-		"666",
-		"X"
+		["Rose"] 		= "Rose",
+		["Bleu"] 		= "Bleu",
+		["Orange"] 		= "Orange",
+		["Turquoise"] 	= "Turquoise",
+		["Violet"] 		= "Violet",
+		["666"] 		= "666",
+		["X"] 			= "X"
 	}
 	Necrosis.Config.Sphere.Count = {
-		"Fragments d'\195\162me",
-		"Pierres d'invocations",
-		"Timer de Rez",
-		"Mana",
-		"Sant\195\169"
+		["Soulshards"] 	= "Fragments d'\195\162me",
+		["DemonStones"] = "Pierres d'invocations",
+		["RezTimer"] 	= "Timer de Rez",
+		["Mana"] 		= "Mana",
+		["Health"] 		= "Sant\195\169"
 	}
 
 	Necrosis.Config.Buttons = {
@@ -277,9 +277,9 @@ function Localization.frFR()
 		["Afficher les timers de bas en haut"] = "Afficher les timers de bas en haut"
 	}
 	Necrosis.Config.Timers.Type = {
-		"Aucun",
-		"Graphiques",
-		"Textuels"
+		Disabled	= "Aucun",
+		Graphical	= "Graphiques",
+		Textual		= "Textuels"
 	}
 
 	Necrosis.Config.Misc = {

@@ -207,43 +207,43 @@ end
 -- FONCTIONS NECESSAIRES AUX DROPDOWNS
 ------------------------------------------------------------------------------------------------------
 
--- Fonctions du Dropdown des timers
-function Necrosis.Timer_Init()
-	local element = {}
+-- -- Fonctions du Dropdown des timers
+-- function Necrosis.Timer_Init()
+-- 	local element = {}
 
-	for i in ipairs(Necrosis.Config.Timers.Type) do
-		element.text = Necrosis.Config.Timers.Type[i]
-		element.checked = false
-		element.func = Necrosis.Timer_Click
-		UIDropDownMenu_AddButton(element)
-	end
-end
+-- 	for i in ipairs(Necrosis.Config.Timers.Type) do
+-- 		element.text = Necrosis.Config.Timers.Type[i]
+-- 		element.checked = false
+-- 		element.func = Necrosis.Timer_Click
+-- 		UIDropDownMenu_AddButton(element)
+-- 	end
+-- end
 
-function Necrosis.Timer_Click(self)
-	local ID = self:GetID()
-	UIDropDownMenu_SetSelectedID(NecrosisTimerSelection, ID)
-	NecrosisConfig.TimerType = ID - 1
-	if not (ID == 1) then Necrosis:CreateTimerAnchor() end
-	if ID == 1 then
-		NecrosisTimerUpward:Disable()
-		NecrosisTimerOnLeft:Disable()
-		if _G["NecrosisListSpells"] then NecrosisListSpells:SetText("") end
-		local index = 1
-		while _G["NecrosisTimerFrame"..index] do
-			_G["NecrosisTimerFrame"..index]:Hide()
-			index = index + 1
-		end
-	elseif ID == 3 then
-		NecrosisTimerUpward:Disable()
-		NecrosisTimerOnLeft:Enable()
-		local index = 1
-		while _G["NecrosisTimerFrame"..index] do
-			_G["NecrosisTimerFrame"..index]:Hide()
-			index = index + 1
-		end
-	else
-		NecrosisTimerUpward:Enable()
-		NecrosisTimerOnLeft:Enable()
-		if _G["NecrosisListSpells"] then NecrosisListSpells:SetText("") end
-	end
-end
+-- function Necrosis.Timer_Click(self)
+-- 	local ID = self:GetID()
+-- 	UIDropDownMenu_SetSelectedID(NecrosisTimerSelection, ID)
+-- 	NecrosisConfig.TimerType = ID - 1
+-- 	if not (ID == 1) then Necrosis:CreateTimerAnchor() end
+-- 	if ID == 1 then
+-- 		NecrosisTimerUpward:Disable()
+-- 		NecrosisTimerOnLeft:Disable()
+-- 		if _G["NecrosisListSpells"] then NecrosisListSpells:SetText("") end
+-- 		local index = 1
+-- 		while _G["NecrosisTimerFrame"..index] do
+-- 			_G["NecrosisTimerFrame"..index]:Hide()
+-- 			index = index + 1
+-- 		end
+-- 	elseif ID == 3 then
+-- 		NecrosisTimerUpward:Disable()
+-- 		NecrosisTimerOnLeft:Enable()
+-- 		local index = 1
+-- 		while _G["NecrosisTimerFrame"..index] do
+-- 			_G["NecrosisTimerFrame"..index]:Hide()
+-- 			index = index + 1
+-- 		end
+-- 	else
+-- 		NecrosisTimerUpward:Enable()
+-- 		NecrosisTimerOnLeft:Enable()
+-- 		if _G["NecrosisListSpells"] then NecrosisListSpells:SetText("") end
+-- 	end
+-- end

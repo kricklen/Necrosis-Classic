@@ -67,15 +67,11 @@ function _chat:BeforeSpellCast(Spell)
 	if (Spell.Name == Necrosis.Spell[1].Name or Spell.Name == Necrosis.Spell[2].Name) then
 		if NecrosisConfig.SteedSummon then
 			_chat:SummonMount()
-		else
-			print("Summon Mount speech disabled")
 		end
 	-- messsages to be posted while casting 'Ritual of Souls' -Draven (April 3rd, 2008)
 	elseif Spell.Name == Necrosis.Spell[50].Name then
 		if NecrosisConfig.RoSSummon then
 			_chat:CastRitualOfSouls()
-		else
-			print("Ritual of Souls speech disabled")
 		end
 	-- messages to be posted while casting 'Soulstone' on a friendly target
 	elseif Spell.Name == Necrosis.Spell[11].Name and not (Spell.TargetName == UnitName("player")) then
@@ -89,43 +85,31 @@ function _chat:BeforeSpellCast(Spell)
 	elseif Spell.Name == Necrosis.Spell[3].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Imp")
-		else
-			print("SummonDemon speech disabled")
 		end
 	-- Messages for summoning Voidwalker
 	elseif Spell.Name == Necrosis.Spell[4].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Voidwalker")
-		else
-			print("SummonDemon speech disabled")
 		end
 	-- Messages for summoning Succubus
 	elseif Spell.Name == Necrosis.Spell[5].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Succubus")
-		else
-			print("SummonDemon speech disabled")
 		end
 	-- Messages for summoning Felhunter
 	elseif Spell.Name == Necrosis.Spell[6].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Felhunter")
-		else
-			print("SummonDemon speech disabled")
 		end
 	-- Messages for summoning Felguard
 	elseif Spell.Name == Necrosis.Spell[7].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Felguard")
-		else
-			print("SummonDemon speech disabled")
 		end
 	-- Messages for Demonic Sacrifice
 	elseif Spell.Name == Necrosis.Spell[44].Name then
 		if NecrosisConfig.DemonicSacrifice then
 			_chat:CastDemonicSacrifice(Necrosis.CurrentEnv.DemonType)
-		else
-			print("DemonicSacrifice speech disabled")
 		end
 	end
 end
@@ -309,6 +293,8 @@ function _chat:_ParseChannelAndMessageData(msg)
 		chatType = "EMOTE"
 	elseif string.find(msg, "<yell>") then
 		chatType = "YELL"
+	elseif string.find(msg, "<say>") then
+		chatType = "SAY"
 	else
 		chatType = "WORLD"
 	end
@@ -324,18 +310,17 @@ function _chat:_ReplaceMessagePlaceholders(msg)
 	msg = msg:gsub("<after>", "")
 	msg = msg:gsub("<sacrifice>", "")
 	msg = msg:gsub("<yell>", "")
+	msg = msg:gsub("<say>", "")
 	if self.TargetName then
 		msg = msg:gsub("<target>", self.TargetName)
 	end
 	if self.PetType and NecrosisConfig.PetName[self.PetType] then
-		print("NecrosisConfig.PetName: "..NecrosisConfig.PetName[self.PetType])
 		msg = msg:gsub("<pet>", NecrosisConfig.PetName[self.PetType])
 	end
 	return msg
 end
 
 function _chat:_PostMessages(msgTable)
-	print("_chat:_PostMessages: "..tostring(#msgTable))
 	for i,data in ipairs(msgTable) do
 		self:_Msg(data.msg, data.channel)
 	end
@@ -364,10 +349,10 @@ function _chat:_Msg(msg, channel)
 	elseif (channel == "EMOTE") then
 		SendChatMessage(msg, _G.EMOTE)
 	-- SAY and YELL are protected functions and can't be called without hardware event anymore
-	-- elseif (channel == "SAY") then
-	-- 	SendChatMessage(msg, _G.SAY)
-	-- elseif (channel == "YELL") then
-	-- 	SendChatMessage(msg, _G.YELL)
+	elseif (channel == "SAY") and IsInInstance() then
+		SendChatMessage(msg, _G.SAY)
+	elseif (channel == "YELL") and IsInInstance() then
+		SendChatMessage(msg, _G.YELL)
 	else
 		-- Add some color to our message :D
 		local msg = self:_ColorizeMessage(msg)
