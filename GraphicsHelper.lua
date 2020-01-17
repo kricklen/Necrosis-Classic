@@ -49,12 +49,15 @@ end
 
 -- Create a UIDropDownMenu with a FontString.
 -- The FontString element has the name: "lbl" + name.
-function GraphicsHelper:CreateDropDown(parentFrame, text, x, y)
+function GraphicsHelper:CreateDropDown(parentFrame, text, x, y, initFunction)
 	local dd = CreateFrame("Frame", nil, parentFrame, "UIDropDownMenuTemplate")
 	dd:Show()
 	dd:ClearAllPoints()
 	dd:SetPoint("TOPRIGHT", x, y)
 	UIDropDownMenu_SetWidth(dd, 125)
+	if initFunction then
+		UIDropDownMenu_Initialize(dd, initFunction)
+	end
 	-- Set the text in line with the dropdown to the left side
 	local fs = self:CreateFontString(parentFrame, nil, text, "TOPLEFT", -12, y - 6)
     return dd, fs
