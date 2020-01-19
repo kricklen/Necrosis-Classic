@@ -45,7 +45,7 @@ Necrosis.Gui.TimersView = {
 	cbEnableTimers = false,
 	cbTimersGrowUpwards = false,
 	cbTimersOnLeftSide = false,
-	Types = {"Disabled", "Graphical", "Textual"}
+	_Types = {"Disabled", "Graphical", "Textual"}
 }
 
 local _tv = Necrosis.Gui.TimersView
@@ -72,7 +72,7 @@ function _tv:cbTimersGrowUpwards_Click()
 end
 
 function _tv.ddTimers_Init(dd)
-	for i,data in ipairs(_tv.Types) do
+	for i,data in ipairs(_tv._Types) do
 		UIDropDownMenu_AddButton({
 			text = Necrosis.Config.Timers.Type[data],
 			value = data,

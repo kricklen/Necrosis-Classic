@@ -45,240 +45,400 @@ local NECROSIS_PAGE_NUMBER = "Page %s of %s";
 ------------------------------------------------------------------------------------------------------
 
 Necrosis.Gui.ButtonsView = {
-	Frame = false
+	Frame = false,
+	Page1 = false,
+	Page2 = false,
+	_ButtonTypes = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu"},
+	_Buttons = {}
 }
 
 local _bv = Necrosis.Gui.ButtonsView
 
+function _bv.SwitchPages()
+	if _bv.Page2.IsShown() then
+		_bv.Page1:Show()
+		_bv.Page2:Hide()
+		_bv.fsPaging:SetText("1 / 2")
+	else
+		_bv.Page1:Hide()
+		_bv.Page2:Show()
+		_bv.fsPaging:SetText("2 / 2")
+	end
+end
+
+function _bv:cbLockButtons_Click()
+	if (self:GetChecked()) then
+		NecrosisConfig.NecrosisLockServ = true
+		Necrosis:ClearAllPoints()
+		Necrosis:ButtonSetup()
+		Necrosis:NoDrag()
+		if not NecrosisConfig.NoDragAll then
+			NecrosisButton:RegisterForDrag("LeftButton")
+			NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+		end
+	else
+		NecrosisConfig.NecrosisLockServ = false
+		Necrosis:ClearAllPoints()
+		local ButtonName = {
+			"NecrosisFirestoneButton",
+			"NecrosisSpellstoneButton",
+			"NecrosisHealthstoneButton",
+			"NecrosisSoulstoneButton",
+			"NecrosisBuffMenuButton",
+			"NecrosisMountButton",
+			"NecrosisPetMenuButton",
+			"NecrosisCurseMenuButton"
+		}
+		local loc = {-121, -87, -53, -17, 17, 53, 87, 121}
+		for i in ipairs(ButtonName) do
+			if _G[ButtonName[i]] then
+				_G[ButtonName[i]]:SetPoint("CENTER", "UIParent", "CENTER", loc[i], -100)
+				NecrosisConfig.FramePosition[ButtonName[i]] = {
+					"CENTER",
+					"UIParent",
+					"CENTER",
+					loc[i],
+					-100
+				}
+			end
+		end
+		Necrosis:Drag()
+		NecrosisConfig.NoDragAll = false
+		NecrosisButton:RegisterForDrag("LeftButton")
+		NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+	end
+end
+
 --We create or display the configuration panel of the sphere ||  On crée ou on affiche le panneau de configuration de la sphere
 function _bv:Show()
-	local frame = _G["NecrosisButtonsConfig"]
-	if not frame then
+	-- local frame = _G["NecrosisButtonsConfig"]
+	if not self.Frame then
 		-- Création de la fenêtre
-		frame = CreateFrame("Frame", "NecrosisButtonsConfig", NecrosisGeneralFrame)
-		self.Frame = frame
-		frame:SetFrameStrata("DIALOG")
-		frame:SetMovable(false)
-		frame:EnableMouse(true)
-		frame:SetWidth(350)
-		frame:SetHeight(452)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("BOTTOMLEFT")
+		self.Frame = GraphicsHelper:CreateDialog(NecrosisGeneralFrame)
+
+		-- frame = CreateFrame("Frame", "NecrosisButtonsConfig", NecrosisGeneralFrame)
+		-- self.Frame = frame
+		-- frame:SetFrameStrata("DIALOG")
+		-- frame:SetMovable(false)
+		-- frame:EnableMouse(true)
+		-- frame:SetWidth(350)
+		-- frame:SetHeight(452)
+		-- frame:Show()
+		-- frame:ClearAllPoints()
+		-- frame:SetPoint("BOTTOMLEFT")
 
 		-- Création de la sous-fenêtre 1
-		frame = CreateFrame("Frame", "NecrosisButtonsConfig1", NecrosisButtonsConfig)
-		frame:SetFrameStrata("DIALOG")
-		frame:SetMovable(false)
-		frame:EnableMouse(true)
-		frame:SetWidth(350)
-		frame:SetHeight(452)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetAllPoints(NecrosisButtonsConfig)
-		
-		local FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
-		FontString:Show()
-		FontString:ClearAllPoints()
-		FontString:SetPoint("BOTTOM", frame, "BOTTOM", 50, 130)
-		FontString:SetText("1 / 2")
+		self.Page1 = GraphicsHelper:CreateDialog(self.Frame)
+		self.Page2 = GraphicsHelper:CreateDialog(self.Frame)
+		self.Page2:Hide()
 
-		FontString = frame:CreateFontString("NecrosisButtonsConfig1Text", nil, "GameFontNormalSmall")
-		FontString:Show()
-		FontString:ClearAllPoints()
-		FontString:SetPoint("BOTTOM", frame, "BOTTOM", 50, 420)
+		-- frame = CreateFrame("Frame", "NecrosisButtonsConfig1", NecrosisButtonsConfig)
+		-- frame:SetFrameStrata("DIALOG")
+		-- frame:SetMovable(false)
+		-- frame:EnableMouse(true)
+		-- frame:SetWidth(350)
+		-- frame:SetHeight(452)
+		-- frame:Show()
+		-- frame:ClearAllPoints()
+		-- frame:SetAllPoints(NecrosisButtonsConfig)
+		
+		self.fsPaging = GraphicsHelper:CreateFontString(
+			self.Frame, nil,
+			"1 / 2",
+			"BOTTOM",
+			-10, 10
+		)
+
+		-- local FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
+		-- FontString:Show()
+		-- FontString:ClearAllPoints()
+		-- FontString:SetPoint("BOTTOM", frame, "BOTTOM", 50, 130)
+		-- FontString:SetText("1 / 2")
+
+		self.fsPage1Title = GraphicsHelper:CreateFontString(
+			self.Page1, nil,
+			Necrosis.Config.Buttons["Choix des boutons a afficher"],
+			"TOP",
+			0, -10
+		)
+
+		self.fsPage2Title = GraphicsHelper:CreateFontString(
+			self.Page2, nil,
+			Necrosis.Config.Menus["Options Generales"],
+			"TOP",
+			0, -10
+		)
+
+		-- FontString = frame:CreateFontString("NecrosisButtonsConfig1Text", nil, "GameFontNormalSmall")
+		-- FontString:Show()
+		-- FontString:ClearAllPoints()
+		-- FontString:SetPoint("BOTTOM", frame, "BOTTOM", 50, 420)
 		
 		-- Boutons
-		frame = CreateFrame("Button", nil, NecrosisButtonsConfig1, "OptionsButtonTemplate")
-		frame:SetText(">>>")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("RIGHT", NecrosisButtonsConfig1, "BOTTOMRIGHT", 40, 135)
+		self.btnNext = GraphicsHelper:CreateButton(
+			self.Frame,
+			">>>",
+			-20, -300,
+			self.SwitchPages
+		)
 
-		frame:SetScript("OnClick", function()
-			NecrosisButtonsConfig2:Show()
-			NecrosisButtonsConfig1:Hide()
-		end)
+		-- frame = CreateFrame("Button", nil, NecrosisButtonsConfig1, "OptionsButtonTemplate")
+		-- frame:SetText(">>>")
+		-- frame:EnableMouse(true)
+		-- frame:Show()
+		-- frame:ClearAllPoints()
+		-- frame:SetPoint("RIGHT", NecrosisButtonsConfig1, "BOTTOMRIGHT", 40, 135)
 
-		frame = CreateFrame("Button", nil, NecrosisButtonsConfig1, "OptionsButtonTemplate")
-		frame:SetText("<<<")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisButtonsConfig1, "BOTTOMLEFT", 40, 135)
+		-- frame:SetScript("OnClick", function()
+		-- 	NecrosisButtonsConfig2:Show()
+		-- 	NecrosisButtonsConfig1:Hide()
+		-- end)
 
-		frame:SetScript("OnClick", function()
-			NecrosisButtonsConfig2:Show()
-			NecrosisButtonsConfig1:Hide()
-		end)
+		self.BtnPrev = GraphicsHelper:CreateButton(
+			self.Frame,
+			"<<<",
+			-260, -300,
+			self.SwitchPages
+		)
+		-- frame = CreateFrame("Button", nil, NecrosisButtonsConfig1, "OptionsButtonTemplate")
+		-- frame:SetText("<<<")
+		-- frame:EnableMouse(true)
+		-- frame:Show()
+		-- frame:ClearAllPoints()
+		-- frame:SetPoint("LEFT", NecrosisButtonsConfig1, "BOTTOMLEFT", 40, 135)
+
+		-- frame:SetScript("OnClick", function()
+		-- 	NecrosisButtonsConfig2:Show()
+		-- 	NecrosisButtonsConfig1:Hide()
+		-- end)
 		
 		-- Création de la sous-fenêtre 2
-		frame = CreateFrame("Frame", "NecrosisButtonsConfig2", NecrosisButtonsConfig)
-		frame:SetFrameStrata("DIALOG")
-		frame:SetMovable(false)
-		frame:EnableMouse(true)
-		frame:SetWidth(350)
-		frame:SetHeight(452)
-		frame:Hide()
-		frame:ClearAllPoints()
-		frame:SetAllPoints(NecrosisButtonsConfig)
+		-- frame = CreateFrame("Frame", "NecrosisButtonsConfig2", NecrosisButtonsConfig)
+		-- frame:SetFrameStrata("DIALOG")
+		-- frame:SetMovable(false)
+		-- frame:EnableMouse(true)
+		-- frame:SetWidth(350)
+		-- frame:SetHeight(452)
+		-- frame:Hide()
+		-- frame:ClearAllPoints()
+		-- frame:SetAllPoints(NecrosisButtonsConfig)
 		
-		local FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
-		FontString:Show()
-		FontString:ClearAllPoints()
-		FontString:SetPoint("BOTTOM", frame, "BOTTOM", 50, 130)
-		FontString:SetText("2 / 2")
+		-- local FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
+		-- FontString:Show()
+		-- FontString:ClearAllPoints()
+		-- FontString:SetPoint("BOTTOM", frame, "BOTTOM", 50, 130)
+		-- FontString:SetText("2 / 2")
 
-		FontString = frame:CreateFontString("NecrosisButtonsConfig2Text", nil, "GameFontNormalSmall")
-		FontString:Show()
-		FontString:ClearAllPoints()
-		FontString:SetPoint("BOTTOM", frame, "BOTTOM", 50, 420)
+		-- FontString = frame:CreateFontString("NecrosisButtonsConfig2Text", nil, "GameFontNormalSmall")
+		-- FontString:Show()
+		-- FontString:ClearAllPoints()
+		-- FontString:SetPoint("BOTTOM", frame, "BOTTOM", 50, 420)
 		
 		-- Boutons
-		frame = CreateFrame("Button", nil, NecrosisButtonsConfig2, "OptionsButtonTemplate")
-		frame:SetText(">>>")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("RIGHT", NecrosisButtonsConfig2, "BOTTOMRIGHT", 40, 135)
+		-- frame = CreateFrame("Button", nil, NecrosisButtonsConfig2, "OptionsButtonTemplate")
+		-- frame:SetText(">>>")
+		-- frame:EnableMouse(true)
+		-- frame:Show()
+		-- frame:ClearAllPoints()
+		-- frame:SetPoint("RIGHT", NecrosisButtonsConfig2, "BOTTOMRIGHT", 40, 135)
 
-		frame:SetScript("OnClick", function()
-			NecrosisButtonsConfig1:Show()
-			NecrosisButtonsConfig2:Hide()
-		end)
+		-- frame:SetScript("OnClick", function()
+		-- 	NecrosisButtonsConfig1:Show()
+		-- 	NecrosisButtonsConfig2:Hide()
+		-- end)
 
-		frame = CreateFrame("Button", nil, NecrosisButtonsConfig2, "OptionsButtonTemplate")
-		frame:SetText("<<<")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisButtonsConfig2, "BOTTOMLEFT", 40, 135)
+		-- frame = CreateFrame("Button", nil, NecrosisButtonsConfig2, "OptionsButtonTemplate")
+		-- frame:SetText("<<<")
+		-- frame:EnableMouse(true)
+		-- frame:Show()
+		-- frame:ClearAllPoints()
+		-- frame:SetPoint("LEFT", NecrosisButtonsConfig2, "BOTTOMLEFT", 40, 135)
 
-		frame:SetScript("OnClick", function()
-			NecrosisButtonsConfig1:Show()
-			NecrosisButtonsConfig2:Hide()
-		end)
+		-- frame:SetScript("OnClick", function()
+		-- 	NecrosisButtonsConfig1:Show()
+		-- 	NecrosisButtonsConfig2:Hide()
+		-- end)
 		
 		-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		-- Sub Menu 1
 		-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		-- Attach or detach the necrosis buttons || Attache ou détache les boutons de Necrosis
-		frame = CreateFrame("CheckButton", "NecrosisLockButtons", NecrosisButtonsConfig1, "UICheckButtonTemplate")
-		frame:EnableMouse(true)
-		frame:SetWidth(24)
-		frame:SetHeight(24)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisButtonsConfig1, "BOTTOMLEFT", 25, 395)
 
-		frame:SetScript("OnClick", function(self)
-			if (self:GetChecked()) then
-				NecrosisConfig.NecrosisLockServ = true
-				Necrosis:ClearAllPoints()
-				Necrosis:ButtonSetup()
-				Necrosis:NoDrag()
-				if not NecrosisConfig.NoDragAll then
-					NecrosisButton:RegisterForDrag("LeftButton")
-					NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
-				end
-			else
-				NecrosisConfig.NecrosisLockServ = false
-				Necrosis:ClearAllPoints()
-				local ButtonName = {
-					"NecrosisFirestoneButton",
-					"NecrosisSpellstoneButton",
-					"NecrosisHealthstoneButton",
-					"NecrosisSoulstoneButton",
-					"NecrosisBuffMenuButton",
-					"NecrosisMountButton",
-					"NecrosisPetMenuButton",
-					"NecrosisCurseMenuButton"
-				}
-				local loc = {-121, -87, -53, -17, 17, 53, 87, 121}
-				for i in ipairs(ButtonName) do
-					if _G[ButtonName[i]] then
-						_G[ButtonName[i]]:SetPoint("CENTER", "UIParent", "CENTER", loc[i], -100)
-						NecrosisConfig.FramePosition[ButtonName[i]] = {
-							"CENTER",
-							"UIParent",
-							"CENTER",
-							loc[i],
-							-100
-						}
-					end
-				end
-				Necrosis:Drag()
-				NecrosisConfig.NoDragAll = false
-				NecrosisButton:RegisterForDrag("LeftButton")
-				NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
-			end
-		end)
+		-- NecrosisLockButtons:SetText(Necrosis.Config.Buttons["Fixer les boutons autour de la sphere"])
+		-- NecrosisLockButtons:SetChecked(NecrosisConfig.NecrosisLockServ)
 
-		FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
-		FontString:Show()
-		FontString:ClearAllPoints()
-		FontString:SetPoint("LEFT", frame, "RIGHT", 5, 1)
-		FontString:SetTextColor(1, 1, 1)
-		frame:SetFontString(FontString)
+		-- frame = CreateFrame("CheckButton", "NecrosisLockButtons", NecrosisButtonsConfig1, "UICheckButtonTemplate")
+		-- frame:EnableMouse(true)
+		-- frame:SetWidth(24)
+		-- frame:SetHeight(24)
+		-- frame:Show()
+		-- frame:ClearAllPoints()
+		-- frame:SetPoint("LEFT", NecrosisButtonsConfig1, "BOTTOMLEFT", 25, 395)
+
+		-- frame:SetScript("OnClick", function(self)
+		-- 	if (self:GetChecked()) then
+		-- 		NecrosisConfig.NecrosisLockServ = true
+		-- 		Necrosis:ClearAllPoints()
+		-- 		Necrosis:ButtonSetup()
+		-- 		Necrosis:NoDrag()
+		-- 		if not NecrosisConfig.NoDragAll then
+		-- 			NecrosisButton:RegisterForDrag("LeftButton")
+		-- 			NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+		-- 		end
+		-- 	else
+		-- 		NecrosisConfig.NecrosisLockServ = false
+		-- 		Necrosis:ClearAllPoints()
+		-- 		local ButtonName = {
+		-- 			"NecrosisFirestoneButton",
+		-- 			"NecrosisSpellstoneButton",
+		-- 			"NecrosisHealthstoneButton",
+		-- 			"NecrosisSoulstoneButton",
+		-- 			"NecrosisBuffMenuButton",
+		-- 			"NecrosisMountButton",
+		-- 			"NecrosisPetMenuButton",
+		-- 			"NecrosisCurseMenuButton"
+		-- 		}
+		-- 		local loc = {-121, -87, -53, -17, 17, 53, 87, 121}
+		-- 		for i in ipairs(ButtonName) do
+		-- 			if _G[ButtonName[i]] then
+		-- 				_G[ButtonName[i]]:SetPoint("CENTER", "UIParent", "CENTER", loc[i], -100)
+		-- 				NecrosisConfig.FramePosition[ButtonName[i]] = {
+		-- 					"CENTER",
+		-- 					"UIParent",
+		-- 					"CENTER",
+		-- 					loc[i],
+		-- 					-100
+		-- 				}
+		-- 			end
+		-- 		end
+		-- 		Necrosis:Drag()
+		-- 		NecrosisConfig.NoDragAll = false
+		-- 		NecrosisButton:RegisterForDrag("LeftButton")
+		-- 		NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+		-- 	end
+		-- end)
+
+		-- FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
+		-- FontString:Show()
+		-- FontString:ClearAllPoints()
+		-- FontString:SetPoint("LEFT", frame, "RIGHT", 5, 1)
+		-- FontString:SetTextColor(1, 1, 1)
+		-- frame:SetFontString(FontString)
 
 		-- Affiche ou cache les boutons autour de Necrosis
-		local boutons = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu"}
-		local initY = 380
-		for i in ipairs(boutons) do
-			frame = CreateFrame("CheckButton", "NecrosisShow"..boutons[i], NecrosisButtonsConfig1, "UICheckButtonTemplate")
-			frame:EnableMouse(true)
-			frame:SetWidth(24)
-			frame:SetHeight(24)
-			frame:Show()
-			frame:ClearAllPoints()
-			frame:SetPoint("LEFT", NecrosisButtonsConfig1, "BOTTOMLEFT", 25, initY - (25 * i))
-
-			frame:SetScript("OnClick", function(self)
-				if (self:GetChecked()) then
-					NecrosisConfig.StonePosition[i] = math.abs(NecrosisConfig.StonePosition[i])
-				else
-					NecrosisConfig.StonePosition[i] = - math.abs(NecrosisConfig.StonePosition[i])
+		-- local boutons = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu"}
+		-- local initY = 380
+		for i,btType in ipairs(self._ButtonTypes) do
+			print(i..", "..btType)
+			local btn = GraphicsHelper:CreateCheckButton(
+				self.Page1,
+				Necrosis.Config.Buttons.Name[i],
+				0, -5 - (i * 22),
+				function(self)
+					if (self:GetChecked()) then
+						NecrosisConfig.StonePosition[i] = math.abs(NecrosisConfig.StonePosition[i])
+					else
+						NecrosisConfig.StonePosition[i] = - math.abs(NecrosisConfig.StonePosition[i])
+					end
+					Necrosis:ButtonSetup()
 				end
-				Necrosis:ButtonSetup()
-			end)
+			)
+			btn:SetChecked(NecrosisConfig.StonePosition[i] > 0)
+			self._Buttons[i] = btn
+			-- frame = CreateFrame("CheckButton", "NecrosisShow"..boutons[i], NecrosisButtonsConfig1, "UICheckButtonTemplate")
+			-- frame:EnableMouse(true)
+			-- frame:SetWidth(24)
+			-- frame:SetHeight(24)
+			-- frame:Show()
+			-- frame:ClearAllPoints()
+			-- frame:SetPoint("LEFT", NecrosisButtonsConfig1, "BOTTOMLEFT", 25, initY - (25 * i))
 
-			FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
-			FontString:Show()
-			FontString:ClearAllPoints()
-			FontString:SetPoint("LEFT", frame, "RIGHT", 5, 1)
-			FontString:SetTextColor(1, 1, 1)
-			frame:SetFontString(FontString)
+			-- frame:SetScript("OnClick", function(self)
+			-- 	if (self:GetChecked()) then
+			-- 		NecrosisConfig.StonePosition[i] = math.abs(NecrosisConfig.StonePosition[i])
+			-- 	else
+			-- 		NecrosisConfig.StonePosition[i] = - math.abs(NecrosisConfig.StonePosition[i])
+			-- 	end
+			-- 	Necrosis:ButtonSetup()
+			-- end)
+
+			-- FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
+			-- FontString:Show()
+			-- FontString:ClearAllPoints()
+			-- FontString:SetPoint("LEFT", frame, "RIGHT", 5, 1)
+			-- FontString:SetTextColor(1, 1, 1)
+			-- frame:SetFontString(FontString)
 		end
 
+		self.cbLockButtons = GraphicsHelper:CreateCheckButton(
+			self.Page1,
+			Necrosis.Config.Buttons["Fixer les boutons autour de la sphere"],
+			0, -214,
+			self.cbLockButtons_Click
+		)
+		self.cbLockButtons:SetChecked(NecrosisConfig.NecrosisLockServ)
+
+		self.slRotation = GraphicsHelper:CreateSlider(
+			self.Page1, "slRotation",
+			0, 360, 9,
+			15, 250,
+			0, -262
+		)
+
+		self.slRotationText = slRotationText
+		self.slRotationLow  = slRotationLow
+		self.slRotationHigh = slRotationHigh
+
+		self.slRotation:SetValue(NecrosisConfig.NecrosisAngle)
+		self.slRotationText:SetText(Necrosis.Config.Buttons["Rotation des boutons"])
+		self.slRotationLow:SetText("0")
+		self.slRotationHigh:SetText("360")
+
+		self.slRotation:SetScript("OnEnter",
+			function(self)
+				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+				GameTooltip:SetText(self:GetValue())
+			end
+		)
+		self.slRotation:SetScript("OnLeave", function() GameTooltip:Hide() end)
+		self.slRotation:SetScript("OnValueChanged",
+			function(self)
+				NecrosisConfig.NecrosisAngle = self:GetValue()
+				GameTooltip:SetText(self:GetValue())
+				Necrosis:ButtonSetup()
+			end
+		)
 		-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		-- Sub Menu 2
 		-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		-- Create a slider control for rotating the buttons around the sphere || Création du slider de rotation de Necrosis
-		frame = CreateFrame("Slider", "NecrosisRotation", NecrosisButtonsConfig2, "OptionsSliderTemplate")
-		frame:SetMinMaxValues(0, 360)
-		frame:SetValueStep(9)
-		frame:SetWidth(150)
-		frame:SetHeight(15)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("CENTER", NecrosisButtonsConfig2, "BOTTOMLEFT", 225, 380)
 
-		frame:SetScript("OnEnter", function(self)
-			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-			GameTooltip:SetText(self:GetValue())
-		end)
-		frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
-		frame:SetScript("OnValueChanged", function(self)
-			NecrosisConfig.NecrosisAngle = self:GetValue()
-			GameTooltip:SetText(self:GetValue())
-			Necrosis:ButtonSetup()
-		end)
+		-- frame = CreateFrame("Slider", "NecrosisRotation", NecrosisButtonsConfig2, "OptionsSliderTemplate")
+		-- frame:SetMinMaxValues(0, 360)
+		-- frame:SetValueStep(9)
+		-- frame:SetWidth(150)
+		-- frame:SetHeight(15)
+		-- frame:Show()
+		-- frame:ClearAllPoints()
+		-- frame:SetPoint("CENTER", NecrosisButtonsConfig2, "BOTTOMLEFT", 225, 380)
 
-		NecrosisRotationLow:SetText("0")
-		NecrosisRotationHigh:SetText("360")
+		-- frame:SetScript("OnEnter", function(self)
+		-- 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		-- 	GameTooltip:SetText(self:GetValue())
+		-- end)
+		-- frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
+		-- frame:SetScript("OnValueChanged", function(self)
+		-- 	NecrosisConfig.NecrosisAngle = self:GetValue()
+		-- 	GameTooltip:SetText(self:GetValue())
+		-- 	Necrosis:ButtonSetup()
+		-- end)
+
+		-- NecrosisRotationLow:SetText("0")
+		-- NecrosisRotationHigh:SetText("360")
 
 		-- lets create a hidden frame container for the mount selection buttons
+		self.MountFrame = GraphicsHelper:CreateDialog(self.Page2)
+
 		frame = CreateFrame("Frame", "NecrosisMountsSelectionFrame", NecrosisButtonsConfig2)
 		frame:SetWidth(222);
 		frame:SetHeight(75);
@@ -535,22 +695,23 @@ function _bv:Show()
 		NecrosisInitSelectedMountButton(NecrosisSelectedMountRight, 23161);
 	end
 
-	NecrosisRotation:SetValue(NecrosisConfig.NecrosisAngle)
-	NecrosisLockButtons:SetChecked(NecrosisConfig.NecrosisLockServ)
+	-- NecrosisRotation:SetValue(NecrosisConfig.NecrosisAngle)
+	-- NecrosisLockButtons:SetChecked(NecrosisConfig.NecrosisLockServ)
 
-	local boutons = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu"}
-	for i in ipairs(boutons) do
-		_G["NecrosisShow"..boutons[i]]:SetChecked(NecrosisConfig.StonePosition[i] > 0)
-		_G["NecrosisShow"..boutons[i]]:SetText(Necrosis.Config.Buttons.Name[i])
-	end
+	-- local boutons = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu"}
+	-- for i in ipairs(boutons) do
+	-- 	_G["NecrosisShow"..boutons[i]]:SetChecked(NecrosisConfig.StonePosition[i] > 0)
+	-- 	_G["NecrosisShow"..boutons[i]]:SetText(Necrosis.Config.Buttons.Name[i])
+	-- end
 
-	NecrosisButtonsConfig1Text:SetText(Necrosis.Config.Buttons["Choix des boutons a afficher"])
-	NecrosisButtonsConfig2Text:SetText(Necrosis.Config.Menus["Options Generales"])
-	NecrosisRotationText:SetText(Necrosis.Config.Buttons["Rotation des boutons"])
-	NecrosisLockButtons:SetText(Necrosis.Config.Buttons["Fixer les boutons autour de la sphere"])
+	-- NecrosisButtonsConfig1Text:SetText(Necrosis.Config.Buttons["Choix des boutons a afficher"])
+	-- NecrosisButtonsConfig2Text:SetText(Necrosis.Config.Menus["Options Generales"])
+	-- NecrosisRotationText:SetText(Necrosis.Config.Buttons["Rotation des boutons"])
+	-- NecrosisLockButtons:SetText(Necrosis.Config.Buttons["Fixer les boutons autour de la sphere"])
 
-	local frame = _G["NecrosisButtonsConfig"]
-	frame:Show()
+	-- local frame = _G["NecrosisButtonsConfig"]
+	-- frame:Show()
+	self.Frame:Show()
 end
 
 function _bv:Hide()

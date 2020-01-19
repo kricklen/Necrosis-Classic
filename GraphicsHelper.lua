@@ -23,12 +23,16 @@ function GraphicsHelper:CreateTexture(parentFrame, type, height, width, textureP
 end
 
 -- Create a dialog frame for the options panels
-function GraphicsHelper:CreateDialog(parentFrame)
+function GraphicsHelper:CreateDialog(parentFrame, height)
 	local dia = CreateFrame("Frame", nil, parentFrame)
 	dia:SetFrameStrata("DIALOG")
 	dia:SetMovable(false)
 	dia:EnableMouse(true)
-	dia:SetHeight(324)
+	if height then
+		dia:SetHeight(height)
+	else
+		dia:SetHeight(324)
+	end
 	dia:SetWidth(340)
 	dia:Show()
 	dia:ClearAllPoints()
@@ -97,6 +101,7 @@ function GraphicsHelper:CreateButton(parentFrame, text, x, y, onClickFunction)
 	btn:EnableMouse(true)
 	btn:Show()
 	btn:ClearAllPoints()
+	btn:SetHeight(24)
 	btn:SetPoint("TOPRIGHT", x, y)
 	btn:SetScript("OnClick", onClickFunction)
 	return btn
