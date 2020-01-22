@@ -188,9 +188,9 @@ function _mv:Show()
 			GraphicsHelper:CreateDropDown(
 				self.Frame,
 				"Langue / Language / Sprache",
-				0, 0
+				0, 0,
+				self.LanguageDropDownInit
 			)
-		self.LanguageDropDownInit(self.ddLanguage)
 
 		-- Turn on help bubbles
 		self.cbShowTooltip =

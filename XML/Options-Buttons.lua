@@ -55,7 +55,7 @@ Necrosis.Gui.ButtonsView = {
 local _bv = Necrosis.Gui.ButtonsView
 
 function _bv.SwitchPages()
-	if _bv.Page2.IsShown() then
+	if _bv.Page2:IsShown() then
 		_bv.Page1:Show()
 		_bv.Page2:Hide()
 		_bv.fsPaging:SetText("1 / 2")
@@ -128,9 +128,7 @@ function _bv:Show()
 		-- frame:SetPoint("BOTTOMLEFT")
 
 		-- Création de la sous-fenêtre 1
-		self.Page1 = GraphicsHelper:CreateDialog(self.Frame)
-		self.Page2 = GraphicsHelper:CreateDialog(self.Frame)
-		self.Page2:Hide()
+		self.Page1 = GraphicsHelper:CreateDialogPage(self.Frame)
 
 		-- frame = CreateFrame("Frame", "NecrosisButtonsConfig1", NecrosisButtonsConfig)
 		-- frame:SetFrameStrata("DIALOG")
@@ -143,10 +141,10 @@ function _bv:Show()
 		-- frame:SetAllPoints(NecrosisButtonsConfig)
 		
 		self.fsPaging = GraphicsHelper:CreateFontString(
-			self.Frame, nil,
+			self.Frame,
 			"1 / 2",
 			"BOTTOM",
-			-10, 10
+			-10, 18
 		)
 
 		-- local FontString = frame:CreateFontString(nil, nil, "GameFontNormalSmall")
@@ -156,17 +154,10 @@ function _bv:Show()
 		-- FontString:SetText("1 / 2")
 
 		self.fsPage1Title = GraphicsHelper:CreateFontString(
-			self.Page1, nil,
+			self.Page1,
 			Necrosis.Config.Buttons["Choix des boutons a afficher"],
 			"TOP",
-			0, -10
-		)
-
-		self.fsPage2Title = GraphicsHelper:CreateFontString(
-			self.Page2, nil,
-			Necrosis.Config.Menus["Options Generales"],
-			"TOP",
-			0, -10
+			0, 0
 		)
 
 		-- FontString = frame:CreateFontString("NecrosisButtonsConfig1Text", nil, "GameFontNormalSmall")
@@ -175,10 +166,8 @@ function _bv:Show()
 		-- FontString:SetPoint("BOTTOM", frame, "BOTTOM", 50, 420)
 		
 		-- Boutons
-		self.btnNext = GraphicsHelper:CreateButton(
+		self.btnNext = GraphicsHelper:CreateButtonNext(
 			self.Frame,
-			">>>",
-			-20, -300,
 			self.SwitchPages
 		)
 
@@ -194,10 +183,8 @@ function _bv:Show()
 		-- 	NecrosisButtonsConfig1:Hide()
 		-- end)
 
-		self.BtnPrev = GraphicsHelper:CreateButton(
+		self.BtnPrev = GraphicsHelper:CreateButtonPrev(
 			self.Frame,
-			"<<<",
-			-260, -300,
 			self.SwitchPages
 		)
 		-- frame = CreateFrame("Button", nil, NecrosisButtonsConfig1, "OptionsButtonTemplate")
@@ -333,7 +320,7 @@ function _bv:Show()
 			local btn = GraphicsHelper:CreateCheckButton(
 				self.Page1,
 				Necrosis.Config.Buttons.Name[i],
-				0, -5 - (i * 22),
+				0, - (i * 22),
 				function(self)
 					if (self:GetChecked()) then
 						NecrosisConfig.StonePosition[i] = math.abs(NecrosisConfig.StonePosition[i])
@@ -373,7 +360,7 @@ function _bv:Show()
 		self.cbLockButtons = GraphicsHelper:CreateCheckButton(
 			self.Page1,
 			Necrosis.Config.Buttons["Fixer les boutons autour de la sphere"],
-			0, -214,
+			0, -210,
 			self.cbLockButtons_Click
 		)
 		self.cbLockButtons:SetChecked(NecrosisConfig.NecrosisLockServ)
@@ -382,7 +369,7 @@ function _bv:Show()
 			self.Page1, "slRotation",
 			0, 360, 9,
 			15, 250,
-			0, -262
+			0, -252
 		)
 
 		self.slRotationText = slRotationText
@@ -408,227 +395,29 @@ function _bv:Show()
 				Necrosis:ButtonSetup()
 			end
 		)
-		-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-		-- Sub Menu 2
-		-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-		-- Create a slider control for rotating the buttons around the sphere || Création du slider de rotation de Necrosis
 
-		-- frame = CreateFrame("Slider", "NecrosisRotation", NecrosisButtonsConfig2, "OptionsSliderTemplate")
-		-- frame:SetMinMaxValues(0, 360)
-		-- frame:SetValueStep(9)
-		-- frame:SetWidth(150)
-		-- frame:SetHeight(15)
-		-- frame:Show()
-		-- frame:ClearAllPoints()
-		-- frame:SetPoint("CENTER", NecrosisButtonsConfig2, "BOTTOMLEFT", 225, 380)
+		------------------------------------------------------------------------------------------------------------------------------------------ Sub Menu 2
+		----------------------------------------------------------------------------------------------------------------------------------------
+		-- Need a mount to debug this...
+		self.Page2 = GraphicsHelper:CreateDialogPage(self.Frame)
+		self.Page2:Hide()
 
-		-- frame:SetScript("OnEnter", function(self)
-		-- 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		-- 	GameTooltip:SetText(self:GetValue())
-		-- end)
-		-- frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
-		-- frame:SetScript("OnValueChanged", function(self)
-		-- 	NecrosisConfig.NecrosisAngle = self:GetValue()
-		-- 	GameTooltip:SetText(self:GetValue())
-		-- 	Necrosis:ButtonSetup()
-		-- end)
+		self.fsPage2Title = GraphicsHelper:CreateFontString(
+			self.Page2,
+			Necrosis.Config.Menus["Options Generales"],
+			"TOP",
+			0, 0
+		)
 
-		-- NecrosisRotationLow:SetText("0")
-		-- NecrosisRotationHigh:SetText("360")
-
-		-- lets create a hidden frame container for the mount selection buttons
-		self.MountFrame = GraphicsHelper:CreateDialog(self.Page2)
-
-		frame = CreateFrame("Frame", "NecrosisMountsSelectionFrame", NecrosisButtonsConfig2)
-		frame:SetWidth(222);
-		frame:SetHeight(75);
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("CENTER", NecrosisGeneralFrame, "CENTER", 0, -25)
-
-		frame:SetBackdrop({	bgFile 		= "Interface/Tooltips/UI-Tooltip-Background", 
-	                      edgeFile 	= "Interface/Tooltips/UI-Tooltip-Border", 
-	                      tile 			= true, tileSize = 16, edgeSize = 16, 
-	                      insets 		= { left = 4, right = 4, top = 4, bottom = 4 }});
-		frame:SetBackdropColor(0,0,0,1);
-
-		-- create the navbar page info text
-		local NecrosisCompanionPageNumber = frame:CreateFontString("NecrosisCompanionPageNumber", "OVERLAY", "GameFontNormalSmall")
-		NecrosisCompanionPageNumber:Show()
-		NecrosisCompanionPageNumber:ClearAllPoints()
-		NecrosisCompanionPageNumber:SetPoint("TOP", NecrosisMountsSelectionFrame, "BOTTOM", 0, -10)
-		NecrosisCompanionPageNumber:SetTextColor(1, 1, 1)
-		NecrosisCompanionPageNumber:SetText("Page 1 of n")
-		
-		-- prev button
-		frame = CreateFrame("Button", "NecrosisCompanionPrevButton", NecrosisButtonsConfig2)
-		frame:SetWidth(32);
-		frame:SetHeight(32);
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("RIGHT", NecrosisCompanionPageNumber, "LEFT", -10, 0)
-		frame:SetNormalTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-PrevPage-Up"))
-		frame:SetPushedTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-PrevPage-Down"))
-		frame:SetDisabledTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-PrevPage-Disabled"))
-		-- frame:SetHighlightTexture(GraphicsHelper.GetWoWTexture("Buttons", "UI-Common-MouseHilight"))
-		-- frame:SetHighlightTexture(GraphicsHelper.GetWoWTexture("Buttons", "ButtonHilight-Square"))
-		-- frame:GetHighlightTexture():SetBlendMode("ADD")
-		frame:SetScript("OnClick", function()
-			 Necrosis:SetCompanionPage(NecrosisMountsSelectionFrame.pageMount - 1);
-		end);
-		
-		-- next button
-		frame = CreateFrame("Button", "NecrosisCompanionNextButton", NecrosisButtonsConfig2)
-		frame:SetWidth(32);
-		frame:SetHeight(32);
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionPageNumber, "RIGHT", 10, 0)
-		frame:SetNormalTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Up"))
-		frame:SetPushedTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Down"))
-		frame:SetDisabledTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Disabled"))
-		-- frame:SetHighlightTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-Common-MouseHilight"))
-		-- frame:SetHighlightTexture(GraphicsHelper:GetWoWTexture("Buttons", "ButtonHilight-Square"))
-		-- frame:GetHighlightTexture():SetBlendMode("ADD")
-		frame:SetScript("OnClick", function()
-			 Necrosis:SetCompanionPage((NecrosisMountsSelectionFrame.pageMount or 0)+1);
-		end);
-		
-		-- now create 12 mount selection buttons in 2 rows of 6 buttons each (similar to the layout in the companion's frame)
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton1", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("1")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("TOPLEFT", NecrosisMountsSelectionFrame)
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton2", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("2")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton1, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton3", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("3")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton2, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton4", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("4")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton3, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton5", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("5")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton4, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton6", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("6")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton5, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton7", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("7")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("BOTTOMLEFT", NecrosisMountsSelectionFrame)
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton8", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("8")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton7, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton9", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("9")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton8, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton10", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("10")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton9, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton11", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("11")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton10, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-
-		frame = CreateFrame("CheckButton", "NecrosisCompanionButton12", NecrosisButtonsConfig2, "UICheckButtonTemplate")
-		frame:SetID("12")
-		frame:EnableMouse(true)
-		frame:Show()
-		frame:ClearAllPoints()
-		frame:SetPoint("LEFT", NecrosisCompanionButton11, "RIGHT")
-		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
-		frame:SetScript("OnClick", nil)
-		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
-		frame:SetScript("OnReceiveDrag", nil)
-		
 		-- create the left/right mount containers which will hold the selected mounts
-		frame = CreateFrame("CheckButton", "NecrosisSelectedMountLeft", NecrosisMountsSelectionFrame, "UICheckButtonTemplate")
+		-- frame = CreateFrame("CheckButton", "NecrosisSelectedMountLeft", NecrosisMountsSelectionFrame, "UICheckButtonTemplate")
+		-- self.cbMountButtonRight = GraphicsHelper:CreateCheckButton(
+		-- 	self.Page2,
+		-- 	"",
+		-- 	40, -100
+		-- )
+
+		frame = CreateFrame("CheckButton", "NecrosisSelectedMountLeft", self.MountFrame, "UICheckButtonTemplate")
 		frame:EnableMouse(true)
 		frame:Show()
 		frame:ClearAllPoints()
@@ -638,7 +427,8 @@ function _bv:Show()
 		frame:SetScript("OnDragStart", nil)
 		frame:SetScript("OnReceiveDrag", NecrosisSelectedMountButton_OnReceiveDrag)
 		
-		frame = CreateFrame("CheckButton", "NecrosisSelectedMountRight", NecrosisMountsSelectionFrame, "UICheckButtonTemplate")
+		-- Right click mount button
+		frame = CreateFrame("CheckButton", "NecrosisSelectedMountRight", self.Page2, "UICheckButtonTemplate")
 		frame:EnableMouse(true)
 		frame:Show()
 		frame:ClearAllPoints()
@@ -669,7 +459,221 @@ function _bv:Show()
 		FontString:SetPoint("LEFT", NecrosisSelectedMountRight, "RIGHT", 10, 0)
 		FontString:SetTextColor(1, 1, 1)
 		FontString:SetText(Necrosis.Config.Buttons["Monture - Clic droit"])
+
+		-- lets create a hidden frame container for the mount selection buttons
+		-- self.MountFrame = GraphicsHelper:CreateDialog(self.Page2)
+
+		self.lblMountPage = GraphicsHelper:CreateFontString(
+			self.Page2,
+			"Page 1 of n",
+			"BOTTOM",
+			0, 20
+		)
+
+		-- frame = CreateFrame("Frame", "NecrosisMountsSelectionFrame", NecrosisButtonsConfig2)
+		frame = CreateFrame("Frame", "NecrosisMountsSelectionFrame", self.Page2)
+		frame:SetWidth(222);
+		frame:SetHeight(75);
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("CENTER", 0, -25)
+
+		frame:SetBackdrop({	bgFile 		= "Interface/Tooltips/UI-Tooltip-Background", 
+	                      edgeFile 	= "Interface/Tooltips/UI-Tooltip-Border", 
+	                      tile 			= true, tileSize = 16, edgeSize = 16, 
+	                      insets 		= { left = 4, right = 4, top = 4, bottom = 4 }});
+		frame:SetBackdropColor(0,0,0,1);
+
+		-- create the navbar page info text
+		-- local NecrosisCompanionPageNumber = frame:CreateFontString("NecrosisCompanionPageNumber", "OVERLAY", "GameFontNormalSmall")
+		-- NecrosisCompanionPageNumber:Show()
+		-- NecrosisCompanionPageNumber:ClearAllPoints()
+		-- NecrosisCompanionPageNumber:SetPoint("TOP", NecrosisMountsSelectionFrame, "BOTTOM", 0, -10)
+		-- NecrosisCompanionPageNumber:SetTextColor(1, 1, 1)
+		-- NecrosisCompanionPageNumber:SetText("Page 1 of n")
 		
+		-- prev button
+		-- frame = CreateFrame("Button", "NecrosisCompanionPrevButton", NecrosisButtonsConfig2)
+		frame = CreateFrame("Button", "NecrosisCompanionPrevButton", self.Page2)
+		frame:SetWidth(32);
+		frame:SetHeight(32);
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("RIGHT", NecrosisCompanionPageNumber, "LEFT", -10, 0)
+		frame:SetNormalTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-PrevPage-Up"))
+		frame:SetPushedTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-PrevPage-Down"))
+		frame:SetDisabledTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-PrevPage-Disabled"))
+		-- frame:SetHighlightTexture(GraphicsHelper.GetWoWTexture("Buttons", "UI-Common-MouseHilight"))
+		-- frame:SetHighlightTexture(GraphicsHelper.GetWoWTexture("Buttons", "ButtonHilight-Square"))
+		-- frame:GetHighlightTexture():SetBlendMode("ADD")
+		frame:SetScript("OnClick", function()
+			 _bv:SetCompanionPage(NecrosisMountsSelectionFrame.pageMount - 1);
+		end);
+		
+		-- next button
+		-- frame = CreateFrame("Button", "NecrosisCompanionNextButton", NecrosisButtonsConfig2)
+		frame = CreateFrame("Button", "NecrosisCompanionNextButton", self.Page2)
+		frame:SetWidth(32);
+		frame:SetHeight(32);
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionPageNumber, "RIGHT", 10, 0)
+		frame:SetNormalTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Up"))
+		frame:SetPushedTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Down"))
+		frame:SetDisabledTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Disabled"))
+		-- frame:SetHighlightTexture(GraphicsHelper:GetWoWTexture("Buttons", "UI-Common-MouseHilight"))
+		-- frame:SetHighlightTexture(GraphicsHelper:GetWoWTexture("Buttons", "ButtonHilight-Square"))
+		-- frame:GetHighlightTexture():SetBlendMode("ADD")
+		frame:SetScript("OnClick", function()
+			 _bv:SetCompanionPage((NecrosisMountsSelectionFrame.pageMount or 0)+1);
+		end);
+		
+		-- now create 12 mount selection buttons in 2 rows of 6 buttons each (similar to the layout in the companion's frame)
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton1", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton1", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("1")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("TOPLEFT", NecrosisMountsSelectionFrame)
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton2", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton2", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("2")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton1, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton3", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton3", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("3")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton2, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton4", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton4", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("4")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton3, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton5", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton5", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("5")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton4, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton6", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton6", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("6")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton5, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton7", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton7", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("7")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("BOTTOMLEFT", NecrosisMountsSelectionFrame)
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton8", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton8", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("8")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton7, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton9", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton9", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("9")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton8, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton10", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton10", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("10")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton9, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton11", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton11", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("11")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton10, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+
+		-- frame = CreateFrame("CheckButton", "NecrosisCompanionButton12", NecrosisButtonsConfig2, "UICheckButtonTemplate")
+		frame = CreateFrame("CheckButton", "NecrosisCompanionButton12", self.Page2, "UICheckButtonTemplate")
+		frame:SetID("12")
+		frame:EnableMouse(true)
+		frame:Show()
+		frame:ClearAllPoints()
+		frame:SetPoint("LEFT", NecrosisCompanionButton11, "RIGHT")
+		frame:SetScript("OnEnter", NecrosisCompanionButton_OnEnter)
+		frame:SetScript("OnClick", nil)
+		frame:SetScript("OnDragStart", NecrosisCompanionButton_OnDrag)
+		frame:SetScript("OnReceiveDrag", nil)
+		
+
 	end
 	
 	-- the frame is created, so set some defaults
@@ -730,7 +734,7 @@ function _bv:SetCompanionPage(num)
 	-- local maxpage = ceil(GetNumCompanions("MOUNT")/NECROSIS_COMPANIONS_PER_PAGE);
 	local maxpage = 1 
 
-	NecrosisCompanionPageNumber:SetFormattedText(NECROSIS_PAGE_NUMBER, num, maxpage);
+	_bv.lblMountPage:SetFormattedText(NECROSIS_PAGE_NUMBER, num, maxpage);
 	
 	if ( num <= 1 ) then
 		NecrosisCompanionPrevButton:Disable();

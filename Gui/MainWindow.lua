@@ -83,7 +83,7 @@ function _mw:Show()
 		self.Frame:SetMovable(true)
 		self.Frame:EnableMouse(true)
 		self.Frame:SetToplevel(true)
-		self.Frame:SetHeight(512)
+		self.Frame:SetHeight(402)--512
 		self.Frame:SetWidth(428)
 		self.Frame:Show()
 		self.Frame:ClearAllPoints()
@@ -134,7 +134,7 @@ function _mw:Show()
 			280, 280,
 			GraphicsHelper:GetWoWTexture("PaperDollInfoFrame", "UI-Character-General-BottomLeft"),
 			"BOTTOMLEFT",
-			0, 0
+			0, -105
 		)
 
 		self.bgBottomRight = GraphicsHelper:CreateTexture(
@@ -142,33 +142,33 @@ function _mw:Show()
 			280, 148,
 			GraphicsHelper:GetWoWTexture("PaperDollInfoFrame", "UI-Character-General-BottomRight"),
 			"BOTTOMRIGHT",
-			0, 0
+			0, -105
 		)
 
 		-- Text of the title
 		self.fsTitle = GraphicsHelper:CreateFontString(
-			self.Frame, nil,
+			self.Frame,
 			Necrosis.Data.Label,
-			"CENTER",
-			6, 229
+			"TOP",
+			0, -21
 		)
 		self.fsTitle:SetTextColor(1, 0.8, 0)
 
 		-- Credits
 		self.fsCredits = GraphicsHelper:CreateFontString(
-			self.Frame, nil,
+			self.Frame,
 			"Developed by Lomig & Tarcalion",
 			"TOP",
-			0, -42
+			0, -44
 		)
 		self.fsCredits:SetTextColor(1, 0.8, 0)
 
 		-- Section title at the top of the page
 		self.fsTabTitle = GraphicsHelper:CreateFontString(
-			self.Frame, nil,
+			self.Frame,
 			nil,
 			"TOP",
-			0, -60
+			0, -62
 		)
 
 		-- Window closing button

@@ -19,6 +19,9 @@
 Necrosis.xml
 
 InitializeNamespaces.lua
+
+Constants.lua
+BagHelper.lua
 GraphicsHelper.lua
 EventHub.lua
 Chat.lua
@@ -42,7 +45,6 @@ Localization\Localization.ruRU.lua
 Localization\Localization.lua
 
 Initialize.lua
-#Chat.lua
 Spells.lua
 
 Timers\Functions.lua
@@ -60,10 +62,11 @@ XML\XML.lua
 XML\Options-Buttons.lua
 #XML\Options-Menus.lua
 #XML\Options-Timers.lua
-XML\Options-Misc.lua
+#XML\Options-Misc.lua
 
 Gui\MenusView.lua
 Gui\MessagesView.lua
+Gui\MiscView.lua
 Gui\SphereView.lua
 Gui\TimersView.lua
 Gui\MainWindow.lua

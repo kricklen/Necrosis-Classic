@@ -280,44 +280,38 @@ function _mv:Show()
 	if not self.Frame then
 		-- Création de la fenêtre
 		self.Frame = GraphicsHelper:CreateDialog(NecrosisGeneralFrame)
-		self.Page1 = GraphicsHelper:CreateDialog(self.Frame, 310)
+		self.Page1 = GraphicsHelper:CreateDialogPage(self.Frame)
 		self.Pages[1] = self.Page1
-		self.Page2 = GraphicsHelper:CreateDialog(self.Frame, 310)
+		self.Page2 = GraphicsHelper:CreateDialogPage(self.Frame)
 		self.Page2:Hide()
 		self.Pages[2] = self.Page2
-		self.Page3 = GraphicsHelper:CreateDialog(self.Frame, 310)
+		self.Page3 = GraphicsHelper:CreateDialogPage(self.Frame)
 		self.Page3:Hide()
 		self.Pages[3] = self.Page3
-		self.Page4 = GraphicsHelper:CreateDialog(self.Frame, 310)
+		self.Page4 = GraphicsHelper:CreateDialogPage(self.Frame)
 		self.Page4:Hide()
 		self.Pages[4] = self.Page4
 
-		self.btnPrev = GraphicsHelper:CreateButton(
+		self.btnPrev = GraphicsHelper:CreateButtonPrev(
 			self.Frame,
-			"<<<",
-			-260, -302,
 			self.PrevPage
 		)
 
 		self.fsPaging = GraphicsHelper:CreateFontString(
 			self.Frame,
-			nil,
 			"1 / 4",
 			"BOTTOM",
-			-10, 5
+			-10, 18
 		)
 
-		self.btnNext = GraphicsHelper:CreateButton(
+		self.btnNext = GraphicsHelper:CreateButtonNext(
 			self.Frame,
-			">>>",
-			-20, -302,
 			self.NextPage
 		)
 
 		-- Page 1
 		self.fsPage1Title = GraphicsHelper:CreateFontString(
 			self.Page1,
-			nil,
 			Necrosis.Config.Menus["Options Generales"],
 			"TOP",
 			0, 0
@@ -354,7 +348,6 @@ function _mv:Show()
 		-- BUFF
 		self.fsPage2Title = GraphicsHelper:CreateFontString(
 			self.Page2,
-			nil,
 			Necrosis.Config.Menus["Menu des Buffs"],
 			"TOP",
 			0, 0
@@ -524,7 +517,6 @@ function _mv:Show()
 		-- DEMON
 		self.fsPage3Title = GraphicsHelper:CreateFontString(
 			self.Page3,
-			nil,
 			Necrosis.Config.Menus["Menu des Demons"],
 			"TOP",
 			0, 0
@@ -643,7 +635,6 @@ function _mv:Show()
 		-- CURSE
 		self.fsPage4Title = GraphicsHelper:CreateFontString(
 			self.Page4,
-			nil,
 			Necrosis.Config.Menus["Menu des Maledictions"],
 			"TOP",
 			0, 0

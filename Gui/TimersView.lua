@@ -79,9 +79,20 @@ function _tv.ddTimers_Init(dd)
 			checked = false,
 			func = _tv.ddTimers_Click,
 			arg1 = dd
-			})
+		})
 		if data == NecrosisConfig.TimerType then
 			UIDropDownMenu_SetSelectedValue(dd, data)
+			UIDropDownMenu_SetText(dd, Necrosis.Config.Timers.Type[NecrosisConfig.TimerType])
+		end
+	end
+	if NecrosisConfig.TimerType == "Disabled" then
+		_tv.DisableTimers()
+	else
+		Necrosis:CreateTimerAnchor()
+		if NecrosisConfig.TimerType == "Textual" then
+			_tv.EnableTextualTimers()
+		else
+			_tv.EnableGraphicalTimers()
 		end
 	end
 end
@@ -142,15 +153,6 @@ function _tv:Show()
 		-- Création de la fenêtre
 		self.Frame = GraphicsHelper:CreateDialog(NecrosisGeneralFrame)
 
-		-- Choix du timer graphique
-		self.ddTimers, self.lblTimers = GraphicsHelper:CreateDropDown(
-			self.Frame,
-			Necrosis.Config.Timers["Type de timers"],
-			0, -60
-		)
-		UIDropDownMenu_Initialize(self.ddTimers, self.ddTimers_Init)
-		UIDropDownMenu_SetText(self.ddTimers, Necrosis.Config.Timers.Type[NecrosisConfig.TimerType])
-
 		-- Affiche ou masque le bouton des timers
 		self.cbEnableTimers = GraphicsHelper:CreateCheckButton(
 			self.Frame,
@@ -181,17 +183,14 @@ function _tv:Show()
 		-- Handler to update texts when language changes
 		EventHub:RegisterLanguageChangedHandler(self.UpdateTexts)
 
-		if NecrosisConfig.TimerType == 0 then
-			self.cbTimersGrowUpwards:Disable()
-			self.cbTimersOnLeftSide:Disable()
-
-		elseif NecrosisConfig.TimerType == 2 then
-			self.cbTimersGrowUpwards:Disable()
-			self.cbTimersOnLeftSide:Enable()
-		else
-			self.cbTimersGrowUpwards:Enable()
-			self.cbTimersOnLeftSide:Enable()
-		end
+		-- Choix du timer graphique
+		-- Initialize dropdown here so the checkboxes can be disabled/enabled
+		self.ddTimers, self.lblTimers = GraphicsHelper:CreateDropDown(
+			self.Frame,
+			Necrosis.Config.Timers["Type de timers"],
+			0, -60,
+			self.ddTimers_Init
+		)
 	end
 
 	self.Frame:Show()
@@ -202,48 +201,3 @@ function _tv:Hide()
 		HideUIPanel(self.Frame)
 	end
 end
-
-------------------------------------------------------------------------------------------------------
--- FONCTIONS NECESSAIRES AUX DROPDOWNS
-------------------------------------------------------------------------------------------------------
-
--- -- Fonctions du Dropdown des timers
--- function Necrosis.Timer_Init()
--- 	local element = {}
-
--- 	for i in ipairs(Necrosis.Config.Timers.Type) do
--- 		element.text = Necrosis.Config.Timers.Type[i]
--- 		element.checked = false
--- 		element.func = Necrosis.Timer_Click
--- 		UIDropDownMenu_AddButton(element)
--- 	end
--- end
-
--- function Necrosis.Timer_Click(self)
--- 	local ID = self:GetID()
--- 	UIDropDownMenu_SetSelectedID(NecrosisTimerSelection, ID)
--- 	NecrosisConfig.TimerType = ID - 1
--- 	if not (ID == 1) then Necrosis:CreateTimerAnchor() end
--- 	if ID == 1 then
--- 		NecrosisTimerUpward:Disable()
--- 		NecrosisTimerOnLeft:Disable()
--- 		if _G["NecrosisListSpells"] then NecrosisListSpells:SetText("") end
--- 		local index = 1
--- 		while _G["NecrosisTimerFrame"..index] do
--- 			_G["NecrosisTimerFrame"..index]:Hide()
--- 			index = index + 1
--- 		end
--- 	elseif ID == 3 then
--- 		NecrosisTimerUpward:Disable()
--- 		NecrosisTimerOnLeft:Enable()
--- 		local index = 1
--- 		while _G["NecrosisTimerFrame"..index] do
--- 			_G["NecrosisTimerFrame"..index]:Hide()
--- 			index = index + 1
--- 		end
--- 	else
--- 		NecrosisTimerUpward:Enable()
--- 		NecrosisTimerOnLeft:Enable()
--- 		if _G["NecrosisListSpells"] then NecrosisListSpells:SetText("") end
--- 	end
--- end

@@ -39,8 +39,8 @@
 ------------------------------------------------------------------------------------------------------
 
 Necrosis.Gui.SphereView = {
-	ButtonX = false,
-	ButtonY = false,
+	ButtonX = 0,
+	ButtonY = 0,
 
 	Frame = false,
 
@@ -215,7 +215,7 @@ function _sv:Show()
 			"slSphereSize",
 			50, 200, 5,
 			15, 150,
-			80, -20
+			0, -20
 		)
 		-- Set special controls that are created automatically with the slider
 		self.slSphereSizeText = slSphereSizeText
@@ -235,25 +235,25 @@ function _sv:Show()
 		self.ddSkins, self.lblSkins = GraphicsHelper:CreateDropDown(
 			self.Frame,
 			Necrosis.Config.Sphere["Skin de la pierre Necrosis"],
-			0, -60
+			0, -60,
+			self.ddSkins_Init
 		)
-		UIDropDownMenu_Initialize(self.ddSkins, self.ddSkins_Init)
 
 		-- Evenement montré par la sphère
 		self.ddEvents, self.lblEvents = GraphicsHelper:CreateDropDown(
 			self.Frame,
 			Necrosis.Config.Sphere["Evenement montre par la sphere"],
-			0, -88
+			0, -88,
+			self.ddEvents_Init
 		)
-		UIDropDownMenu_Initialize(self.ddEvents, self.ddEvents_Init)
 
 		-- Sort associé à la sphère
 		self.ddSpells, self.lblSpells = GraphicsHelper:CreateDropDown(
 			self.Frame,
 			Necrosis.Config.Sphere["Sort caste par la sphere"],
-			0, -116
+			0, -116,
+			self.ddSpells_Init
 		)
-		UIDropDownMenu_Initialize(self.ddSpells, self.ddSpells_Init)
 
 		-- Affiche ou masque le compteur numérique
 		self.cbShowCount = GraphicsHelper:CreateCheckButton(
@@ -268,9 +268,9 @@ function _sv:Show()
 		self.ddCount, self.lblCount = GraphicsHelper:CreateDropDown(
 			self.Frame,
 			Necrosis.Config.Sphere["Type de compteur numerique"],
-			0, -172
+			0, -172,
+			self.ddCount_Init
 		)
-		UIDropDownMenu_Initialize(self.ddCount, self.ddCount_Init)
 
 		EventHub:RegisterLanguageChangedHandler(self.UpdateTexts)
 	end
