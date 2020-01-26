@@ -43,7 +43,8 @@ local _G = getfenv(0)
 
 function Necrosis:CreateTimerAnchor()
 
-	if NecrosisConfig.TimerType == 1 then
+	-- if NecrosisConfig.TimerType == 1 then
+	if NecrosisConfig.TimerType == "Graphical" then
 		-- Create the graphical timer frame || Création de l'ancre invisible des timers graphiques
 		local f = _G["NecrosisTimerFrame0"]
 		if not f then
@@ -54,7 +55,8 @@ function Necrosis:CreateTimerAnchor()
 			f:ClearAllPoints()
 			f:SetPoint("LEFT", NecrosisSpellTimerButton, "CENTER", 50, 0)
 		end
-	elseif NecrosisConfig.TimerType == 2 then
+	-- elseif NecrosisConfig.TimerType == 2 then
+	elseif NecrosisConfig.TimerType == "Textual" then
 		-- Create the text timer || Création de la liste des Timers Textes
 		local FontString = _G["NecrosisListSpells"]
 		if not FontString then
@@ -142,15 +144,17 @@ function Necrosis:CreateWarlockUI()
 	frame:Show()
 
 	-- Edit the scripts associated with the button || Edition des scripts associés au bouton
-	frame:SetScript("OnEvent", function(self,event, ...)
-		-- if (event == "UNIT_SPELLCAST_SUCCEEDED") then
-		-- 	print 'yah UNIT_SPELLCAST_SUCCEEDED'
-		-- 	print(...)
-		-- 	print(sourceGUID)
-		-- end
+	frame:SetScript("OnEvent", Necrosis.OnEvent
+		-- function(self,event, ...)
+		-- 	-- if (event == "UNIT_SPELLCAST_SUCCEEDED") then
+		-- 	-- 	print 'yah UNIT_SPELLCAST_SUCCEEDED'
+		-- 	-- 	print(...)
+		-- 	-- 	print(sourceGUID)
+		-- 	-- end
 
-		 Necrosis:OnEvent(self, event,...) 
-		end)
+		-- 	Necrosis:OnEvent(self, event,...) 
+		-- end
+	)
 	frame:SetScript("OnUpdate", function(self, arg1) Necrosis:OnUpdate(self, arg1) end)
 	frame:SetScript("OnEnter", function(self) Necrosis:BuildTooltip(self, "Main", "ANCHOR_LEFT") end)
 	frame:SetScript("OnLeave", function() GameTooltip:Hide() end)

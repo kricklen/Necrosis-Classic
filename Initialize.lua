@@ -43,8 +43,7 @@ local _G = getfenv(0)
 -- FONCTION D'INITIALISATION
 ------------------------------------------------------------------------------------------------------
 
-function Necrosis:Initialize(Config)
-
+local function ApplyLocalization()
 	-- Initilialisation des Textes (VO / VF / VA / VCT / VCS / VE)
 	if NecrosisConfig.Version then
 		if NecrosisConfig.Language == "frFR" then
@@ -63,22 +62,29 @@ function Necrosis:Initialize(Config)
 			-- Default to English
 			Localization.enUS()
 		end
-	elseif GetLocale() == "frFR" then
-		Localization.frFR()
-	elseif GetLocale() == "deDE" then
-		Localization.deDE()
-	elseif GetLocale() == "zhTW" then
-		Localization.zhTW()
-	elseif GetLocale() == "zhCN" then
-		Localization.zhCN()
-	elseif GetLocale() == "esES" then
-		Localization.esES()
-	elseif GetLocale() == "ruRU" then
-		Localization.ruRU()
 	else
-		-- Default to English
-		Localization.enUS()
+		local code = GetLocale()
+		if code == "frFR" then
+			Localization.frFR()
+		elseif code == "deDE" then
+			Localization.deDE()
+		elseif code == "zhTW" then
+			Localization.zhTW()
+		elseif code == "zhCN" then
+			Localization.zhCN()
+		elseif code == "esES" then
+			Localization.esES()
+		elseif code == "ruRU" then
+			Localization.ruRU()
+		else
+			-- Default to English
+			Localization.enUS()
+		end
 	end
+end
+
+function Necrosis:Initialize(Config)
+	ApplyLocalization()
 
 	-- On charge (ou on crée la configuration pour le joueur et on l'affiche sur la console
 	if not NecrosisConfig.Version or type(NecrosisConfig.Version) == "string" or Necrosis.Data.LastConfig > NecrosisConfig.Version then
@@ -153,6 +159,7 @@ function Necrosis:Initialize(Config)
 	end
 
 	-- Inventaire des pierres et des fragments possedés par le Démoniste
+	print("Initialize BagExplore")
 	self:BagExplore()
 
 	-- Si la sphere doit indiquer la vie ou la mana, on y va
@@ -163,16 +170,11 @@ function Necrosis:Initialize(Config)
 	if NecrosisConfig.SoulshardSort then
 		self:SoulshardSwitch("CHECK")
 	end
-	-- Initialisation des fichiers de langues -- Mise en place ponctuelle du SMS
-	if NecrosisConfig.SM then
---		self.Speech.Rez = self.Speech.ShortMessage[1]
-		self.Speech.TP = self.Speech.ShortMessage[2]
-	end
 end
 
 
 ------------------------------------------------------------------------------------------------------
--- FONCTION GERANT LA COMMANDE CONSOLE /NECRO
+-- FUNCTION RUNNING CONSOLE CONTROL / FONCTION GERANT LA COMMANDE CONSOLE /NECRO
 ------------------------------------------------------------------------------------------------------
 
 function Necrosis.SlashHandler(arg1)

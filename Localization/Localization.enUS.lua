@@ -61,7 +61,7 @@ function Localization.enUS()
 			["Soulshard"] = "Soul Shard(s): ",
 			["InfernalStone"] = "Infernal Stone(s): ",
 			["DemoniacStone"] = "Demonic Figurine(s): ",
-			["Soulstone"] = "\nSoulstone: ",
+			["Soulstone"] = "Soulstone: ",
 			["Healthstone"] = "Healthstone: ",
 			["Spellstone"] = "Spellstone: ",
 			["Firestone"] = "Firestone: ",
@@ -69,12 +69,15 @@ function Localization.enUS()
 			["EnslavedDemon"] = "Demon: Enslaved",
 			["NoCurrentDemon"] = "Demon: None",
 		},
+		Create = "Right click to create",
+		Use = "Left click to use",
+		OnCooldown = "On cooldown: ",
 		["Soulstone"] = {
 			Text = {"Right click to create","Left click to use","Used\nRight click to recreate","Waiting"},
 			Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
 		},
 		["Healthstone"] = {
-			Text = {"Right click to create","Left click to use"},
+			Text = {"Right click to create", "Left click to use"},
 			Text2 = "Middle click or Ctrl+left click to trade",
 			Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Souls|r"
 		},
@@ -82,7 +85,7 @@ function Localization.enUS()
 			Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\nClick to create"}
 		},
 		["Firestone"] = {
-			Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\Click to create"}
+			Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\nClick to create"}
 		},
 		["SpellTimer"] = {
 			Label = "|c00FFFFFFSpell Durations|r",

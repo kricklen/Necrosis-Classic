@@ -65,8 +65,7 @@ local _mv = Necrosis.Gui.MiscView
 ------------------------------------------------------------------------------------------------------
 
 function _mv.ddShardBag_Init(dd)
-	BagHelper:GetPlayerBags()
-	for i,data in ipairs(BagHelper.BagsArray) do
+	for i,data in ipairs(BagHelper:GetPlayerBags()) do
 		UIDropDownMenu_AddButton({
 			text = data.name,
 			value = data.slot,

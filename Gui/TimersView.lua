@@ -45,6 +45,7 @@ Necrosis.Gui.TimersView = {
 	cbEnableTimers = false,
 	cbTimersGrowUpwards = false,
 	cbTimersOnLeftSide = false,
+	--        0           1            2
 	_Types = {"Disabled", "Graphical", "Textual"}
 }
 
