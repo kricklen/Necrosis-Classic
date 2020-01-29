@@ -41,6 +41,8 @@ local _G = getfenv(0)
 -- FUNCTIONS FOR CREATION OF FRAMES ||FONCTIONS DE CREATION DES FRAMES
 ------------------------------------------------------------------------------------------------------
 
+local BAR_HEIGHT = 20
+
 --Creation of headers for timer groups || Création des entêtes des groupes de timers
 function Necrosis:CreateGroup(SpellGroup, index)
 	local texte = ""
@@ -71,7 +73,7 @@ function Necrosis:CreateGroup(SpellGroup, index)
 
 	-- Définition de ses attributs
 	frame:SetWidth(150)
-	frame:SetHeight(10)
+	frame:SetHeight(BAR_HEIGHT)
 	frame:ClearAllPoints()
 	frame:SetPoint("CENTER", UIParent, "CENTER", 3000, 3000)
 	frame:Show()
@@ -80,7 +82,7 @@ function Necrosis:CreateGroup(SpellGroup, index)
 	local FontString = frame:CreateFontString(FrameName.."Text", "OVERLAY", "TextStatusBarText")
 
 	FontString:SetWidth(150)
-	FontString:SetHeight(10)
+	FontString:SetHeight(BAR_HEIGHT)
 	FontString:SetJustifyH("CENTER")
 	FontString:SetJustifyV("MIDDLE")
 	FontString:SetTextColor(1, 1, 1)
@@ -112,6 +114,8 @@ end
 -- Creation of the timers || Création des timers
 function Necrosis:AddFrame(FrameName)
 
+print("Necrosis:AddFrame FrameName: "..tostring(FrameName))
+
 	if _G[FrameName] then
 		f = _G[FrameName]
 		f:ClearAllPoints()
@@ -120,12 +124,12 @@ function Necrosis:AddFrame(FrameName)
 		return _G[FrameName.."Text"], _G[FrameName.."Bar"]
 	end
 
-	-- Création de la frame principale du timer
+	-- Creating the main frame of the timer | Création de la frame principale du timer
 	local frame = CreateFrame("Frame", FrameName, UIParent)
 
 	-- Définition de ses attributs
 	frame:SetWidth(150)
-	frame:SetHeight(10)
+	frame:SetHeight(BAR_HEIGHT)
 	frame:ClearAllPoints()
 	frame:SetPoint("CENTER", UIParent, "CENTER", 3000, 3000)
 	frame:Show()
@@ -134,7 +138,7 @@ function Necrosis:AddFrame(FrameName)
 	local texture = frame:CreateTexture(FrameName.."Texture", "BACKGROUND")
 
 	texture:SetWidth(150)
-	texture:SetHeight(10)
+	texture:SetHeight(BAR_HEIGHT)
 	texture:SetTexture(0, 0, 0, 0.5)
 	texture:ClearAllPoints()
 	texture:SetPoint(NecrosisConfig.SpellTimerJust, FrameName, NecrosisConfig.SpellTimerJust, 0, 0)
@@ -145,7 +149,7 @@ function Necrosis:AddFrame(FrameName)
 	local FontString = frame:CreateFontString(FrameName.."OutText", "OVERLAY", "TextStatusBarText")
 
 	FontString:SetWidth(150)
-	FontString:SetHeight(10)
+	FontString:SetHeight(BAR_HEIGHT)
 	FontString:SetTextColor(1, 1, 1)
 	FontString:ClearAllPoints()
 
@@ -164,7 +168,7 @@ function Necrosis:AddFrame(FrameName)
 	FontString = frame:CreateFontString(FrameName.."Text", "OVERLAY", "GameFontNormalSmall")
 
 	FontString:SetWidth(150)
-	FontString:SetHeight(10)
+	FontString:SetHeight(BAR_HEIGHT)
 	FontString:SetJustifyH("LEFT")
 	FontString:SetJustifyV("MIDDLE")
 	FontString:ClearAllPoints()
@@ -173,19 +177,21 @@ function Necrosis:AddFrame(FrameName)
 
 	FontString:SetTextColor(1, 1, 1)
 
-	-- Définition de la barre colorée
+	-- Definition of the colored bar | Définition de la barre colorée
 	local StatusBar = CreateFrame("StatusBar", FrameName.."Bar", frame)
 
 	StatusBar:SetWidth(150)
-	StatusBar:SetHeight(10)
+	StatusBar:SetHeight(BAR_HEIGHT)
 	StatusBar:SetStatusBarTexture(GraphicsHelper:GetWoWTexture("TargetingFrame", "UI-StatusBar"))
 	StatusBar:SetStatusBarColor(1, 1, 0)
 	StatusBar:SetFrameLevel(StatusBar:GetFrameLevel() - 1)
 	StatusBar:ClearAllPoints()
-	StatusBar:SetPoint(NecrosisConfig.SpellTimerJust, FrameName, NecrosisConfig.SpellTimerJust, 0, 0)
+	-- StatusBar:SetPoint(NecrosisConfig.SpellTimerJust, FrameName, NecrosisConfig.SpellTimerJust, 0, 0)
+	StatusBar:SetPoint("TOPLEFT", 0, 0)
 	StatusBar:Show()
+print("NecrosisConfig.SpellTimerJust: "..tostring(NecrosisConfig.SpellTimerJust))
 
-	-- Définition de l'étincelle en bout de barre
+	-- Definition of the spark at the end of the bar | Définition de l'étincelle en bout de barre
 	texture = StatusBar:CreateTexture(FrameName.."Spark", "OVERLAY")
 
 	texture:SetWidth(32)

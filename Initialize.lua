@@ -104,9 +104,6 @@ function Necrosis:Initialize(Config)
 	-- Affichage d'un message sur la console
 	self.Chat:_Msg(self.ChatMessage.Interface.Welcome, "USER")
 	-- Création de la liste des sorts disponibles
-	for index in ipairs(self.Spell) do
-		self.Spell[index].ID = nil
-	end
 	self:SpellLocalize()
 	self:SpellSetup()
 	self:CreateMenu()

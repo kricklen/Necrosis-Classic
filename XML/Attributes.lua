@@ -358,7 +358,7 @@ function Necrosis:MainButtonAttribute()
 			Necrosis.Gui.MainWindow:Show()
 		end
 	end
-
+print("Necrosis.Spell[NecrosisConfig.MainSpell].ID + Name: "..tostring(Necrosis.Spell[NecrosisConfig.MainSpell].ID).." "..tostring(Necrosis.Spell[NecrosisConfig.MainSpell].Name))
 	if Necrosis.Spell[NecrosisConfig.MainSpell].ID then
 		NecrosisButton:SetAttribute("type1", "spell")
 		NecrosisButton:SetAttribute("spell", Necrosis.Spell[NecrosisConfig.MainSpell].Name)
@@ -370,7 +370,8 @@ end
 -- DEFINITION DES ATTRIBUTS DES SORTS EN FONCTION DU COMBAT / REGEN
 ------------------------------------------------------------------------------------------------------
 
-function Necrosis:NoCombatAttribute(SoulstoneMode, FirestoneMode, SpellstoneMode, Pet, Buff, Curse)
+-- function Necrosis:NoCombatAttribute(SoulstoneMode, FirestoneMode, SpellstoneMode, Pet, Buff, Curse)
+function Necrosis:NoCombatAttribute(Pet, Buff, Curse)
 
 	-- Si on veut que le menu s'engage automatiquement en combat
 	-- Et se désengage à la fin

@@ -77,6 +77,46 @@ do
 end
 
 
+
+Necrosis.Spells = {}
+
+local _sp = Necrosis.Spells
+
+function _sp:GetFelDominationCooldown()
+	return self:GetSpellCooldownTime(Necrosis.Spell[15].ID)
+end
+
+function _sp:GetShadowWardCooldown()
+	return self:GetSpellCooldownTime(Necrosis.Spell[43].ID)
+end
+
+function _sp:GetRitualOfSoulsCooldown()
+	return self:GetSpellCooldownTime(Necrosis.Spell[50].ID)
+end
+
+function _sp:GetSpellCooldownTime(spellBookId)
+	local secs = self:GetSpellCooldownInSecs(spellBookId)
+	return (secs > 0), Necrosis.Timers:GetFormattedTime(secs)
+end
+
+function _sp:GetSpellCooldownInSecs(spellBookId)
+	if not spellBookId then
+		-- Some spells may not be available
+		return 0
+	end
+	local startTime, duration, enable = GetSpellCooldown(spellBookId, BOOKTYPE_SPELL)
+	if enable == 0 then
+		return 0
+	end
+	if startTime == 0 then
+		return 0
+	end
+	local remainingSecs = math.floor(duration - (GetTime() - startTime))
+	return remainingSecs
+end
+
+
+
 -- Fonction pour relocaliser  automatiquemlent des éléments en fonction du client
 function Necrosis:SpellLocalize(tooltip) 
 

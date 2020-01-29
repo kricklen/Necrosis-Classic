@@ -68,7 +68,7 @@ function _mv.ddShardBag_Init(dd)
 	for i,data in ipairs(BagHelper:GetPlayerBags()) do
 		UIDropDownMenu_AddButton({
 			text = data.name,
-			value = data.slot,
+			value = data.id,
 			checked = false,
 			func = _mv.ddShardBag_Click,
 			arg1 = dd

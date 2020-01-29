@@ -46,12 +46,26 @@ Necrosis.Timers = {}
 
 local _t = Necrosis.Timers
 
-function _t:GetHealthstoneCooldown(formatted)
-	local secs = self:GetRemainingCooldownInSecs(GetItemCooldown(Constants.Healthstone_Item_Id))
-	if formatted then
-		return (secs > 0), self:GetFormattedTime(secs)
-	end
-	return (secs > 0), secs
+function _t:IsSoulstoneOnCooldown()
+	local secs = self:GetItemCooldownInSecs(Constants.Soulstone_Item_Id)
+	return (secs > 0)
+end
+
+function _t:GetSoulstoneCooldown()
+	return self:GetItemCooldownTime(Constants.Soulstone_Item_Id)
+end
+
+function _t:GetHealthstoneCooldown()
+	return self:GetItemCooldownTime(Constants.Healthstone_Item_Id)
+end
+
+function _t:GetHearthstoneCooldown()
+	return self:GetItemCooldownTime(Constants.Hearthstone_Item_Id)
+end
+
+function _t:GetItemCooldownTime(itemId)
+	local secs = self:GetItemCooldownInSecs(itemId)
+	return (secs > 0), self:GetFormattedTime(secs)
 end
 
 function _t:GetFormattedTime(secs)
@@ -63,26 +77,28 @@ function _t:GetFormattedTime(secs)
 	return string.format("%d Secs", secs)
 end
 
-function _t:GetRemainingCooldownInSecs(startTime, duration, enable)
+function _t:GetItemCooldownInSecs(itemId)
+	local startTime, duration, enable = GetItemCooldown(itemId)
 	if enable == 0 then
 		return 0
 	end
 	if startTime == 0 then
 		return 0
 	end
-	local remainInSecs = math.floor(duration - (GetTime() - startTime))
-	return remainInSecs
+	local remainingSecs = math.floor(duration - (GetTime() - startTime))
+	return remainingSecs
 end
 
--- La table des timers est là pour ça !
-function Necrosis:InsertTimerParTable(IndexTable, Target, LevelTarget, Timer, TargetGUID)
+
+-- The timers' table is here for that. | La table des timers est là pour ça !
+function Necrosis:InsertTimerParTable(spellIndex, Target, LevelTarget, Timer, TargetGUID)
 	-- insert an entry into the table || Insertion de l'entrée dans le tableau
 	Timer.SpellTimer:insert(
 		{
-			Name = Necrosis.Spell[IndexTable].Name,
-			Time = Necrosis.Spell[IndexTable].Length,
-			TimeMax = floor(GetTime() + Necrosis.Spell[IndexTable].Length),
-			Type = Necrosis.Spell[IndexTable].Type,
+			Name = Necrosis.Spell[spellIndex].Name,
+			Time = Necrosis.Spell[spellIndex].Length,
+			TimeMax = floor(GetTime() + Necrosis.Spell[spellIndex].Length),
+			Type = Necrosis.Spell[spellIndex].Type,
 			Target = Target,
 			TargetGUID = TargetGUID,
 			TargetLevel = LevelTarget,
@@ -116,6 +132,8 @@ function Necrosis:InsertTimerParTable(IndexTable, Target, LevelTarget, Timer, Ta
 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax - Timer.SpellTimer[#Timer.SpellTimer].Time,
 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax
 		)
+print("TimerLibre: "..tostring(TimerLibre))
+print("StatusBar Height: "..tostring(StatusBar:GetHeight()))
 	end
 
 	-- if NecrosisConfig.TimerType > 0 then
@@ -130,9 +148,9 @@ function Necrosis:InsertTimerParTable(IndexTable, Target, LevelTarget, Timer, Ta
 		NecrosisUpdateTimer(Timer.SpellTimer, Timer.SpellGroup)
 	end
 
-		-- detection of resists || Détection des resists
-	if not (Necrosis.Spell[IndexTable].Type == 0) then
-		Timer.LastSpell.Name = Necrosis.Spell[IndexTable].Name
+	-- detection of resists || Détection des resists
+	if not (Necrosis.Spell[spellIndex].Type == 0) then
+		Timer.LastSpell.Name = Necrosis.Spell[spellIndex].Name
 		Timer.LastSpell.Target = Target
 		Timer.LastSpell.TargetGUID = TargetGUID
 		Timer.LastSpell.TargetLevel = LevelTarget
@@ -140,9 +158,9 @@ function Necrosis:InsertTimerParTable(IndexTable, Target, LevelTarget, Timer, Ta
 		for i in ipairs(Timer.SpellTimer) do
 			if Timer.SpellTimer[i].Name == Timer.LastSpell.Name
 				and Timer.SpellTimer[i].TargetGUID == Timer.LastSpell.TargetGUID
-				then
-					Timer.LastSpell.Index = i
-					break
+			then
+				Timer.LastSpell.Index = i
+				break
 			end
 		end
 	end

@@ -382,10 +382,10 @@ function Localization.enUS()
 	Necrosis.Speech.ShortMessage = {
 		-- Soulstone
 		Soulstone = {
-			-- {"<after>{X} --> <target> is soulstoned! <-- {X}"},
-			-- {"<after>{S} --> <target> is soulstoned! <-- {S}"}
-			{"{X} --> <target> test 123! <-- {X}", "abc"},
-			{"{S} --> <target> test 456! <-- {S}"}
+			{"<after>{X} --> <target> is soulstoned! <-- {X}"},
+			{"<after>{skull} --> <target> is soulstoned! <-- {skull}"}
+			-- {"{X} --> <target> test 123! <-- {X}", "abc"},
+			-- {"{S} --> <target> test 456! <-- {S}"}
 		},
 		-- Ritual of Summoning
 		RitualOfSummoning = {

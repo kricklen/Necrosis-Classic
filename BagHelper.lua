@@ -56,8 +56,7 @@ function _bh:BagExplore(bagId)
 	if bagId
 		and (bagId < 0 or bagId > NUM_BAG_SLOTS)
 	    and not (bagId == -2)
-		then
-			print("Ignore: "..tostring(bagId))
+	then
 		return
 	end
 	local bagsArray = self:GetPlayerBags()
@@ -105,9 +104,9 @@ function _bh:_FindStones(bag)
 					self.Soulstone_BagId = bag.id
 					self.Soulstone_SlotId = slot
 					NecrosisConfig.ItemSwitchCombat[4] = itemName
-
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:SoulstoneUpdateAttribute()
+
 				-- Check if its a healthstone || Même chose pour une pierre de soin
 				elseif itemName:find(Necrosis.Translation.Item.Healthstone) then
 					self.Healthstone_IsAvailable = true
@@ -115,27 +114,27 @@ function _bh:_FindStones(bag)
 					self.Healthstone_BagId = bag.id
 					self.Healthstone_SlotId = slot
 					NecrosisConfig.ItemSwitchCombat[3] = itemName
-
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:HealthstoneUpdateAttribute()
+
 				-- Check if its a spellstone || Et encore pour la pierre de sort
 				elseif itemName:find(Necrosis.Translation.Item.Spellstone) then
 					self.Spellstone_IsAvailable = true
 					self.Spellstone_BagId = bag.id
 					self.Spellstone_SlotId = slot
 					NecrosisConfig.ItemSwitchCombat[1] = itemName
-
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:SpellstoneUpdateAttribute()
+
 				-- Check if its a firestone || La pierre de feu maintenant
 				elseif itemName:find(Necrosis.Translation.Item.Firestone) then
 					self.Firestone_IsAvailable = true
 					self.Firestone_BagId = bag.id
 					self.Firestone_SlotId = slot
 					NecrosisConfig.ItemSwitchCombat[2] = itemName
-
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:FirestoneUpdateAttribute()
+
 				-- Check if its a hearthstone || et enfin la pierre de foyer
 				elseif itemName:find(Necrosis.Translation.Item.Hearthstone) then
 					self.Hearthstone_IsAvailable = true
@@ -162,10 +161,8 @@ end
 
 function _bh:DestroyShards(maxToKeep)
 	for i,bag in ipairs(self:GetPlayerBags()) do
-
 		-- Skip soul bags
 		if not bag.isSoulBag then
-
 			-- Iterate over the bag slots
 			for slot = 1,bag.capacity,1 do
 				if maxToKeep >= self.Soulshard_Count then

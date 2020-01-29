@@ -278,7 +278,6 @@ Local.TimerManagement = {
 -- Variables used for managing summoning and stone buttons || Variables utilisées pour la gestion des boutons d'invocation et d'utilisation des pierres
 Local.Stone = {
 	Soul = {Mode = 1, Location = {}},
-	Health = {Mode = 1, Location = {}},
 	Spell = {Mode = 1, Location = {}},
 	Hearth = {Location = {}},
 	Fire = {Mode = 1},
@@ -336,10 +335,7 @@ function Necrosis:OnLoad(event)
 	if event == "SPELLS_CHANGED" then
 		local _, Class = UnitClass("player")
 		if Class == "WARLOCK" then
-
-			for index in ipairs(Necrosis.Spell) do
-				Necrosis.Spell[index].ID = nil
-			end
+print("SPELLS_CHANGED")
 			Necrosis:SpellSetup()
 			-- Necrosis:CreateMenu()
 			Necrosis:ButtonSetup()
@@ -437,10 +433,8 @@ function Necrosis:OnUpdate(something, elapsed)
 		-- If configured, the Sphere is transfected into a Ground Chrono || Si configuré, on transfome la Sphere en Chrono de Rez
 		if (NecrosisConfig.CountType == "RezTimer" or NecrosisConfig.Circle == "RezTimer")
 			and (Local.Stone.Soul.Mode == 3 or Local.Stone.Soul.Mode == 4)
-			then
-				Local.LastSphereSkin = self:RezTimerUpdate(
-					Local.TimerManagement.SpellTimer, Local.LastSphereSkin
-				)
+		then
+			Local.LastSphereSkin = self:RezTimerUpdate(Local.TimerManagement.SpellTimer, Local.LastSphereSkin)
 		end
 		Local.LastUpdate[2] = 0
 	end
@@ -595,9 +589,7 @@ function Necrosis.OnEvent(self, event,...)
 	-- If the Warlock learns a new spell / spell, we get the new spells list || Si le Démoniste apprend un nouveau sort / rang de sort, on récupère la nouvelle liste des sorts
 	-- If the Warlock learns a new buff or summon spell, the buttons are recreated || Si le Démoniste apprend un nouveau sort de buff ou d'invocation, on recrée les boutons
 	elseif (event == "LEARNED_SPELL_IN_TAB") then
-		for index in ipairs(Necrosis.Spell) do
-			Necrosis.Spell[index].ID = nil
-		end
+print("LEARNED_SPELL_IN_TAB")
 		Necrosis:SpellSetup()
 		Necrosis:CreateMenu()
 		Necrosis:ButtonSetup()
@@ -609,7 +601,7 @@ function Necrosis.OnEvent(self, event,...)
 		Local.TimerManagement = Necrosis:RetraitTimerCombat(Local.TimerManagement)
 
 		-- We are redefining the attributes of spell buttons in a situational way || On redéfinit les attributs des boutons de sorts de manière situationnelle
-		Necrosis:NoCombatAttribute(Local.Stone.Soul.Mode, Local.Stone.Fire.Mode, Local.Stone.Spell.Mode, Local.Menu.Pet, Local.Menu.Buff, Local.Menu.Curse)
+		Necrosis:NoCombatAttribute(Local.Menu.Pet, Local.Menu.Buff, Local.Menu.Curse)
 		Necrosis:UpdateIcons()
 
 	-- When the warlock changes demon || Quand le démoniste change de démon
@@ -648,6 +640,7 @@ function Necrosis.OnEvent(self, event,...)
 			and destGUID == UnitGUID("player")
 			and (arg9 == NecrosisConfig.ItemSwitchCombat[1] or NecrosisConfig.ItemSwitchCombat[2])
 			then
+print("ENCHANT_APPLIED: "..arg9)
 				Local.SomethingOnHand = arg9
 				Necrosis:UpdateIcons()
 		-- End of enchantment detection || Détection fin d'enchant
@@ -1019,28 +1012,34 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 	end
 
 	-- We look at whether corrupt domination, shadow guard or curse amplification are up (for tooltips) ||On regarde si la domination corrompue, le gardien de l'ombre ou l'amplification de malédiction sont up (pour tooltips)
-	local start, duration, start2, duration2, start3, duration3
+	-- local start, duration
+	-- local start2, duration2
 
-	if self.Spell[15].ID then
-		start, duration = GetSpellCooldown(self.Spell[15].ID, BOOKTYPE_SPELL)
-	else
-		start = 1
-		duration = 1
-	end
-	if self.Spell[43].ID then
-		start2, duration2 = GetSpellCooldown(self.Spell[43].ID, BOOKTYPE_SPELL)
-		if not start2 then start2 = 1 end
-		if not duration2 then duration2 = 1 end
-	else
-		start2 = 1
-		duration2 = 1
-	end
-	if self.Spell[50].ID then
-		start3, duration3 = GetSpellCooldown(self.Spell[50].ID, BOOKTYPE_SPELL)
-	else
-		start3 = 1
-		duration3 = 1
-	end
+	local felDomCooldown, felDomCooldownTime = Necrosis.Spells:GetFelDominationCooldown()
+
+	-- if self.Spell[15].ID then
+	-- 	start, duration = GetSpellCooldown(self.Spell[15].ID, BOOKTYPE_SPELL)
+	-- else
+	-- 	start = 1
+	-- 	duration = 1
+	-- end
+
+	-- if self.Spell[43].ID then
+	-- 	start2, duration2 = GetSpellCooldown(self.Spell[43].ID, BOOKTYPE_SPELL)
+	-- 	if not start2 then start2 = 1 end
+	-- 	if not duration2 then duration2 = 1 end
+	-- else
+	-- 	start2 = 1
+	-- 	duration2 = 1
+	-- end
+
+	-- local start3, duration3
+	-- if self.Spell[50].ID then
+	-- 	start3, duration3 = GetSpellCooldown(self.Spell[50].ID, BOOKTYPE_SPELL)
+	-- else
+	-- 	start3 = 1
+	-- 	duration3 = 1
+	-- end
 
 	-- Creating help bubbles .... ||Création des bulles d'aides....
 	GameTooltip:SetOwner(button, anchor)
@@ -1065,82 +1064,59 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 		else
 			GameTooltip:AddLine(self.TooltipData.Main.NoCurrentDemon)
 		end
+
 	-- ..... for stone buttons ||..... pour les boutons de pierre
 	elseif Type:find("stone") then
+
 		-- Soul Stone ||Pierre d'âme
 		if (Type == "Soulstone") then
 			-- We display the name of the stone and the action that will produce the click on the button ||On affiche le nom de la pierre et l'action que produira le clic sur le bouton
 			-- And also the cooldown ||Et aussi le Temps de recharge
-			if Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 3 then
-				GameTooltip:AddLine(self.Spell[51].Mana.." Mana")
-			end
-			-- self:MoneyToggle()
-			-- NecrosisTooltip:SetBagItem(Local.Stone.Soul.Location[1], Local.Stone.Soul.Location[2])
-			-- local itemName = tostring(NecrosisTooltipTextLeft6:GetText())
-
-			GameTooltip:AddLine(self.TooltipData[Type].Text[Local.Stone.Soul.Mode])
-			GameTooltip:AddLine(self.TooltipData[Type].Ritual)
-			-- if itemName:find(self.Translation.Misc.Cooldown) then
-			if BagHelper.Soulstone_IsAvailable and BagHelper.Soulstone_Name:find(self.Translation.Misc.Cooldown) then
-				-- GameTooltip:AddLine(itemName)
-				GameTooltip:AddLine(BagHelper.Soulstone_Name)
-			end
-		-- Healthstone | Stone of life ||Healthstone | Pierre de vie
-		elseif (Type == "Healthstone") then
-			-- Idem ||Idem
-			GameTooltip:AddLine(self.Spell[52].Mana.." Mana")
-			if BagHelper.Healthstone_IsAvailable then
-				local isOnCooldown, formattedCooldown = Necrosis.Timers:GetHealthstoneCooldown(true)
+			GameTooltip:AddLine(self.Spell[51].Mana.." Mana")
+			if BagHelper.Soulstone_IsAvailable then
+				local isOnCooldown, formattedCooldown = Necrosis.Timers:GetSoulstoneCooldown()
 				if isOnCooldown then
 					GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..formattedCooldown)
 				else
 					GameTooltip:AddLine(Necrosis.TooltipData.Use)
 				end
-				GameTooltip:AddLine(self.TooltipData[Type].Text2)
+			else
+				GameTooltip:AddLine(Necrosis.TooltipData.Create)
+			end
+			GameTooltip:AddLine(self.TooltipData[Type].Ritual)
+
+		-- Healthstone | Stone of life ||Healthstone | Pierre de vie
+		elseif (Type == "Healthstone") then
+
+			-- Idem ||Idem
+			GameTooltip:AddLine(self.Spell[52].Mana.." Mana")
+			if BagHelper.Healthstone_IsAvailable then
+				local isOnCooldown, formattedCooldown = Necrosis.Timers:GetHealthstoneCooldown()
+				if isOnCooldown then
+					GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..formattedCooldown)
+				else
+					GameTooltip:AddLine(Necrosis.TooltipData.Use)
+				end
+				GameTooltip:AddLine(Necrosis.TooltipData[Type].Text2)
 			else
 				GameTooltip:AddLine(Necrosis.TooltipData.Create)
 			end
 
-
--- 			if Local.Stone.Health.Mode == 1 then
--- 				GameTooltip:AddLine(self.Spell[52].Mana.." Mana")
--- 			end
--- 			-- self:MoneyToggle()
--- 			-- -- NecrosisTooltip:SetBagItem(Local.Stone.Health.Location[1], Local.Stone.Health.Location[2])
--- 			-- NecrosisTooltip:SetBagItem(BagHelper.Healthstone_BagId, BagHelper.Healthstone_SlotId)
--- 			-- local itemName = tostring(NecrosisTooltipTextLeft6:GetText())
-
--- -- local hsStartTime, hsDuration, hsEnable = GetContainerItemCooldown(BagHelper.Healthstone_BagId, BagHelper.Healthstone_SlotId)
--- -- local hsStartTime, hsDuration, hsEnable = GetItemCooldown(Constants.Healthstone_Item_Id)
--- -- print("hsStartTime, hsDuration, hsEnable: "..tostring(hsStartTime)..", "..tostring(hsDuration)..", "..tostring(hsEnable))
--- -- local remaining = Necrosis.Timers:GetRemainingCooldownInSecs(hsStartTime, hsDuration, hsEnable)
--- print("TooltipData["..Type.."].Text["..Local.Stone.Health.Mode.."]: "..self.TooltipData[Type].Text[Local.Stone.Health.Mode])
-
--- 			GameTooltip:AddLine(self.TooltipData[Type].Text[Local.Stone.Health.Mode])
--- 			if Local.Stone.Health.Mode == 2 then
--- 				GameTooltip:AddLine(self.TooltipData[Type].Text2)
--- 			end
--- 			-- if itemName:find(self.Translation.Misc.Cooldown) then
--- print("BagHelper.Healthstone_Name: "..tostring(BagHelper.Healthstone_Name))
--- local formattedCooldown = Necrosis.Timers:GetHealthstoneCooldown(true)
--- print("remaining: "..tostring(remaining))
--- 			if BagHelper.Healthstone_IsAvailable and BagHelper.Healthstone_Name:find(self.Translation.Misc.Cooldown) then
--- 				-- GameTooltip:AddLine(itemName)
--- 				GameTooltip:AddLine(BagHelper.Healthstone_Name)
--- 			end
-
-			if  Local.Soulshard.Count > 0 and not (start3 > 0 and duration3 > 0) then
-				GameTooltip:AddLine(self.TooltipData[Type].Ritual)
-			end
-
+			-- TODO: Ritual of Souls doesn't exist in classic (yet)
+			-- local rosCooldown, rosCooldownTime = Necrosis.Spells:GetRitualOfSoulsCooldown()
+			-- if Local.Soulshard.Count > 0 and not rosCooldown then
+			-- 	GameTooltip:AddLine(self.TooltipData[Type].Ritual)
+			-- end
 
 		-- Stone of spell ||Pierre de sort
 		elseif (Type == "Spellstone") then
+
 			-- Eadem ||Eadem
 			if Local.Stone.Spell.Mode == 1 then
 				GameTooltip:AddLine(self.Spell[53].Mana.." Mana")
 			end
-			GameTooltip:AddLine(self.TooltipData[Type].Text[Local.Stone.Spell.Mode])
+			GameTooltip:AddLine(Necrosis.TooltipData[Type].Text[Local.Stone.Spell.Mode])
+
 		-- Fire stone ||Pierre de feu
 		elseif (Type == "Firestone") then
 			-- Idem ||Idem
@@ -1149,14 +1125,13 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 			end
 			GameTooltip:AddLine(self.TooltipData[Type].Text[Local.Stone.Fire.Mode])
 		end
+
 	-- ..... for the Timers button ||..... pour le bouton des Timers
 	elseif (Type == "SpellTimer") then
-		self:MoneyToggle()
-		NecrosisTooltip:SetBagItem(Local.Stone.Hearth.Location[1], Local.Stone.Hearth.Location[2])
-		local itemName = tostring(NecrosisTooltipTextLeft5:GetText())
-		GameTooltip:AddLine(self.TooltipData[Type].Text)
-		if itemName:find(self.Translation.Misc.Cooldown) then
-			GameTooltip:AddLine(self.Translation.Item.Hearthstone.." - "..itemName)
+
+		local hsCooldown, hsCooldownTime = Necrosis.Timers:GetHearthstoneCooldown()
+		if hsCooldown then
+			GameTooltip:AddLine(self.Translation.Item.Hearthstone.." - "..hsCooldownTime)
 		else
 			GameTooltip:AddLine(self.TooltipData[Type].Right..GetBindLocation())
 		end
@@ -1223,35 +1198,44 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 		end
 	elseif (Type == "SoulLink") then
 		GameTooltip:AddLine(self.Spell[38].Mana.." Mana")
+
 	elseif (Type == "ShadowProtection") then
+
 		GameTooltip:AddLine(self.Spell[43].Mana.." Mana")
-		if start2 > 0 and duration2 > 0 then
-			local seconde = duration2 - ( GetTime() - start2)
-			local affiche
-			affiche = tostring(floor(seconde)).." sec"
-			GameTooltip:AddLine("Cooldown : "..affiche)
+		local shadowWardCooldown, shadowWardCooldownTime = Necrosis.Spells:GetShadowWardCooldown()
+		if shadowWardCooldown then
+		-- if start2 > 0 and duration2 > 0 then
+			-- local seconde = duration2 - ( GetTime() - start2)
+			-- local affiche
+			-- affiche = tostring(floor(seconde)).." sec"
+			-- GameTooltip:AddLine("Cooldown : "..affiche)
+			GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..shadowWardCooldownTime)
 		end
+
 	elseif (Type == "Domination") then
-		if start > 0 and duration > 0 then
-			local seconde = duration - ( GetTime() - start)
-			local affiche, minute, time
-			if seconde <= 59 then
-				affiche = tostring(floor(seconde)).." sec"
-			else
-				minute = tostring(floor(seconde/60))
-				seconde = mod(seconde, 60)
-				if seconde <= 9 then
-					time = "0"..tostring(floor(seconde))
-				else
-					time = tostring(floor(seconde))
-				end
-				affiche = minute..":"..time
-			end
-			GameTooltip:AddLine("Cooldown : "..affiche)
+
+		if felDomCooldown then
+			-- local seconde = duration - ( GetTime() - start)
+			-- local affiche, minute, time
+			-- if seconde <= 59 then
+			-- 	affiche = tostring(floor(seconde)).." sec"
+			-- else
+			-- 	minute = tostring(floor(seconde/60))
+			-- 	seconde = mod(seconde, 60)
+			-- 	if seconde <= 9 then
+			-- 		time = "0"..tostring(floor(seconde))
+			-- 	else
+			-- 		time = tostring(floor(seconde))
+			-- 	end
+			-- 	affiche = minute..":"..time
+			-- end
+			GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..felDomCooldownTime)
 		end
+
 	elseif (Type == "Imp") then
+
 		GameTooltip:AddLine(self.Spell[3].Mana.." Mana")
-		if not (start > 0 and duration > 0) then
+		if not felDomCooldown then
 			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
 		end
 
@@ -1259,28 +1243,28 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 		GameTooltip:AddLine(self.Spell[4].Mana.." Mana")
 		if Local.Soulshard.Count == 0 then
 			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		elseif not (start > 0 and duration > 0) then
+		elseif not felDomCooldown then
 			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
 		end
 	elseif (Type == "Succubus") then
 		GameTooltip:AddLine(self.Spell[5].Mana.." Mana")
 		if Local.Soulshard.Count == 0 then
 			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		elseif not (start > 0 and duration > 0) then
+		elseif not felDomCooldown then
 			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
 		end
 	elseif (Type == "Felhunter") then
 		GameTooltip:AddLine(self.Spell[6].Mana.." Mana")
 		if Local.Soulshard.Count == 0 then
 			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		elseif not (start > 0 and duration > 0) then
+		elseif not felDomCooldown then
 			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
 		end
 	elseif (Type == "Felguard") then
 		GameTooltip:AddLine(self.Spell[7].Mana.." Mana")
 		if Local.Soulshard.Count == 0 then
 			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		elseif not (start > 0 and duration > 0) then
+		elseif not felDomCooldown then
 			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
 		end
 	elseif (Type == "Infernal") then
@@ -1322,6 +1306,9 @@ end
 
 -- Function updating the buttons Necrosis and giving the state of the button of the soul stone || Fonction mettant à jour les boutons Necrosis et donnant l'état du bouton de la pierre d'âme
 function Necrosis:UpdateIcons()
+
+print("UpdateIcons...")
+
 	-- If the function was called to detect an enchantment, it is detected! || Si la fonction a été appelée pour détecter un enchantement, on le détecte !
 	if Local.SomethingOnHand == "Truc" then
 		self:MoneyToggle()
@@ -1343,51 +1330,67 @@ function Necrosis:UpdateIcons()
 	-----------------------------------------------
 
 	-- We inquire to know if a stone of soul was used -> verification in the timers || On se renseigne pour savoir si une pierre d'âme a été utilisée --> vérification dans les timers
-	local SoulstoneInUse = false
-	if Local.TimerManagement.SpellTimer then
-		for index = 1, #Local.TimerManagement.SpellTimer, 1 do
-			if (Local.TimerManagement.SpellTimer[index].Name == self.Spell[11].Name)  and Local.TimerManagement.SpellTimer[index].TimeMax > 0 then
-				SoulstoneInUse = true
-				break
-			end
-		end
-	end
+	-- local SoulstoneInUse = false
+	-- if Local.TimerManagement.SpellTimer then
+	-- 	for index = 1, #Local.TimerManagement.SpellTimer, 1 do
+	-- 		if (Local.TimerManagement.SpellTimer[index].Name == self.Spell[11].Name)  and Local.TimerManagement.SpellTimer[index].TimeMax > 0 then
+	-- 			SoulstoneInUse = true
+	-- 			break
+	-- 		end
+	-- 	end
+	-- end
+	local soulstoneInUse = Necrosis.Timers:IsSoulstoneOnCooldown()
 
-	-- If the stone was not used, and there is no stone in inventory -> Mode 1 || Si la Pierre n'a pas été utilisée, et qu'il n'y a pas de pierre en inventaire -> Mode 1
-	-- if not (Local.Stone.Soul.OnHand or SoulstoneInUse) then
-	if not (BagHelper.Soulstone_IsAvailable or SoulstoneInUse) then
-print("Local.Stone.Soul.Mode = 1")
-		Local.Stone.Soul.Mode = 1
-	end
-
-	-- If the stone was not used, but there is a stone in inventory || Si la Pierre n'a pas été utilisée, mais qu'il y a une pierre en inventaire
-	-- if Local.Stone.Soul.OnHand and (not SoulstoneInUse) then
-	if BagHelper.Soulstone_IsAvailable and (not SoulstoneInUse) then
-		-- If the stone in inventory contains a timer, and we leave a RL -> Mode 4 || Si la pierre en inventaire contient un timer, et qu'on sort d'un RL --> Mode 4
-		-- local start, duration = GetContainerItemCooldown(Local.Stone.Soul.Location[1],Local.Stone.Soul.Location[2])
-		local start, duration = GetContainerItemCooldown(BagHelper.Soulstone_BagId, BagHelper.Soulstone_SlotId)
-		if Local.LoggedIn and start > 0 and duration > 0 then
-			Local.TimerManagement = self:InsertTimerStone("Soulstone", start, duration, Local.TimerManagement)
+	if BagHelper.Soulstone_IsAvailable then
+		if soulstoneInUse then
 			Local.Stone.Soul.Mode = 4
-			Local.LoggedIn = false
-		-- If the stone does not contain a timer, or you do not leave an RL -> Mode 2 || Si la pierre ne contient pas de timer, ou qu'on ne sort pas d'un RL --> Mode 2
 		else
 			Local.Stone.Soul.Mode = 2
-			Local.LoggedIn = false
+		end
+	else
+		if soulstoneInUse then
+			Local.Stone.Soul.Mode = 3
+		else
+			-- If the stone was not used, and there is no stone in inventory -> Mode 1 || Si la Pierre n'a pas été utilisée, et qu'il n'y a pas de pierre en inventaire -> Mode 1
+			Local.Stone.Soul.Mode = 1
 		end
 	end
 
-	-- If the stone was used but there is no stone in inventory -> Mode 3 || Si la Pierre a été utilisée mais qu'il n'y a pas de pierre en inventaire --> Mode 3
-	-- if (not Local.Stone.Soul.OnHand) and SoulstoneInUse then
-	if (not BagHelper.Soulstone_IsAvailable) and SoulstoneInUse then
-		Local.Stone.Soul.Mode = 3
-	end
+-- 	-- If the stone was not used, and there is no stone in inventory -> Mode 1 || Si la Pierre n'a pas été utilisée, et qu'il n'y a pas de pierre en inventaire -> Mode 1
+-- 	-- if not (Local.Stone.Soul.OnHand or SoulstoneInUse) then
+-- 	if not (BagHelper.Soulstone_IsAvailable or SoulstoneInUse) then
+-- print("Local.Stone.Soul.Mode = 1")
+-- 		Local.Stone.Soul.Mode = 1
+-- 	end
 
-	-- If the stone was used and there is a stone in inventory || Si la Pierre a été utilisée et qu'il y a une pierre en inventaire
-	-- if Local.Stone.Soul.OnHand and SoulstoneInUse then
-	if BagHelper.Soulstone_IsAvailable and SoulstoneInUse then
-		Local.Stone.Soul.Mode = 4
-	end
+-- 	-- If the stone was not used, but there is a stone in inventory || Si la Pierre n'a pas été utilisée, mais qu'il y a une pierre en inventaire
+-- 	-- if Local.Stone.Soul.OnHand and (not SoulstoneInUse) then
+-- 	if BagHelper.Soulstone_IsAvailable and (not SoulstoneInUse) then
+-- 		-- If the stone in inventory contains a timer, and we leave a RL -> Mode 4 || Si la pierre en inventaire contient un timer, et qu'on sort d'un RL --> Mode 4
+-- 		-- local start, duration = GetContainerItemCooldown(Local.Stone.Soul.Location[1],Local.Stone.Soul.Location[2])
+-- 		local start, duration = GetContainerItemCooldown(BagHelper.Soulstone_BagId, BagHelper.Soulstone_SlotId)
+-- 		if Local.LoggedIn and start > 0 and duration > 0 then
+-- 			Local.TimerManagement = self:InsertTimerStone("Soulstone", start, duration, Local.TimerManagement)
+-- 			Local.Stone.Soul.Mode = 4
+-- 			Local.LoggedIn = false
+-- 		-- If the stone does not contain a timer, or you do not leave an RL -> Mode 2 || Si la pierre ne contient pas de timer, ou qu'on ne sort pas d'un RL --> Mode 2
+-- 		else
+-- 			Local.Stone.Soul.Mode = 2
+-- 			Local.LoggedIn = false
+-- 		end
+-- 	end
+
+-- 	-- If the stone was used but there is no stone in inventory -> Mode 3 || Si la Pierre a été utilisée mais qu'il n'y a pas de pierre en inventaire --> Mode 3
+-- 	-- if (not Local.Stone.Soul.OnHand) and SoulstoneInUse then
+-- 	if (not BagHelper.Soulstone_IsAvailable) and SoulstoneInUse then
+-- 		Local.Stone.Soul.Mode = 3
+-- 	end
+
+-- 	-- If the stone was used and there is a stone in inventory || Si la Pierre a été utilisée et qu'il y a une pierre en inventaire
+-- 	-- if Local.Stone.Soul.OnHand and SoulstoneInUse then
+-- 	if BagHelper.Soulstone_IsAvailable and SoulstoneInUse then
+-- 		Local.Stone.Soul.Mode = 4
+-- 	end
 
 	-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
 	if self.Spell[51].ID and NecrosisConfig.ItemSwitchCombat[4] and (Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 3) then
@@ -1398,12 +1401,11 @@ print("Local.Stone.Soul.Mode = 1")
 	if _G["NecrosisSoulstoneButton"] then
 		NecrosisSoulstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("SoulstoneButton-0")..Local.Stone.Soul.Mode)
 	end
-print("Local.Stone.Soul.Mode: "..Local.Stone.Soul.Mode)
+
 	-- Stone of life || Pierre de vie
 	-----------------------------------------------
 
 	-- Mode "I have one" (2) / "I have none" (1) || Mode "j'en ai une" (2) / "j'en ai pas" (1)
-	-- if (Local.Stone.Health.OnHand) then
 	if (not BagHelper.Healthstone_IsAvailable) then
 		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
 		if self.Spell[52].ID and NecrosisConfig.ItemSwitchCombat[3] then
@@ -1413,16 +1415,19 @@ print("Local.Stone.Soul.Mode: "..Local.Stone.Soul.Mode)
 
 	--Display of the mode icon || Affichage de l'icone liée au mode
 	if _G["NecrosisHealthstoneButton"] then
-print("BagHelper.Healthstone_IsAvailable: "..tostring(BagHelper.Healthstone_IsAvailable))
-print("Local.Stone.Health.Mode: "..tostring(Local.Stone.Health.Mode))
-		NecrosisHealthstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-0"..Local.Stone.Health.Mode))
+		if BagHelper.Healthstone_IsAvailable then
+			NecrosisHealthstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-02"))
+		else
+			NecrosisHealthstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-01"))
+		end
 	end
 
 	-- Stone of spell || Pierre de sort
 	-----------------------------------------------
 
 	-- Stone in the inventory ... || Pierre dans l'inventaire...
-	if Local.Stone.Spell.OnHand then
+	-- if Local.Stone.Spell.OnHand then
+	if BagHelper.Spellstone_IsAvailable then
 		-- ... and on the weapon = mode 3, otherwise = mode 2 || ... et sur l'arme = mode 3, sinon = mode 2
 		if Local.SomethingOnHand == NecrosisConfig.ItemSwitchCombat[1] then
 			Local.Stone.Spell.Mode = 3
@@ -1445,14 +1450,15 @@ print("Local.Stone.Health.Mode: "..tostring(Local.Stone.Health.Mode))
 
 	-- Display of the mode icon || Affichage de l'icone liée au mode
 	if _G["NecrosisSpellstoneButton"] then
-		NecrosisSpellstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("SpellstoneButton-0")..Local.Stone.Spell.Mode)
+		NecrosisSpellstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("SpellstoneButton-0"..Local.Stone.Spell.Mode))
 	end
 
 	-- Fire stone || Pierre de feu
 	-----------------------------------------------
 
 	-- Stone in the inventory ... || Pierre dans l'inventaire...
-	if Local.Stone.Fire.OnHand then
+	-- if Local.Stone.Fire.OnHand then
+	if BagHelper.Firestone_IsAvailable then
 		-- ... and on the weapon = mode 3, otherwise = mode 2 || ... et sur l'arme = mode 3, sinon = mode 2
 		if Local.SomethingOnHand == NecrosisConfig.ItemSwitchCombat[2] then
 			Local.Stone.Fire.Mode = 3
@@ -1475,8 +1481,17 @@ print("Local.Stone.Health.Mode: "..tostring(Local.Stone.Health.Mode))
 
 	-- Display of the mode icon || Affichage de l'icone liée au mode
 	if _G["NecrosisFirestoneButton"] then
-		NecrosisFirestoneButton:SetNormalTexture(GraphicsHelper:GetTexture("FirestoneButton-0")..Local.Stone.Fire.Mode)
+		NecrosisFirestoneButton:SetNormalTexture(GraphicsHelper:GetTexture("FirestoneButton-0"..Local.Stone.Fire.Mode))
 	end
+	
+
+	local hsCooldown = Necrosis.Timers:GetHearthstoneCooldown()
+	if hsCooldown then
+		NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(1)
+	else
+		NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(nil)
+	end
+	
 end
 
 -- Update the sphere according to life || Update de la sphere en fonction de la vie
@@ -1506,7 +1521,7 @@ end
 -- Update buttons according to mana || Update des boutons en fonction de la mana
 function Necrosis:UpdateMana()
 	if Local.Dead then return end
-  local ptype = UnitPowerType("player")
+  	local ptype = UnitPowerType("player")
 	local mana = UnitPower("player",ptype)
 	local manaMax = UnitPowerMax("player", ptype)
 
@@ -1530,6 +1545,7 @@ function Necrosis:UpdateMana()
 	if NecrosisConfig.CountType == "Mana" then
 		NecrosisShardCount:SetText(mana)
 	end
+
 	-- If corrupt domination cooldown is gray || Si cooldown de domination corrompue on grise
 	if _G["NecrosisPetMenu1"] and self.Spell[15].ID and not Local.BuffActif.Domination then
 		local start, duration = GetSpellCooldown(self.Spell[15].ID, "spell")
@@ -1572,7 +1588,6 @@ function Necrosis:UpdateMana()
 	if mana then
 	-- Coloring the button in gray if not enough mana || Coloration du bouton en grisé si pas assez de mana
 		if self.Spell[3].ID then
-
 			if self.Spell[3].Mana > mana then
 				for i = 1, 7, 1 do
 					ManaPet[i] = false
@@ -1779,23 +1794,20 @@ function Necrosis:UpdateMana()
 		del(SpellMana)
 	end
 
-
-	-- Timers button || Bouton des Timers
-	-----------------------------------------------
-	if Local.Stone.Hearth.OnHand and Local.Stone.Hearth.Location[1] then
-		local start, duration, enable = GetContainerItemCooldown(Local.Stone.Hearth.Location[1], Local.Stone.Hearth.Location[2])
-		if duration > 20 and start > 0 then
-			if not Local.Stone.Hearth.Cooldown then
-				NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(1)
-				Local.Stone.Hearth.Cooldown = true
-			end
-		else
-			if Local.Stone.Hearth.Cooldown then
-				NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(nil)
-				Local.Stone.Hearth.Cooldown = false
-			end
-		end
-	end
+	-- if Local.Stone.Hearth.OnHand and Local.Stone.Hearth.Location[1] then
+	-- 	local start, duration, enable = GetContainerItemCooldown(Local.Stone.Hearth.Location[1], Local.Stone.Hearth.Location[2])
+	-- 	if duration > 20 and start > 0 then
+	-- 		if not Local.Stone.Hearth.Cooldown then
+	-- 			NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(1)
+	-- 			Local.Stone.Hearth.Cooldown = true
+	-- 		end
+	-- 	else
+	-- 		if Local.Stone.Hearth.Cooldown then
+	-- 			NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(nil)
+	-- 			Local.Stone.Hearth.Cooldown = false
+	-- 		end
+	-- 	end
+	-- end
 end
 
 
@@ -1805,24 +1817,7 @@ end
 
 -- Explore bags for stones & shards || Fonction qui fait l'inventaire des éléments utilisés en démonologie : Pierres, Fragments, Composants d'invocation
 function Necrosis:BagExplore(containerId)
-	-- Wait for login to complete
-	if not IsLoggedIn() then
-		print("Not logged in")
-		return
-	end
-
 	BagHelper:BagExplore(containerId)
-
-	-- Local.Stone.Soul.OnHand = BagHelper.Soulstone_Available
-	-- Local.Stone.Soul.Location = BagHelper.Soulstone_Location
-	-- Local.Stone.Health.OnHand = BagHelper.Healthstone_Available
-	-- Local.Stone.Health.Location = BagHelper.Healthstone_Location
-	Local.Stone.Fire.OnHand = BagHelper.Firestone_Available
-	Local.Stone.Fire.Location = BagHelper.Firestone_Location
-	Local.Stone.Spell.OnHand = BagHelper.Spellstone_Available
-	Local.Stone.Spell.Location = BagHelper.Spellstone_Location
-	Local.Stone.Hearth.OnHand = BagHelper.Hearthstone_Available
-	Local.Stone.Hearth.Location = BagHelper.Hearthstone_Location
 
 	BagHelper:GetStoneCounts()
 
@@ -2170,15 +2165,12 @@ end
 function Necrosis:TradeStone()
 	-- If a friendly target is selected then trade the stone || Dans ce cas si un pj allié est sélectionné, on lui donne la pierre
 	-- Else use it || Sinon, on l'utilise
-	-- if Local.Trade.Request and Local.Stone.Health.OnHand and not Local.Trade.Complete then
 	if Local.Trade.Request and BagHelper.Healthstone_IsAvailable and not Local.Trade.Complete then
-		-- PickupContainerItem(Local.Stone.Health.Location[1], Local.Stone.Health.Location[2])
 		PickupContainerItem(BagHelper.Healthstone_BagId, BagHelper.Healthstone_SlotId)
 		ClickTradeButton(1)
 		Local.Trade.Complete = true
 	elseif UnitExists("target") and UnitIsPlayer("target")
 		and not (UnitCanAttack("player", "target") or UnitName("target") == UnitName("player")) then
-			-- PickupContainerItem(Local.Stone.Health.Location[1], Local.Stone.Health.Location[2])
 			PickupContainerItem(BagHelper.Healthstone_BagId, BagHelper.Healthstone_SlotId)
 			if CursorHasItem() then
 				DropItemOnUnit("target")
@@ -2570,6 +2562,7 @@ function Necrosis:SymetrieTimer(bool)
 			)
 			_G["NecrosisTimerFrame"..num.."OutText"]:SetJustifyH("LEFT")
 			num = num + 1
+print("Necrosis:SymetrieTimer: "..tostring(_G["NecrosisTimerFrame"..num.."OutText"]:GetTop()))
 		end
 	end
 	if _G["NecrosisTimerFrame0"] then
@@ -2659,6 +2652,10 @@ function Necrosis:SpellSetup()
 		"subName", {}
 	)
 
+	for index in ipairs(self.Spell) do
+		self.Spell[index].ID = nil
+	end
+
 	local spellID = 1
 	local Invisible = 0
 	local InvisibleID = 0
@@ -2688,16 +2685,17 @@ function Necrosis:SpellSetup()
 			subSpellName= Necrosis:StoneToRank(spellName)
 			spellName = self.Translation.Misc.Create .. " " .. self.Translation.Item.Spellstone
 		end
+
 		-- Print(subSpellName)
 		-- Print(spellName.."   -   "..subSpellName.."----"..spellID)
 		-- For spells with numbered ranks, compare each one || Pour les sorts avec des rangs numérotés, on compare pour chaque sort les rangs 1 à 1
 		-- And preserve the highest rank || Le rang supérieur est conservé
+		local found = false
 		if (subSpellName and not (subSpellName == " " or subSpellName == "")) then
 			local _, _, spellRank = subSpellName:find("(%d+)")
 			spellRank = tonumber(spellRank)
 
 			if (spellRank ~= nil) then
-				local found = false
 				for index=1, #CurrentSpells.Name, 1 do
 					--  a version of the spell is already in our table
 					if (CurrentSpells.Name[index] == spellName) then
@@ -2715,14 +2713,27 @@ function Necrosis:SpellSetup()
 						break
 					end
 				end
-				-- The highest rank of each spell is inserted into the table || Les plus grands rangs de chacun des sorts à rang numérotés sont insérés dans la table
-				if (not found) then
-					table.insert(CurrentSpells.ID, spellID)
-					table.insert(CurrentSpells.Name, spellName)
-					table.insert(CurrentSpells.NameOrg, spellNameOrg)
-					table.insert(CurrentSpells.subName, subSpellName)
-				end
 			end
+			-- -- The highest rank of each spell is inserted into the table || Les plus grands rangs de chacun des sorts à rang numérotés sont insérés dans la table
+			-- if (not found) then
+			-- 	table.insert(CurrentSpells.ID, spellID)
+			-- 	table.insert(CurrentSpells.Name, spellName)
+			-- 	table.insert(CurrentSpells.NameOrg, spellNameOrg)
+			-- 	table.insert(CurrentSpells.subName, subSpellName)
+			-- end
+-- 		else
+-- print("Spell got no subspell: "..tostring(spellName))
+-- 			table.insert(CurrentSpells.ID, spellID)
+-- 			table.insert(CurrentSpells.Name, spellName)
+-- 			table.insert(CurrentSpells.NameOrg, spellNameOrg)
+-- 			table.insert(CurrentSpells.subName, subSpellName)
+		end
+		-- If no ranked spell was found, store it
+		if (not found) then
+			table.insert(CurrentSpells.ID, spellID)
+			table.insert(CurrentSpells.Name, spellName)
+			table.insert(CurrentSpells.NameOrg, spellNameOrg)
+			table.insert(CurrentSpells.subName, subSpellName)
 		end
 		spellID = spellID + 1
 	end
