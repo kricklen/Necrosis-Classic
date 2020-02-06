@@ -189,7 +189,7 @@ function Necrosis:BuffSpellAttribute()
 		NecrosisBuffMenu10:SetAttribute("unit*", "target")				-- associate left & right clicks with target
 		NecrosisBuffMenu10:SetAttribute("ctrl-unit*", "focus") 		-- associate CTRL+left or right clicks with focus
 
-		if self.Spell[9].Rank:find("1") then	-- the warlock can only do Banish(Rank 1) 
+		if (self.Spell[9].Rank == 1) then	-- the warlock can only do Banish(Rank 1) 
 			-- left & right click will perform the same macro
 			NecrosisBuffMenu10:SetAttribute("type*", "macro")
 			NecrosisBuffMenu10:SetAttribute("macrotext*", "/focus\n/cast "..SpellName_Rank)
@@ -200,7 +200,7 @@ function Necrosis:BuffSpellAttribute()
 			NecrosisBuffMenu10:SetAttribute("ctrl-spell*", SpellName_Rank)
 		end 
 
-		if self.Spell[9].Rank:find("2") then -- the warlock has Banish(rank 2)
+		if (self.Spell[9].Rank == 2) then -- the warlock has Banish(rank 2)
 			local Rank1 = SpellName_Rank:gsub("2", "1")
 			
 			-- so lets use the "harmbutton" special attribute!
@@ -299,7 +299,7 @@ function Necrosis:StoneAttribute(Steed)
 		local f = _G["Necrosis"..itemName[i].."Button"]
 		if f then
 			f:SetAttribute("type2", "spell")
-			f:SetAttribute("spell2", self.Spell[ buffID[i] ].Name..Necrosis:RankToStone(self.Spell[ buffID[i] ].Rank))
+			f:SetAttribute("spell2", self.Spell[ buffID[i] ].NameOrg)
 		end
 	end
 
@@ -344,9 +344,7 @@ function Necrosis:StoneAttribute(Steed)
 	if _G["NecrosisSoulstoneButton"] and self.Spell[37].ID then
 		NecrosisSoulstoneButton:SetAttribute("shift-type*", "spell")
 		NecrosisSoulstoneButton:SetAttribute("shift-spell*", self.Spell[37].Name)
-	end
-	
-	
+	end	
 end
 
 -- Association de la Connexion au bouton central si le sort est disponible
@@ -358,7 +356,6 @@ function Necrosis:MainButtonAttribute()
 			Necrosis.Gui.MainWindow:Show()
 		end
 	end
-print("Necrosis.Spell[NecrosisConfig.MainSpell].ID + Name: "..tostring(Necrosis.Spell[NecrosisConfig.MainSpell].ID).." "..tostring(Necrosis.Spell[NecrosisConfig.MainSpell].Name))
 	if Necrosis.Spell[NecrosisConfig.MainSpell].ID then
 		NecrosisButton:SetAttribute("type1", "spell")
 		NecrosisButton:SetAttribute("spell", Necrosis.Spell[NecrosisConfig.MainSpell].Name)
@@ -515,7 +512,7 @@ function Necrosis:SoulstoneUpdateAttribute(nostone)
 	-- Un clic gauche crée la pierre
 	if nostone then
 		NecrosisSoulstoneButton:SetAttribute("type1", "spell")
-		NecrosisSoulstoneButton:SetAttribute("spell1", self.Spell[51].Name..Necrosis:RankToStone(self.Spell[51].Rank))
+		NecrosisSoulstoneButton:SetAttribute("spell1", self.Spell[51].NameOrg)
 		return
 	end
 
@@ -536,7 +533,7 @@ function Necrosis:HealthstoneUpdateAttribute(nostone)
 	-- Un clic gauche crée la pierre
 	if nostone then
 		NecrosisHealthstoneButton:SetAttribute("type1", "spell")
-		NecrosisHealthstoneButton:SetAttribute("spell1", self.Spell[52].Name..Necrosis:RankToStone(self.Spell[52].Rank))
+		NecrosisHealthstoneButton:SetAttribute("spell1", self.Spell[52].NameOrg)
 		return
 	end
 

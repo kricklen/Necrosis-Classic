@@ -20,7 +20,7 @@ Necrosis.xml
 
 InitializeNamespaces.lua
 
-Constants.lua
+ItemHelper.lua
 BagHelper.lua
 GraphicsHelper.lua
 EventHub.lua

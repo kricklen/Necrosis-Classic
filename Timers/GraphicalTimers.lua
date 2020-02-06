@@ -141,7 +141,8 @@ print("Necrosis:AddFrame FrameName: "..tostring(FrameName))
 	texture:SetHeight(BAR_HEIGHT)
 	texture:SetTexture(0, 0, 0, 0.5)
 	texture:ClearAllPoints()
-	texture:SetPoint(NecrosisConfig.SpellTimerJust, FrameName, NecrosisConfig.SpellTimerJust, 0, 0)
+	-- texture:SetPoint(NecrosisConfig.SpellTimerJust, FrameName, NecrosisConfig.SpellTimerJust, 0, 0)
+	texture:SetPoint("TOPLEFT", 0, 0)
 	texture:Show()
 
 	-- Définition de ses textes
@@ -211,7 +212,6 @@ end
 ------------------------------------------------------------------------------------------------------
 
 function NecrosisUpdateTimer(tableau, Changement)
-	-- if not (NecrosisConfig.TimerType == 1 and tableau[1]) then
 	if not (NecrosisConfig.TimerType == "Graphical" and tableau[1]) then
 		return
 	end
@@ -220,15 +220,16 @@ function NecrosisUpdateTimer(tableau, Changement)
 	LastPoint[1], LastPoint[2], LastPoint[3], LastPoint[4], LastPoint[5] = NecrosisTimerFrame0:GetPoint()
 	local LastGroup = 0
 
-	local yPosition = - NecrosisConfig.SensListe * 12
+	-- local yPosition = - NecrosisConfig.SensListe * 12
+	local yPosition = - NecrosisConfig.SensListe * BAR_HEIGHT
 
 	-- smooth timers (if selected) || *Lisse* l'écoulement des timers si option sélectionnée
-	local Now
-	if NecrosisConfig.Smooth then
-		Now = GetTime()
-	else
-		Now = floor(GetTime())
-	end
+	local Now = GetTime()
+	-- if NecrosisConfig.Smooth then
+	-- 	Now = GetTime()
+	-- else
+	-- 	Now = floor(GetTime())
+	-- end
 
 	for index =  1, #tableau, 1 do
 		-- Ca arrive quand on passe des timers textes aux timers graphiques

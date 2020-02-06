@@ -4,27 +4,22 @@ BagHelper = {
 	DemonicFigure_Count = 0,
 	
 	Soulstone_IsAvailable = false,
-	Soulstone_Name = nil,
 	Soulstone_BagId = nil,
 	Soulstone_SlotId = nil,
 
 	Healthstone_IsAvailable = false,
-	Healthstone_Name = nil,
 	Healthstone_BagId = nil,
 	Healthstone_SlotId = nil,
 
 	Firestone_IsAvailable = false,
-	Firestone_Name = nil,
 	Firestone_BagId = nil,
 	Firestone_SlotId = nil,
 
 	Spellstone_IsAvailable = false,
-	Spellstone_Name = nil,
 	Spellstone_BagId = nil,
 	Spellstone_SlotId = nil,
 
 	Hearthstone_IsAvailable = false,
-	Hearthstone_Name = nil,
 	Hearthstone_BagId = nil,
 	Hearthstone_SlotId = nil
 }
@@ -45,9 +40,9 @@ function _bh:GetPlayerBags()
 end
 
 function _bh:GetStoneCounts()
-	self.Soulshard_Count = GetItemCount(Constants.Soulshard_Item_Id)
-	self.InfernalStone_Count = GetItemCount(Constants.InfernalStone_Item_Id)
-	self.DemonicFigure_Count = GetItemCount(Constants.DemonicFigure_Item_Id)
+	self.Soulshard_Count = GetItemCount(ItemHelper.Soulshard_Item_Id)
+	self.InfernalStone_Count = GetItemCount(ItemHelper.InfernalStone_Item_Id)
+	self.DemonicFigure_Count = GetItemCount(ItemHelper.DemonicFigure_Item_Id)
 end
 
 -- Explore bags for stones & shards || Fonction qui fait l'inventaire des éléments utilisés en démonologie : Pierres, Fragments, Composants d'invocation
@@ -88,37 +83,43 @@ end
 
 function _bh:_FindStones(bag)
 	-- Exit if its a known soul bag (which can only store shards) || Parcours des emplacements des sacs
-	if not bag.isSoulBag then
+	if (not bag.isSoulBag) then
 		-- Iterate over the bag slots
 		for slot = 1,bag.capacity,1 do
-			local itemLink = GetContainerItemLink(bag.id, slot)
+			-- local itemLink = GetContainerItemLink(bag.id, slot)
+			local itemId = GetContainerItemID(bag.id, slot)
 			-- If there is an item located in that bag slot || Dans le cas d'un emplacement non vide
-			if itemLink then
-				local itemName = self:GetItemNameFromLink(itemLink)
-
+			-- if itemLink then
+			if (itemId ~= nil) then
+				-- local itemName = self:GetItemNameFromLink(itemLink)
+-- local itemName = GetItemInfo(itemId)
+-- if (itemName:find("stone")) then
+-- 	print("hs: "..tostring(tContains(ItemHelper.Healthstone.ItemIds, itemId)))
+-- 	print("itemName, id: "..itemName..", "..itemId)
+-- end
 				-- Check if its a soulstone || Si c'est une pierre d'âme, on note son existence et son emplacement
-				if itemName:find(Necrosis.Translation.Item.Soulstone) then
-					print("Soulstone found")
+				if (ItemHelper:IsSoulstone(itemId)) then
 					self.Soulstone_IsAvailable = true
-					self.Soulstone_Name = itemName
 					self.Soulstone_BagId = bag.id
 					self.Soulstone_SlotId = slot
-					NecrosisConfig.ItemSwitchCombat[4] = itemName
+					NecrosisConfig.ItemSwitchCombat[4] = GetItemInfo(itemId)
+print("NecrosisConfig.ItemSwitchCombat[4]: "..tostring(NecrosisConfig.ItemSwitchCombat[4]))
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:SoulstoneUpdateAttribute()
 
 				-- Check if its a healthstone || Même chose pour une pierre de soin
-				elseif itemName:find(Necrosis.Translation.Item.Healthstone) then
+				elseif (ItemHelper:IsHealthstone(itemId)) then
+print("Healthstone found")
 					self.Healthstone_IsAvailable = true
-					self.Healthstone_Name = itemName
 					self.Healthstone_BagId = bag.id
 					self.Healthstone_SlotId = slot
-					NecrosisConfig.ItemSwitchCombat[3] = itemName
+					NecrosisConfig.ItemSwitchCombat[3] = GetItemInfo(itemId)
+print("NecrosisConfig.ItemSwitchCombat[3]: "..tostring(NecrosisConfig.ItemSwitchCombat[3]))
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:HealthstoneUpdateAttribute()
 
 				-- Check if its a spellstone || Et encore pour la pierre de sort
-				elseif itemName:find(Necrosis.Translation.Item.Spellstone) then
+				elseif (ItemHelper:IsSpellstone(itemId)) then
 					self.Spellstone_IsAvailable = true
 					self.Spellstone_BagId = bag.id
 					self.Spellstone_SlotId = slot
@@ -127,7 +128,7 @@ function _bh:_FindStones(bag)
 					Necrosis:SpellstoneUpdateAttribute()
 
 				-- Check if its a firestone || La pierre de feu maintenant
-				elseif itemName:find(Necrosis.Translation.Item.Firestone) then
+				elseif (ItemHelper:IsFirestone(itemId)) then
 					self.Firestone_IsAvailable = true
 					self.Firestone_BagId = bag.id
 					self.Firestone_SlotId = slot
@@ -136,7 +137,7 @@ function _bh:_FindStones(bag)
 					Necrosis:FirestoneUpdateAttribute()
 
 				-- Check if its a hearthstone || et enfin la pierre de foyer
-				elseif itemName:find(Necrosis.Translation.Item.Hearthstone) then
+				elseif (ItemHelper:IsHearthstone(itemId)) then
 					self.Hearthstone_IsAvailable = true
 					self.Hearthstone_Name = itemName
 					self.Hearthstone_BagId = bag.id
@@ -169,7 +170,7 @@ function _bh:DestroyShards(maxToKeep)
 					break
 				end
 				if self:TryDestroyShard(bag.id, slot) then
-					self.Soulshard_Count = GetItemCount(Constants.Soulshard_Item_Id)
+					self.Soulshard_Count = GetItemCount(ItemHelper.Soulshard_Item_Id)
 				end
 			end
 		end
@@ -178,7 +179,7 @@ end
 
 function _bh:TryDestroyShard(bagId, slot)
 	local itemId = GetContainerItemID(bagId, slot)
-	if (itemId == Constants.Soulshard_Item_Id) then
+	if (itemId == ItemHelper.Soulshard_Item_Id) then
 		PickupContainerItem(bagId, slot)
 		if (CursorHasItem()) then
 			DeleteCursorItem()

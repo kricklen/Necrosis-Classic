@@ -100,9 +100,9 @@ function _mw:Show()
 		end
 
 		self.Frame:RegisterForDrag("LeftButton")
-		self.Frame:SetScript("OnMouseUp", function(self) Necrosis:OnDragStop(self) end)
-		self.Frame:SetScript("OnDragStart", function(self) Necrosis:OnDragStart(self) end)
-		self.Frame:SetScript("OnDragStop", function(self) Necrosis:OnDragStop(self) end)
+		self.Frame:SetScript("OnMouseUp", Necrosis.OnDragStop)
+		self.Frame:SetScript("OnDragStart", Necrosis.OnDragStart)
+		self.Frame:SetScript("OnDragStop", Necrosis.OnDragStop)
 
 		self.bgIcon = GraphicsHelper:CreateTexture(
 			self.Frame, "BACKGROUND",

@@ -103,11 +103,13 @@ function Necrosis:Initialize(Config)
 	-----------------------------------------------------------
 	-- Affichage d'un message sur la console
 	self.Chat:_Msg(self.ChatMessage.Interface.Welcome, "USER")
+
 	-- Création de la liste des sorts disponibles
 	self:SpellLocalize()
 	self:SpellSetup()
 	self:CreateMenu()
 	self:ButtonSetup()
+
     -- Enregistrement de la commande console
 	SlashCmdList["NecrosisCommand"] = Necrosis.SlashHandler
 	SLASH_NecrosisCommand1 = "/necrosis"
@@ -156,7 +158,6 @@ function Necrosis:Initialize(Config)
 	end
 
 	-- Inventaire des pierres et des fragments possedés par le Démoniste
-	print("Initialize BagExplore")
 	self:BagExplore()
 
 	-- Si la sphere doit indiquer la vie ou la mana, on y va

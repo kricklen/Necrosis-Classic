@@ -108,6 +108,8 @@ Necrosis.Spell = setmetatable({}, metatable)
 -- Detection of initialisation || Détection des initialisations du mod
 Local.LoggedIn = true
 Local.InWorld = true
+-- Local.InWorld = false
+Local.SpellInitDone = false
 
 -- Events utilised by Necrosis || Events utilisés dans Necrosis
 Local.Events = {
@@ -287,9 +289,6 @@ Local.SomethingOnHand = "Truc"
 -- Component count variable || Variable de comptage des composants
 Local.Reagent = {Infernal = 0, Demoniac = 0}
 
--- Variables used in demon management || Variables utilisées dans la gestion des démons
-Local.Summon = {}
-
 -- List of buttons available in each menu || Liste des boutons disponibles dans chaque menu
 Local.Menu = {
 	Pet = setmetatable({}, metatable),
@@ -329,38 +328,40 @@ Local.LastUpdate = {0, 0}
 -- NECROSIS FUNCTIONS APPLIED TO ENTRY IN THE GAME || FONCTIONS NECROSIS APPLIQUEES A L'ENTREE DANS LE JEU
 ------------------------------------------------------------------------------------------------------
 
+local function InitializeMyself()
+	-- Initialization of the mod || Initialisation du mod
+	Necrosis:Initialize(Local.DefaultConfig)
+	-- Recording of the events used || Enregistrement des events utilisés
+	NecrosisButton:RegisterEvent("PLAYER_ENTERING_WORLD")
+	NecrosisButton:RegisterEvent("PLAYER_LEAVING_WORLD")
+	for i in ipairs(Local.Events) do
+		NecrosisButton:RegisterEvent(Local.Events[i])
+	end
+	-- Detecting the type of demon present at the connection || Détection du Type de démon présent à la connexion
+	Necrosis.CurrentEnv.DemonType = UnitCreatureFamily("pet")
+	Necrosis.Chat:_Msg("initialized", "USER")
+end
+
+local loggedIn = false
+local weCanStart = false
+
 -- Function applied to loading || Fonction appliquée au chargement
 function Necrosis:OnLoad(event)
-
-	if event == "SPELLS_CHANGED" then
+	if (event == "PLAYER_LOGIN" and not loggedIn) then
+		-- Logon is fired once, wait for it
 		local _, Class = UnitClass("player")
-		if Class == "WARLOCK" then
-print("SPELLS_CHANGED")
-			Necrosis:SpellSetup()
-			-- Necrosis:CreateMenu()
-			Necrosis:ButtonSetup()
+		if (Class == "WARLOCK") then
+			loggedIn = true
 		end
-	end
-	if event == "PLAYER_LOGIN" then
-
-		local _, Class = UnitClass("player")
-		if Class == "WARLOCK" then
-			-- EventHub:RegisterPlayerEnteringWorldHandler()
-
-			-- Initialization of the mod || Initialisation du mod
-			self:Initialize(Local.DefaultConfig)
-
-			-- Recording of the events used || Enregistrement des events utilisés
-			NecrosisButton:RegisterEvent("PLAYER_ENTERING_WORLD")
-			NecrosisButton:RegisterEvent("PLAYER_LEAVING_WORLD")
-			for i in ipairs(Local.Events) do
-				NecrosisButton:RegisterEvent(Local.Events[i])
-			end
-
-			-- Detecting the type of demon present at the connection || Détection du Type de démon présent à la connexion
-			self.CurrentEnv.DemonType = UnitCreatureFamily("pet")
-			Local.Summon.DemonType = self.CurrentEnv.DemonType
-		end
+	elseif (event == "SKILL_LINES_CHANGED" and loggedIn and not weCanStart) then
+		-- Skill changed is fired more than once, seems like a more stable
+		-- indicator that tells when the spellbook is ready
+		InitializeMyself()
+		weCanStart = true
+	elseif (event == "SPELLS_CHANGED" and weCanStart) then
+		-- Spells changed fires each time a new spell is learned etc.
+		Necrosis:SpellSetup()
+		Necrosis:ButtonSetup()
 	end
 end
 
@@ -369,13 +370,15 @@ end
 ------------------------------------------------------------------------------------------------------
 -- Function started when updating the interface (main) - every 0.1 seconds || Fonction lancée à la mise à jour de l'interface (main) -- Toutes les 0,1 secondes environ
 function Necrosis:OnUpdate(something, elapsed)
-	Local.LastUpdate[1] = Local.LastUpdate[1] + elapsed
-	Local.LastUpdate[2] = Local.LastUpdate[2] + elapsed
 
-	-- If smooth scroll timers, we update them as soon as possible || Si défilement lisse des timers, on les met à jours le plus vite possible
-	if NecrosisConfig.Smooth then
-		NecrosisUpdateTimer(Local.TimerManagement.SpellTimer)
+	if elapsed then
+		Local.LastUpdate[1] = Local.LastUpdate[1] + elapsed
+		Local.LastUpdate[2] = Local.LastUpdate[2] + elapsed
 	end
+	-- If smooth scroll timers, we update them as soon as possible || Si défilement lisse des timers, on les met à jours le plus vite possible
+	-- if NecrosisConfig.Smooth then
+	NecrosisUpdateTimer(Local.TimerManagement.SpellTimer)
+	-- end
 
 	-- If timers texts, we update them very quickly also || Si timers textes, on les met à jour très vite également
 	if NecrosisConfig.TimerType == "Textual" then
@@ -423,9 +426,9 @@ function Necrosis:OnUpdate(something, elapsed)
 	-- Every half second || Toutes les demies secondes
 	elseif Local.LastUpdate[2] > 0.5 then
 		-- If normal graphical timers scroll, then we update every 0.5 seconds || Si défilement normal des timers graphiques, alors on met à jour toutes les 0.5 secondes
-		if not NecrosisConfig.Smooth then
-			NecrosisUpdateTimer(Local.TimerManagement.SpellTimer)
-		end
+		-- if not NecrosisConfig.Smooth then
+		-- 	NecrosisUpdateTimer(Local.TimerManagement.SpellTimer)
+		-- end
 		-- If configured, display warnings from Antifear || Si configuré, affichage des avertissements d'Antifear
 		if NecrosisConfig.AntiFearAlert then
 			Necrosis:ShowAntiFearWarning()
@@ -442,7 +445,7 @@ end
 
 
 -- Function started according to the intercepted event || Fonction lancée selon l'événement intercepté
-function Necrosis.OnEvent(self, event,...)
+function Necrosis.OnEvent(self, event, ...)
 
 	local arg1,arg2,arg3,arg4,arg5,arg6 = ...
 
@@ -453,7 +456,7 @@ function Necrosis.OnEvent(self, event,...)
 	end
 
 	-- Is the game well loaded? || Le jeu est-il bien chargé ?
-	if not Local.InWorld then
+	if (not Local.InWorld) then
 		return
 	end
 
@@ -707,14 +710,14 @@ end
 function Necrosis:ChangeDemon()
 	-- If the new demon is a slave demon, we put a 5 minute timer || Si le nouveau démon est un démon asservi, on place un timer de 5 minutes
 	if (self:UnitHasEffect("pet", self.Spell[10].Name)) then
-		if (not Local.Summon.DemonEnslaved) then
-			Local.Summon.DemonEnslaved = true
+		if (not Necrosis.CurrentEnv.DemonEnslaved) then
+			Necrosis.CurrentEnv.DemonEnslaved = true
 			Local.TimerManagement = Necrosis:InsertTimerParTable(10, "","", Local.TimerManagement)
 		end
 	else
 		-- When the enslaved demon is lost, remove the timer and warn the warlock || Quand le démon asservi est perdu, on retire le Timer et on prévient le Démoniste
-		if (Local.Summon.DemonEnslaved) then
-			Local.Summon.DemonEnslaved = false
+		if (Necrosis.CurrentEnv.DemonEnslaved) then
+			Necrosis.CurrentEnv.DemonEnslaved = false
 			Local.TimerManagement = self:RetraitTimerParNom(self.Spell[10].Name, Local.TimerManagement)
 			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.EnslaveEnd) end
 			self.Chat:_Msg(self.ChatMessage.Information.EnslaveBreak, "USER")
@@ -722,19 +725,18 @@ function Necrosis:ChangeDemon()
 	end
 
 	-- If the demon is not enslaved we define its title, and we update its name in Necrosis || Si le démon n'est pas asservi on définit son titre, et on met à jour son nom dans Necrosis
-	Local.Summon.LastDemonType = self.CurrentEnv.DemonType
-	self.CurrentEnv.DemonType = UnitCreatureFamily("pet")
-	Local.Summon.DemonType = self.CurrentEnv.DemonType
+	Necrosis.CurrentEnv.LastDemonType = Necrosis.CurrentEnv.DemonType
+	Necrosis.CurrentEnv.DemonType = UnitCreatureFamily("pet")
 
-	if self.CurrentEnv.DemonType then
-		NecrosisConfig.PetName[self.CurrentEnv.DemonType] = UnitName("pet")
+	if Necrosis.CurrentEnv.DemonType then
+		NecrosisConfig.PetName[Necrosis.CurrentEnv.DemonType] = UnitName("pet")
 	else
 		print("Demon vanished")
 		-- Demon vanished, might have been a corpse already
 	end
 
 	for i = 1, #self.Translation.DemonName, 1 do
-		if Local.Summon.DemonType == self.Translation.DemonName[i] and not (NecrosisConfig.PetName[i] or (UnitName("pet") == UNKNOWNOBJECT)) then
+		if Necrosis.CurrentEnv.DemonType == self.Translation.DemonName[i] and not (NecrosisConfig.PetName[i] or (UnitName("pet") == UNKNOWNOBJECT)) then
 			NecrosisConfig.PetName[i] = UnitName("pet")
 			--self:Localization()
 			break
@@ -946,7 +948,7 @@ function Necrosis:SpellManagement()
 
 						if (spell == 9) then
 
-							if Necrosis.Spell[9].Rank:find("(%d+)") then
+							if Necrosis.Spell[9].Rank then
 								self.Spell[spell].Length = 20
 							else
 								self.Spell[spell].Length = 30
@@ -971,23 +973,23 @@ end
 ------------------------------------------------------------------------------------------------------
 
 -- Function to move Necrosis elements on the screen ||Fonction permettant le déplacement d'éléments de Necrosis sur l'écran
-function Necrosis:OnDragStart(button)
-	button:StartMoving()
+function Necrosis.OnDragStart(uiElement)
+	uiElement:StartMoving()
 end
 
 -- Function stopping the movement of Necrosis elements on the screen ||Fonction arrêtant le déplacement d'éléments de Necrosis sur l'écran
-function Necrosis:OnDragStop(button)
+function Necrosis.OnDragStop(uiElement)
 	-- We stop the movement effectively ||On arrête le déplacement de manière effective
-	button:StopMovingOrSizing()
+	uiElement:StopMovingOrSizing()
 	-- We save the location of the button ||On sauvegarde l'emplacement du bouton
-	local NomBouton = button:GetName()
-	local AncreBouton, BoutonParent, AncreParent, BoutonX, BoutonY = button:GetPoint()
+	local name = uiElement:GetName()
+	local AncreBouton, BoutonParent, AncreParent, BoutonX, BoutonY = uiElement:GetPoint()
 	if not BoutonParent then
 		BoutonParent = "UIParent"
 	else
 		BoutonParent = BoutonParent:GetName()
 	end
-	NecrosisConfig.FramePosition[NomBouton] = {AncreBouton, BoutonParent, AncreParent, BoutonX, BoutonY}
+	NecrosisConfig.FramePosition[name] = {AncreBouton, BoutonParent, AncreParent, BoutonX, BoutonY}
 end
 
 -- Function managing the help bubbles ||Fonction gérant les bulles d'aide
@@ -1057,9 +1059,9 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 		GameTooltip:AddLine(self.TooltipData.Main.Firestone..self.TooltipData[Type].Stone[BagHelper.Firestone_IsAvailable])
 
 		-- View the name of the daemon, or if it is slave, or "None" if no daemon is present ||Affichage du nom du démon, ou s'il est asservi, ou "Aucun" si aucun démon n'est présent
-		if (Local.Summon.DemonType) then
-			GameTooltip:AddLine(self.TooltipData.Main.CurrentDemon..Local.Summon.DemonType)
-		elseif Local.Summon.DemonEnslaved then
+		if (Necrosis.CurrentEnv.DemonType) then
+			GameTooltip:AddLine(self.TooltipData.Main.CurrentDemon..Necrosis.CurrentEnv.DemonType)
+		elseif Necrosis.CurrentEnv.DemonEnslaved then
 			GameTooltip:AddLine(self.TooltipData.Main.EnslavedDemon)
 		else
 			GameTooltip:AddLine(self.TooltipData.Main.NoCurrentDemon)
@@ -1074,7 +1076,7 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 			-- And also the cooldown ||Et aussi le Temps de recharge
 			GameTooltip:AddLine(self.Spell[51].Mana.." Mana")
 			if BagHelper.Soulstone_IsAvailable then
-				local isOnCooldown, formattedCooldown = Necrosis.Timers:GetSoulstoneCooldown()
+				local isOnCooldown, formattedCooldown = ItemHelper:GetSoulstoneCooldown()
 				if isOnCooldown then
 					GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..formattedCooldown)
 				else
@@ -1091,7 +1093,7 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 			-- Idem ||Idem
 			GameTooltip:AddLine(self.Spell[52].Mana.." Mana")
 			if BagHelper.Healthstone_IsAvailable then
-				local isOnCooldown, formattedCooldown = Necrosis.Timers:GetHealthstoneCooldown()
+				local isOnCooldown, formattedCooldown = ItemHelper:GetHealthstoneCooldown()
 				if isOnCooldown then
 					GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..formattedCooldown)
 				else
@@ -1129,7 +1131,7 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 	-- ..... for the Timers button ||..... pour le bouton des Timers
 	elseif (Type == "SpellTimer") then
 
-		local hsCooldown, hsCooldownTime = Necrosis.Timers:GetHearthstoneCooldown()
+		local hsCooldown, hsCooldownTime = ItemHelper:GetHearthstoneCooldown()
 		if hsCooldown then
 			GameTooltip:AddLine(self.Translation.Item.Hearthstone.." - "..hsCooldownTime)
 		else
@@ -1174,8 +1176,8 @@ function Necrosis:BuildTooltip(button, Type, anchor, sens)
 		GameTooltip:AddLine(self.Spell[34].Mana.." Mana")
 	elseif (Type == "Banish") then
 		GameTooltip:AddLine(self.Spell[9].Mana.." Mana")
-		if self.Spell[9].Rank:find("2") then
-		GameTooltip:AddLine(self.TooltipData[Type].Text)
+		if (self.Spell[9].Rank == 2) then
+			GameTooltip:AddLine(self.TooltipData[Type].Text)
 		end
 	elseif (Type == "Weakness") then
 		GameTooltip:AddLine(self.Spell[23].Mana.." Mana")
@@ -1307,7 +1309,7 @@ end
 -- Function updating the buttons Necrosis and giving the state of the button of the soul stone || Fonction mettant à jour les boutons Necrosis et donnant l'état du bouton de la pierre d'âme
 function Necrosis:UpdateIcons()
 
-print("UpdateIcons...")
+--print("UpdateIcons...")
 
 	-- If the function was called to detect an enchantment, it is detected! || Si la fonction a été appelée pour détecter un enchantement, on le détecte !
 	if Local.SomethingOnHand == "Truc" then
@@ -1339,7 +1341,7 @@ print("UpdateIcons...")
 	-- 		end
 	-- 	end
 	-- end
-	local soulstoneInUse = Necrosis.Timers:IsSoulstoneOnCooldown()
+	local soulstoneInUse = ItemHelper:IsSoulstoneOnCooldown()
 
 	if BagHelper.Soulstone_IsAvailable then
 		if soulstoneInUse then
@@ -1485,7 +1487,7 @@ print("UpdateIcons...")
 	end
 	
 
-	local hsCooldown = Necrosis.Timers:GetHearthstoneCooldown()
+	local hsCooldown = ItemHelper:GetHearthstoneCooldown()
 	if hsCooldown then
 		NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(1)
 	else
@@ -1631,16 +1633,16 @@ function Necrosis:UpdateMana()
 	for i = 1, #PetNameHere, 1 do
 		local PetManaButton = _G["NecrosisPetMenu"..(i + 1)]
 		if PetManaButton
-			and Local.Summon.LastDemonType
-			and Local.Summon.LastDemonType == self.Translation.DemonName[i]
-			and not (Local.Summon.LastDemonType == Local.Summon.DemonType)
+			and Necrosis.CurrentEnv.LastDemonType
+			and Necrosis.CurrentEnv.LastDemonType == self.Translation.DemonName[i]
+			and not (Necrosis.CurrentEnv.LastDemonType == Necrosis.CurrentEnv.DemonType)
 			then
 				PetManaButton:SetNormalTexture(GraphicsHelper:GetTexture(PetNameHere[i].."1"))
-				Local.Summon.LastDemonType = nil
+				Necrosis.CurrentEnv.LastDemonType = nil
 		end
 		if PetManaButton
-			and Local.Summon.DemonType
-			and Local.Summon.DemonType == self.Translation.DemonName[i]
+			and Necrosis.CurrentEnv.DemonType
+			and Necrosis.CurrentEnv.DemonType == self.Translation.DemonName[i]
 			then
 				PetManaButton:SetNormalTexture(GraphicsHelper:GetTexture(PetNameHere[i].."2"))
 		elseif PetManaButton and ManaPet[i] then
@@ -1961,7 +1963,7 @@ end
 
 -- Display or Hide buttons depending on spell availability || Affiche ou masque les boutons de sort à chaque nouveau sort appris
 function Necrosis:ButtonSetup()
-
+print("Necrosis:ButtonSetup")
 	local NBRScale = (100 + (NecrosisConfig.NecrosisButtonScale - 85)) / 100
 	if NecrosisConfig.NecrosisButtonScale <= 95 then
 		NBRScale = 1.1
@@ -1989,7 +1991,7 @@ function Necrosis:ButtonSetup()
 		self.Spell[52].ID,
 		self.Spell[51].ID,
 		Local.Menu.Buff[1],
-		Local.Summon.SteedAvailable,
+		Necrosis.CurrentEnv.SteedAvailable,
 		Local.Menu.Pet[1],
 		Local.Menu.Curse[1]
 		-- self.Spell[27].ID  Not in classic //TODO clear up
@@ -2006,7 +2008,7 @@ function Necrosis:ButtonSetup()
 
 						if not f then
 							f = self:CreateSphereButtons(ButtonName[button])
-							self:StoneAttribute(Local.Summon.SteedAvailable)
+							self:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
 						end
 						f:ClearAllPoints()
 						f:SetPoint(
@@ -2029,7 +2031,7 @@ function Necrosis:ButtonSetup()
 						local f = _G[ButtonName[button]]
 						if not f then
 							f = self:CreateSphereButtons(ButtonName[button])
-							self:StoneAttribute(Local.Summon.SteedAvailable)
+							self:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
 						end
 						f:ClearAllPoints()
 						f:SetPoint(
@@ -2640,172 +2642,4 @@ function Necrosis:GetCompanionInfo(type, id)
 	end
 
 	return creatureID, creatureName, creatureSpellID, icon, issummoned
-end
-
--- My favourite feature! Create a list of spells known by the warlock sorted by name & rank || Ma fonction préférée ! Elle fait la liste des sorts connus par le démo, et les classe par rang.
--- Select the highest available spell in the case of stones. || Pour les pierres, elle sélectionne le plus haut rang connu
-function Necrosis:SpellSetup()
-	local CurrentSpells = new("hash",
-		"ID", {},
-		"Name", {},
-		"NameOrg", {},
-		"subName", {}
-	)
-
-	for index in ipairs(self.Spell) do
-		self.Spell[index].ID = nil
-	end
-
-	local spellID = 1
-	local Invisible = 0
-	local InvisibleID = 0
-
-	-- Search for all spells known by the warlock || On va parcourir tous les sorts possedés par le Démoniste
-	while true do
-
-		local spellName, subSpellName = GetSpellBookItemName(spellID, BOOKTYPE_SPELL)
-		local spellNameOrg = spellName
-
-		if not spellName then
-			do break end
-		end
-		if(spellName:find(self.Translation.Misc.Create .. " " .. self.Translation.Item.Healthstone) )then
-			subSpellName= Necrosis:StoneToRank(spellName)
-			spellName = self.Translation.Misc.Create .. " " .. self.Translation.Item.Healthstone
-		end
-		if(spellName:find(self.Translation.Misc.Create .. " " .. self.Translation.Item.Soulstone) )then
-			subSpellName= Necrosis:StoneToRank(spellName)
-			spellName = self.Translation.Misc.Create .. " " .. self.Translation.Item.Soulstone
-		end
-		if(spellName:find(self.Translation.Misc.Create .. " " .. self.Translation.Item.Firestone) )then
-			subSpellName= Necrosis:StoneToRank(spellName)
-			spellName = self.Translation.Misc.Create .. " " .. self.Translation.Item.Firestone
-		end
-		if(spellName:find(self.Translation.Misc.Create .. " " .. self.Translation.Item.Spellstone) )then
-			subSpellName= Necrosis:StoneToRank(spellName)
-			spellName = self.Translation.Misc.Create .. " " .. self.Translation.Item.Spellstone
-		end
-
-		-- Print(subSpellName)
-		-- Print(spellName.."   -   "..subSpellName.."----"..spellID)
-		-- For spells with numbered ranks, compare each one || Pour les sorts avec des rangs numérotés, on compare pour chaque sort les rangs 1 à 1
-		-- And preserve the highest rank || Le rang supérieur est conservé
-		local found = false
-		if (subSpellName and not (subSpellName == " " or subSpellName == "")) then
-			local _, _, spellRank = subSpellName:find("(%d+)")
-			spellRank = tonumber(spellRank)
-
-			if (spellRank ~= nil) then
-				for index=1, #CurrentSpells.Name, 1 do
-					--  a version of the spell is already in our table
-					if (CurrentSpells.Name[index] == spellName) then
-						found = true
-						local _, _, CurrentRank = CurrentSpells.subName[index]:find("(%d+)")
-						CurrentRank = tonumber(CurrentRank)
-						if (CurrentRank ~= nil) then
-							-- Higher rank spell? Update the table
-							if (CurrentRank < spellRank) then
-								CurrentSpells.ID[index] = spellID
-								CurrentSpells.subName[index] = subSpellName
-								CurrentSpells.NameOrg[index] = spellNameOrg
-							end
-						end
-						break
-					end
-				end
-			end
-			-- -- The highest rank of each spell is inserted into the table || Les plus grands rangs de chacun des sorts à rang numérotés sont insérés dans la table
-			-- if (not found) then
-			-- 	table.insert(CurrentSpells.ID, spellID)
-			-- 	table.insert(CurrentSpells.Name, spellName)
-			-- 	table.insert(CurrentSpells.NameOrg, spellNameOrg)
-			-- 	table.insert(CurrentSpells.subName, subSpellName)
-			-- end
--- 		else
--- print("Spell got no subspell: "..tostring(spellName))
--- 			table.insert(CurrentSpells.ID, spellID)
--- 			table.insert(CurrentSpells.Name, spellName)
--- 			table.insert(CurrentSpells.NameOrg, spellNameOrg)
--- 			table.insert(CurrentSpells.subName, subSpellName)
-		end
-		-- If no ranked spell was found, store it
-		if (not found) then
-			table.insert(CurrentSpells.ID, spellID)
-			table.insert(CurrentSpells.Name, spellName)
-			table.insert(CurrentSpells.NameOrg, spellNameOrg)
-			table.insert(CurrentSpells.subName, subSpellName)
-		end
-		spellID = spellID + 1
-	end
-
-	-- Update the list of spells with the new ranks || On met à jour la liste des sorts avec les nouveaux rangs
-	-- Spells in self.Spell have a global spellId
-	-- Spells in CurrentSpells have spellID from the player's spellbook
-	-- Matching is done via the spell name
-	for spell=1, #self.Spell, 1 do
-		for index = 1, #CurrentSpells.Name, 1 do
-			if (self.Spell[spell].Name == CurrentSpells.Name[index]) then
-				self.Spell[spell].ID = CurrentSpells.ID[index]
-				self.Spell[spell].Rank = CurrentSpells.subName[index]
-				-- This is for stones mostly, original name is f.e. "Create Healthstone (Major)"
-				-- Keep the original name for later reference to SpellBook
-				if CurrentSpells.NameOrg[index] and CurrentSpells.NameOrg[index] ~= CurrentSpells.Name[index] then
-					self.Spell[spell].NameOrg = CurrentSpells.NameOrg[index]
-					self.Spell[spell].Mana = self:GetManaCostForSpell(self.Spell[spell].NameOrg) or 100
-				else
-					self.Spell[spell].Mana = self:GetManaCostForSpell(self.Spell[spell].Name) or 100
-				end
-			end
-		end
-	end
-	del(CurrentSpells)
-
-	-- Update the spell durations according to their rank || On met à jour la durée de chaque sort en fonction de son rang
-	-- Fear || Peur
-	if self.Spell[13].ID then
-		local _, _, lengtH = self.Spell[13].Rank:find("(%d+)")
-		if lengtH then
-			lengtH = tonumber(lengtH)
-			self.Spell[13].Length = tonumber(lengtH) * 5 + 5
-		end
-	end
-	-- Corruption
-	local _, _, ranK = self.Spell[14].Rank:find("(%d+)")
-	if ranK then
-		ranK = tonumber(ranK)
-		if self.Spell[14].ID and ranK <= 2 then
-			self.Spell[14].Length = ranK * 3 + 9
-		end
-	end
-
-	-- WoW 3.0 :  Les montures se retrouvent dans une interface à part
-	-- if GetNumCompanions("MOUNT") > 0 then
-	-- 	for i = 1, GetNumCompanions("MOUNT"), 1 do
-	-- 		local _, NomCheval, SpellCheval = Necrosis:GetCompanionInfo("MOUNT", i)
-	-- 		if NomCheval == self.Spell[1].Name then
-	-- 			self.Spell[1].ID = SpellCheval
-	-- 		end
-	-- 		if NomCheval == self.Spell[2].Name then
-	-- 			self.Spell[2].ID = SpellCheval
-	-- 		end
-	-- 	end
-	-- end
-
-	-- associate the mounts to the sphere button || Association du sort de monture correct au bouton
-
-	if self.Spell[1].ID or self.Spell[2].ID then
-		Local.Summon.SteedAvailable = true
-	else
-		Local.Summon.SteedAvailable = false
-	end
-
-	if not InCombatLockdown() then
-		self:MainButtonAttribute()
-		self:BuffSpellAttribute()
-		self:PetSpellAttribute()
-		self:CurseSpellAttribute()
-		self:StoneAttribute(Local.Summon.SteedAvailable)
-	end
-
-	Necrosis:BindName()
 end

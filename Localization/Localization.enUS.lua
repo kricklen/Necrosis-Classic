@@ -69,8 +69,8 @@ function Localization.enUS()
 			["EnslavedDemon"] = "Demon: Enslaved",
 			["NoCurrentDemon"] = "Demon: None",
 		},
-		Create = "Right click to create",
-		Use = "Left click to use",
+		Create = "Click to create",
+		Use = "Click to use",
 		OnCooldown = "On cooldown: ",
 		["Soulstone"] = {
 			Text = {"Right click to create","Left click to use","Used\nRight click to recreate","Waiting"},

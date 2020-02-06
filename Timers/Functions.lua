@@ -42,31 +42,11 @@ local _G = getfenv(0)
 -- FUNCTIONS TO ADD TIMERS || FONCTIONS D'INSERTION
 ------------------------------------------------------------------------------------------------------
 
-Necrosis.Timers = {}
+Necrosis.Timers = {
+	ActiveTimers = {}
+}
 
 local _t = Necrosis.Timers
-
-function _t:IsSoulstoneOnCooldown()
-	local secs = self:GetItemCooldownInSecs(Constants.Soulstone_Item_Id)
-	return (secs > 0)
-end
-
-function _t:GetSoulstoneCooldown()
-	return self:GetItemCooldownTime(Constants.Soulstone_Item_Id)
-end
-
-function _t:GetHealthstoneCooldown()
-	return self:GetItemCooldownTime(Constants.Healthstone_Item_Id)
-end
-
-function _t:GetHearthstoneCooldown()
-	return self:GetItemCooldownTime(Constants.Hearthstone_Item_Id)
-end
-
-function _t:GetItemCooldownTime(itemId)
-	local secs = self:GetItemCooldownInSecs(itemId)
-	return (secs > 0), self:GetFormattedTime(secs)
-end
 
 function _t:GetFormattedTime(secs)
 	local mins = math.modf(secs / 60)
@@ -77,22 +57,41 @@ function _t:GetFormattedTime(secs)
 	return string.format("%d Secs", secs)
 end
 
-function _t:GetItemCooldownInSecs(itemId)
-	local startTime, duration, enable = GetItemCooldown(itemId)
-	if enable == 0 then
-		return 0
+local count = 0
+function _t.UpdateTimers(something, elapsed)
+	if (not elapsed) then
+		return
 	end
-	if startTime == 0 then
-		return 0
+	count = count + elapsed
+	if (count > 1) then
+		count = 0
 	end
-	local remainingSecs = math.floor(duration - (GetTime() - startTime))
-	return remainingSecs
 end
 
+function _t:InsertSpellTimer(spellIndex, targetName, targetLevel, targetGuid)
+	local spell = Necrosis.Spell[spellIndex]
+	table.insert(
+		self.ActiveTimers,
+		{
+			SpellName = spell.Name,
+			SpellTime = Necrosis.Spells:GetSpellCooldownInSecs(spell.ID),
+			SpellTimeMax = floor(GetTime() + spell.Length),
+			SpellType = spell.Type,
+			TargetName = targetName,
+			TargetGUID = targetGuid,
+			TargetLevel = targetLevel,
+			Group = 0,
+			Gtimer = nil
+		}
+	)
+	print("self.ActiveTimers: "..self.ActiveTimers[#self.ActiveTimers].SpellTime)
+end
 
 -- The timers' table is here for that. | La table des timers est là pour ça !
 function Necrosis:InsertTimerParTable(spellIndex, Target, LevelTarget, Timer, TargetGUID)
 	-- insert an entry into the table || Insertion de l'entrée dans le tableau
+	Necrosis.Timers:InsertSpellTimer(spellIndex, Target, LevelTarget, TargetGUID)
+print("Insert timer in table: "..tostring(spellIndex))
 	Timer.SpellTimer:insert(
 		{
 			Name = Necrosis.Spell[spellIndex].Name,

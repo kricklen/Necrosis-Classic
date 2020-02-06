@@ -149,6 +149,35 @@ function _tv.UpdateTexts()
 	_tv.cbTimersOnLeftSide:SetText(Necrosis.Config.Timers["Afficher les timers sur la gauche du bouton"])
 end
 
+
+-- Testing
+local metatable = {
+	__index = {
+		["insert"] = table.insert,
+		["remove"] = table.remove,
+		["sort"] = table.sort,
+	}
+}
+
+local timerManagement = {
+	-- Spells to timer || Sorts à timer
+	SpellTimer = setmetatable({}, metatable),
+	-- Association of timers to Frames || Association des timers aux Frames
+	TimerTable = setmetatable({}, metatable),
+	-- Groups of timers by mobs || Groupes de timers par mobs
+	SpellGroup = setmetatable(
+		{
+			{Name = "Rez", SubName = " ", Visible = 0},
+			{Name = "Main", SubName = " ", Visible = 0},
+			{Name = "Cooldown", SubName = " ", Visible = 0}
+		},
+		metatable
+	),
+	-- Last cast spell || Dernier sort casté
+	LastSpell = {}
+}
+
+
 function _tv:Show()
 	if not self.Frame then
 		-- Création de la fenêtre
@@ -192,6 +221,28 @@ function _tv:Show()
 			0, -60,
 			self.ddTimers_Init
 		)
+	
+		self.btnTestTimer = GraphicsHelper:CreateButton(
+			self.Frame,
+			"Test timer",
+			-200, -250,
+			function(self)
+				Necrosis:InsertTimerParTable(11, "Test target", "", timerManagement)
+			end
+		)
+		self.btnTestTimer:SetWidth(100)
+
+		self.btnClearTimer = GraphicsHelper:CreateButton(
+			self.Frame,
+			"Clear timer",
+			-90, -250,
+			function(self)
+				while (#timerManagement.SpellTimer > 0) do
+					Necrosis:RetraitTimerParIndex(1, timerManagement)
+				end
+			end
+		)
+		self.btnClearTimer:SetWidth(100)
 	end
 
 	self.Frame:Show()

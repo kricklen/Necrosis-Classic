@@ -115,7 +115,22 @@ function _sp:GetSpellCooldownInSecs(spellBookId)
 	return remainingSecs
 end
 
+function _sp:GetRankNumberFromSubName(subName)
+	local _, _, rank = subName:find("(%d+)")
+	if rank then
+		return  tonumber(rank)
+	end
+	return nil
+end
 
+
+local function MakeSpellIdRanks(root)
+    -- i is the rank of the item
+    -- Create an entry in the form of [itemId] = rank
+    for i,id in ipairs(root.SpellIds) do
+        root[id] = i
+    end
+end
 
 -- Fonction pour relocaliser  automatiquemlent des éléments en fonction du client
 function Necrosis:SpellLocalize(tooltip) 
@@ -125,66 +140,104 @@ function Necrosis:SpellLocalize(tooltip)
 	------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	if not tooltip then
 		self.Spell = {
-			[1] = {Name = GetSpellInfo(5784), 	GlobalId = 5784, 	Mana = 50,				Length = 0,		Type = 0}, -- Felsteed
-			[2] = {Name = GetSpellInfo(23161), 	GlobalId = 23161,	Mana = 50,			 	Length = 0,		Type = 0}, -- Dreadsteed
-			[3] = {Name = GetSpellInfo(688), 	GlobalId = 688,		Mana = 50,				Length = 0,		Type = 0}, -- Imp || Diablotin 
-			[4] = {Name = GetSpellInfo(697),	GlobalId = 697,		Mana = 50,				Length = 0,		Type = 0}, -- Voidwalker || Marcheur
-			[5] = {Name = GetSpellInfo(712),	GlobalId = 712,		Mana = 50,				Length = 0,		Type = 0}, -- Succubus || Succube
-			[6] = {Name = GetSpellInfo(691),	GlobalId = 691,		Mana = 50,				Length = 0,		Type = 0}, -- Fellhunter
-			[7] = {Name = GetSpellInfo(691),	GlobalId = 691,		Mana = 50,				Length = 0,		Type = 0}, -- Felguard -- Fellhunter now
-			[8] = {Name = GetSpellInfo(1122),	GlobalId = 1122,	Mana = 50,				Length = 600,	Type = 3}, -- Infernal
-			[9] = {Name = GetSpellInfo(18647),	GlobalId = 18647,	Mana = 50,				Length = 30,	Type = 2}, -- Banish
-			[10] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,				Length = 300,	Type = 2}, -- Enslave
-			[11] = {Name = GetSpellInfo(20707),	GlobalId = 20707,	Mana = 50,				Length = 1800,	Type = 1}, -- Soulstone Resurrection || Résurrection de pierre d'ame
-			[12] = {Name = GetSpellInfo(707),	GlobalId = 707,		Mana = 50,				Length = 15,	Type = 6}, -- Immolate
-			[13] = {Name = GetSpellInfo(6215),	GlobalId = 6215,	Mana = 50,				Length = 15,	Type = 6}, -- Fear
-			[14] = {Name = GetSpellInfo(6222),	GlobalId = 6222,	Mana = 50,				Length = 18,	Type = 5}, -- Corruption
-			[15] = {Name = GetSpellInfo(18708),	GlobalId = 18708,	Mana = 50,				Length = 180,	Type = 3}, -- Fel Domination || Domination corrompue
-			[16] = {Name = GetSpellInfo(603),	GlobalId = 603,		Mana = 50,				Length = 60,	Type = 3}, -- Curse of Doom || Malédiction funeste
-			[17] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 20,	Type = 3}, -- NOPE NOT IN Classic Shadowfury || Furie de l'ombre
-			[18] = {Name = GetSpellInfo(17924),	GlobalId = 17924,	Mana = 50,				Length = 60,	Type = 3}, -- Soul Fire || Feu de l'âme
-			[19] = {Name = GetSpellInfo(17926),	GlobalId = 17926,	Mana = 50,				Length = 120,	Type = 3}, -- Death Coil || Voile mortel
-			[20] = {Name = GetSpellInfo(18871),	GlobalId = 18871,	Mana = 50,				Length = 15,	Type = 3}, -- Shadowburn || Brûlure de l'ombre
-			[21] = {Name = GetSpellInfo(18932),	GlobalId = 18932,	Mana = 50,				Length = 10,	Type = 3}, -- Conflagration
-			[22] = {Name = GetSpellInfo(11713),	GlobalId = 11713,	Mana = 50,				Length = 24,	Type = 4}, -- Curse of Agony || Malédiction Agonie
-			[23] = {Name = GetSpellInfo(11708),	GlobalId = 11708,	Mana = 50,				Length = 120,	Type = 4}, -- Curse of Weakness || Malédiction Faiblesse
-			[24] = {Name = GetSpellInfo(11717),	GlobalId = 11717,	Mana = 0 ,              Length = 0,	    Type = 0}, -- Curse of Recklessness - removed in patch 3.1 || Malédiction Témérité || 
-			[25] = {Name = GetSpellInfo(11719),	GlobalId = 11719,	Mana = 50,				Length = 30,	Type = 4}, -- Curse of Tongues || Malédiction Langage
-			[26] = {Name = GetSpellInfo(11722),	GlobalId = 11722,	Mana = 50,				Length = 300,	Type = 4}, -- Curse of the Elements || Malédiction Eléments
-			[27] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 180,	Type = 3}, -- NOPE NOT IN Classic  Metamorphosis || Metamorphose
-			[28] = {Name = GetSpellInfo(18881),	GlobalId = 18881,	Mana = 50,				Length = 30,	Type = 6}, -- Siphon Life || Syphon de vie
-			[29] = {Name = GetSpellInfo(17928),	GlobalId = 17928,	Mana = 50,				Length = 40,	Type = 3}, -- Howl of Terror || Hurlement de terreur
-			[30] = {Name = GetSpellInfo(18540),	GlobalId = 18540,	Mana = 50,				Length = 1800,	Type = 3}, -- Ritual of Doom || Rituel funeste
-			[31] = {Name = GetSpellInfo(11735),	GlobalId = 11735,	Mana = 50,				Length = 0,		Type = 0}, -- Demon Armor || Armure démoniaque
-			[32] = {Name = GetSpellInfo(5697),	GlobalId = 5697,	Mana = 50,				Length = 600,	Type = 0}, -- Unending Breath || Respiration interminable
-			[33] = {Name = GetSpellInfo(132),	GlobalId = 132,		Mana = 50,				Length = 0,		Type = 0}, -- Detect Invisibility || Détection de l'invisibilité
-			[34] = {Name = GetSpellInfo(126),	GlobalId = 126,		Mana = 50,				Length = 0,		Type = 0}, -- Eye of Kilrogg
-			[35] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,				Length = 0,		Type = 0}, -- Enslave Demon
-			[36] = {Name = GetSpellInfo(696),	GlobalId = 696,		Mana = 50,				Length = 0,		Type = 0}, -- Demon Skin || Peau de démon 
-			[37] = {Name = GetSpellInfo(698),	GlobalId = 698,		Mana = 50,				Length = 120,	Type = 3}, -- Ritual of Summoning || Rituel d'invocation
-			[38] = {Name = GetSpellInfo(19028),	GlobalId = 19028,	Mana = 50,				Length = 0,		Type = 0}, -- Soul Link || Lien spirituel
-			[39] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 45,	Type = 3}, -- NOPE NOT IN Classic  Demon Charge || Charge démoniaque
-			[40] = {Name = GetSpellInfo(18223),	GlobalId = 18223,	Mana = 50,				Length = 12,	Type = 4}, -- Curse of Exhaustion || Malédiction de fatigue
-			[41] = {Name = GetSpellInfo(11689),	GlobalId = 11689,	Mana = 50,				Length = 0,	    Type = 0}, -- Life Tap || Connexion
-			[42] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 12,	Type = 2}, -- NOPE NOT IN Classic  Haunt || Hanter
-			[43] = {Name = GetSpellInfo(28610),	GlobalId = 28610,	Mana = 50,				Length = 30,	Type = 0}, -- Shadow Ward || Gardien de l'ombre
-			[44] = {Name = GetSpellInfo(18788),	GlobalId = 18788,	Mana = 50,				Length = 60,	Type = 3}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[45] = {Name = GetSpellInfo(11661),	GlobalId = 11661,	Mana = 50,				Length = 0,		Type = 0}, -- Shadow Bolt
-			[46] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 18,	Type = 6}, -- NOPE NOT IN Classic  Unstable Affliction || Affliction instable
-			[47] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 0,		Type = 0}, -- NOPE NOT IN Classic  Fel Armor || Gangrarmure
-			[48] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 18,	Type = 5}, -- NOPE NOT IN Classic  Seed of Corruption || Graine de Corruption
-			[49] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 180,	Type = 3}, -- NOPE NOT IN Classic SoulShatter || Brise âme
-			[50] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 300,	Type = 3}, -- NOPE NOT IN Classic Ritual of Souls || Rituel des âmes
-			[51] = {Name = GetSpellInfo(20755),	GlobalId = 20755,	Mana = 50,				Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
-			[52] = {Name = GetSpellInfo(5699),	GlobalId = 5699,	Mana = 50,				Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
-			[53] = {Name = GetSpellInfo(2362),	GlobalId = 2362,	Mana = 50,				Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
-			[54] = {Name = GetSpellInfo(17951),	GlobalId = 17951,	Mana = 50,				Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
-			[55] = {Name = GetSpellInfo(18938),	GlobalId = 18938,	Mana = 50,				Length = 0,		Type = 0}, -- Dark Pact || Pacte noir
-			[56] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 0,		Type = 0}, -- NOPE NOT IN Classic  Shadow Cleave || Enchainement d'ombre
-			[57] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 30,	Type = 3}, -- NOPE NOT IN Classic  Immolation Aura || Aura d'immolation
-			[58] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,				Length = 15,	Type = 3}, --  NOPE NOT IN Classic Challenging Howl || Hurlement de défi
-			[59] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,			    Length = 60,	Type = 3} --NOPE NOT IN Classic   Demonic Empowerment || Renforcement démoniaque
+			[1] = {Name = GetSpellInfo(5784), 	GlobalId = 5784, 	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Felsteed
+			[2] = {Name = GetSpellInfo(23161), 	GlobalId = 23161,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Dreadsteed
+			[3] = {Name = GetSpellInfo(688), 	GlobalId = 688,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Imp || Diablotin 
+			[4] = {Name = GetSpellInfo(697),	GlobalId = 697,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Voidwalker || Marcheur
+			[5] = {Name = GetSpellInfo(712),	GlobalId = 712,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Succubus || Succube
+			[6] = {Name = GetSpellInfo(691),	GlobalId = 691,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Fellhunter
+			[7] = {Name = GetSpellInfo(691),	GlobalId = 691,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Felguard -- Fellhunter now
+			[8] = {Name = GetSpellInfo(1122),	GlobalId = 1122,	Mana = 50,	Rank = 0,	Length = 600,	Type = 3}, -- Infernal
+			[9] = {Name = GetSpellInfo(18647),	GlobalId = 18647,	Mana = 50,	Rank = 0,	Length = 30,	Type = 2}, -- Banish
+			[10] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,	Rank = 0,	Length = 300,	Type = 2}, -- Enslave
+			[11] = {Name = GetSpellInfo(20707),	GlobalId = 20707,	Mana = 50,	Rank = 0,	Length = 1800,	Type = 1}, -- Soulstone Resurrection || Résurrection de pierre d'ame
+			[12] = {Name = GetSpellInfo(707),	GlobalId = 707,		Mana = 50,	Rank = 0,	Length = 15,	Type = 6}, -- Immolate
+			[13] = {Name = GetSpellInfo(6215),	GlobalId = 6215,	Mana = 50,	Rank = 0,	Length = 15,	Type = 6}, -- Fear
+			[14] = {Name = GetSpellInfo(6222),	GlobalId = 6222,	Mana = 50,	Rank = 0,	Length = 18,	Type = 5}, -- Corruption
+			[15] = {Name = GetSpellInfo(18708),	GlobalId = 18708,	Mana = 50,	Rank = 0,	Length = 180,	Type = 3}, -- Fel Domination || Domination corrompue
+			[16] = {Name = GetSpellInfo(603),	GlobalId = 603,		Mana = 50,	Rank = 0,	Length = 60,	Type = 3}, -- Curse of Doom || Malédiction funeste
+			[17] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 20,	Type = 3}, -- NOPE NOT IN Classic Shadowfury || Furie de l'ombre
+			[18] = {Name = GetSpellInfo(17924),	GlobalId = 17924,	Mana = 50,	Rank = 0,	Length = 60,	Type = 3}, -- Soul Fire || Feu de l'âme
+			[19] = {Name = GetSpellInfo(17926),	GlobalId = 17926,	Mana = 50,	Rank = 0,	Length = 120,	Type = 3}, -- Death Coil || Voile mortel
+			[20] = {Name = GetSpellInfo(18871),	GlobalId = 18871,	Mana = 50,	Rank = 0,	Length = 15,	Type = 3}, -- Shadowburn || Brûlure de l'ombre
+			[21] = {Name = GetSpellInfo(18932),	GlobalId = 18932,	Mana = 50,	Rank = 0,	Length = 10,	Type = 3}, -- Conflagration
+			[22] = {Name = GetSpellInfo(11713),	GlobalId = 11713,	Mana = 50,	Rank = 0,	Length = 24,	Type = 4}, -- Curse of Agony || Malédiction Agonie
+			[23] = {Name = GetSpellInfo(11708),	GlobalId = 11708,	Mana = 50,	Rank = 0,	Length = 120,	Type = 4}, -- Curse of Weakness || Malédiction Faiblesse
+			[24] = {Name = GetSpellInfo(11717),	GlobalId = 11717,	Mana = 0 ,  Rank = 0, 	Length = 0,	    Type = 0}, -- Curse of Recklessness - removed in patch 3.1 || Malédiction Témérité || 
+			[25] = {Name = GetSpellInfo(11719),	GlobalId = 11719,	Mana = 50,	Rank = 0,	Length = 30,	Type = 4}, -- Curse of Tongues || Malédiction Langage
+			[26] = {Name = GetSpellInfo(11722),	GlobalId = 11722,	Mana = 50,	Rank = 0,	Length = 300,	Type = 4}, -- Curse of the Elements || Malédiction Eléments
+			[27] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 180,	Type = 3}, -- NOPE NOT IN Classic  Metamorphosis || Metamorphose
+			[28] = {Name = GetSpellInfo(18881),	GlobalId = 18881,	Mana = 50,	Rank = 0,	Length = 30,	Type = 6}, -- Siphon Life || Syphon de vie
+			[29] = {Name = GetSpellInfo(17928),	GlobalId = 17928,	Mana = 50,	Rank = 0,	Length = 40,	Type = 3}, -- Howl of Terror || Hurlement de terreur
+			[30] = {Name = GetSpellInfo(18540),	GlobalId = 18540,	Mana = 50,	Rank = 0,	Length = 1800,	Type = 3}, -- Ritual of Doom || Rituel funeste
+			[31] = {Name = GetSpellInfo(11735),	GlobalId = 11735,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Demon Armor || Armure démoniaque
+			[32] = {Name = GetSpellInfo(5697),	GlobalId = 5697,	Mana = 50,	Rank = 0,	Length = 600,	Type = 0}, -- Unending Breath || Respiration interminable
+			[33] = {Name = GetSpellInfo(132),	GlobalId = 132,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Detect Invisibility || Détection de l'invisibilité
+			[34] = {Name = GetSpellInfo(126),	GlobalId = 126,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Eye of Kilrogg
+			[35] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Enslave Demon
+			[36] = {Name = GetSpellInfo(696),	GlobalId = 696,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Demon Skin || Peau de démon 
+			[37] = {Name = GetSpellInfo(698),	GlobalId = 698,		Mana = 50,	Rank = 0,	Length = 120,	Type = 3}, -- Ritual of Summoning || Rituel d'invocation
+			[38] = {Name = GetSpellInfo(19028),	GlobalId = 19028,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Soul Link || Lien spirituel
+			[39] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 45,	Type = 3}, -- NOPE NOT IN Classic  Demon Charge || Charge démoniaque
+			[40] = {Name = GetSpellInfo(18223),	GlobalId = 18223,	Mana = 50,	Rank = 0,	Length = 12,	Type = 4}, -- Curse of Exhaustion || Malédiction de fatigue
+			[41] = {Name = GetSpellInfo(11689),	GlobalId = 11689,	Mana = 50,	Rank = 0,	Length = 0,	    Type = 0}, -- Life Tap || Connexion
+			[42] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 12,	Type = 2}, -- NOPE NOT IN Classic  Haunt || Hanter
+			[43] = {Name = GetSpellInfo(28610),	GlobalId = 28610,	Mana = 50,	Rank = 0,	Length = 30,	Type = 0}, -- Shadow Ward || Gardien de l'ombre
+			[44] = {Name = GetSpellInfo(18788),	GlobalId = 18788,	Mana = 50,	Rank = 0,	Length = 60,	Type = 3}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[45] = {Name = GetSpellInfo(11661),	GlobalId = 11661,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Shadow Bolt
+			[46] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 18,	Type = 6}, -- NOPE NOT IN Classic  Unstable Affliction || Affliction instable
+			[47] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- NOPE NOT IN Classic  Fel Armor || Gangrarmure
+			[48] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 18,	Type = 5}, -- NOPE NOT IN Classic  Seed of Corruption || Graine de Corruption
+			[49] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 180,	Type = 3}, -- NOPE NOT IN Classic SoulShatter || Brise âme
+			[50] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 300,	Type = 3}, -- NOPE NOT IN Classic Ritual of Souls || Rituel des âmes
+			[51] = {Name = GetSpellInfo(20755),	GlobalId = 20755,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Create Soulstone || Création pierre d'âme
+			[52] = {Name = GetSpellInfo(5699),	GlobalId = 5699,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Create Healthstone || Création pierre de soin
+			[53] = {Name = GetSpellInfo(2362),	GlobalId = 2362,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Create Spellstone || Création pierre de sort
+			[54] = {Name = GetSpellInfo(17951),	GlobalId = 17951,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Create Firestone || Création pierre de feu
+			[55] = {Name = GetSpellInfo(18938),	GlobalId = 18938,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- Dark Pact || Pacte noir
+			[56] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0}, -- NOPE NOT IN Classic  Shadow Cleave || Enchainement d'ombre
+			[57] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 30,	Type = 3}, -- NOPE NOT IN Classic  Immolation Aura || Aura d'immolation
+			[58] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 15,	Type = 3}, --  NOPE NOT IN Classic Challenging Howl || Hurlement de défi
+			[59] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0, 	Length = 60,	Type = 3}, --NOPE NOT IN Classic   Demonic Empowerment || Renforcement démoniaque
+			Firestone = {
+				SpellIds = {
+					6366,  -- Lesser
+					17951, -- Normal
+					17952, -- Greater
+					17953  -- Major
+				}
+			},
+			Healthstone = {
+				SpellIds = {
+					6202,  -- Minor
+					6201,  -- Lesser
+					5699,  -- Normal
+					11729, -- Greater
+					11730  -- Major
+				}
+			},
+			Soulstone = {
+				SpellIds = {
+					693,   -- Minor
+					20752, -- Lesser
+					20755, -- Normal
+					20756, -- Greater
+					20757  -- Major
+				}
+			},
+			Spellstone = {
+				SpellIds = {
+					2362,  -- Normal
+					17727, -- Greater
+					17728  -- Major
+				}
+			}
 		}
+
+		MakeSpellIdRanks(self.Spell.Firestone)
+		MakeSpellIdRanks(self.Spell.Healthstone)
+		MakeSpellIdRanks(self.Spell.Soulstone)
+		MakeSpellIdRanks(self.Spell.Spellstone)
 		-- Type 0 = Pas de Timer || no timer
 		-- Type 1 = Timer permanent principal || Standing main timer
 		-- Type 2 = Timer permanent || main timer
@@ -192,11 +245,6 @@ function Necrosis:SpellLocalize(tooltip)
 		-- Type 4 = Timer de malédiction || curse timer
 		-- Type 5 = Timer de corruption || corruption timer
 		-- Type 6 = Timer de combat || combat timer
-
-		for i in ipairs(self.Spell) do
-			self.Spell[i].Rank = " "
-			-- print (i .. '  '..self.Spell[i].Name)
-		end
 	end
 	
 	------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -298,54 +346,129 @@ function Necrosis:SpellLocalize(tooltip)
 	del(buttonName)
 end
 
-
--- Input a spell check on Minor Major Lesser Greater and turn it into a rank
-function Necrosis:StoneToRank(spellName)
-	if (spellName:find(self.Translation.StoneRank.Minor))  then
-		return self.Translation.Misc.Rank .. " 1"
-	end
-	if (spellName:find(self.Translation.StoneRank.Major)) then
-		return self.Translation.Misc.Rank .. " 5"
-	end
-	if (spellName:find(self.Translation.StoneRank.Lesser)) then
-		return self.Translation.Misc.Rank .. " 2"
-	end
-	if (spellName:find(self.Translation.StoneRank.Greater)) then
-		return self.Translation.Misc.Rank .. " 4"
-	end
-	return self.Translation.Misc.Rank .. " 3"
-end
-
--- Inputa rank and convert it to major lesser greater etc
-function Necrosis:RankToStone(rank)
-	if (rank == self.Translation.Misc.Rank .. " 1" )  then
-		return " ("..self.Translation.StoneRank.Minor..")"
-	end
-	if (rank == self.Translation.Misc.Rank .. " 2" )  then
-		return " ("..self.Translation.StoneRank.Lesser..")"
-	end
-	if (rank == self.Translation.Misc.Rank .. " 4" )  then
-		return " ("..self.Translation.StoneRank.Greater..")"
-	end
-	if (rank == self.Translation.Misc.Rank .. " 5" )  then
-		return " ("..self.Translation.StoneRank.Major..")"
-	end
-	return ""
-end
-
 -- https://github.com/WeakAuras/WeakAuras2/wiki/Useful-Snippets
 function Necrosis:GetManaCostForSpell(spellID)
-	if not spellID then return end
+	if (not spellID) then return end
 	local cost = 0
 	local costTable = GetSpellPowerCost(spellID);
-	if costTable == nil then
+	if (costTable == nil) then
 		return false
 	end
 	return table.foreach(costTable,
 		function(k,v)  
-			if v.name  == "MANA" then
+			if (v.name  == "MANA") then
 				return v.cost;
 			end 
 		end
 	)
+end
+
+local function UpdateSpellIfHigherRank(index, spellRank, spellID, spellNameOrg, globalId)
+	-- Only update the spell stats if a higher rank has been found
+	if (Necrosis.Spell[index].Rank < spellRank) then
+		Necrosis.Spell[index].ID = spellID
+		Necrosis.Spell[index].Rank = spellRank
+		Necrosis.Spell[index].NameOrg = spellNameOrg
+		Necrosis.Spell[index].GlobalId = globalId
+		Necrosis.Spell[index].Mana = Necrosis:GetManaCostForSpell(spellNameOrg)
+	end
+end
+
+-- My favourite feature! Create a list of spells known by the warlock sorted by name & rank || Ma fonction préférée ! Elle fait la liste des sorts connus par le démo, et les classe par rang.
+-- Select the highest available spell in the case of stones. || Pour les pierres, elle sélectionne le plus haut rang connu
+function Necrosis:SpellSetup()
+
+	for index in ipairs(Necrosis.Spell) do
+		Necrosis.Spell[index].ID = nil
+		Necrosis.Spell[index].Rank = 0
+	end
+
+	local spellID = 1
+
+	-- Search for all spells known by the warlock || On va parcourir tous les sorts possedés par le Démoniste
+	while true do
+
+		local spellName, subSpellName, globalId = GetSpellBookItemName(spellID, BOOKTYPE_SPELL)
+
+		if (not spellName) then
+			do break end
+		end
+
+		local spellNameOrg = spellName
+
+		if (tContains(Necrosis.Spell.Healthstone.SpellIds, globalId)) then
+			-- Healthstone
+			local spellRank = Necrosis.Spell.Healthstone[globalId]
+			UpdateSpellIfHigherRank(52, spellRank, spellID, spellNameOrg, globalId)
+		elseif (tContains(Necrosis.Spell.Soulstone.SpellIds, globalId)) then
+			-- Soulstone
+			local spellRank = Necrosis.Spell.Soulstone[globalId]
+			UpdateSpellIfHigherRank(51, spellRank, spellID, spellNameOrg, globalId)
+		elseif (tContains(Necrosis.Spell.Firestone.SpellIds, globalId)) then
+			-- Firestone
+			local spellRank = Necrosis.Spell.Firestone[globalId]
+			UpdateSpellIfHigherRank(54, spellRank, spellID, spellNameOrg, globalId)
+		elseif (tContains(Necrosis.Spell.Spellstone.SpellIds, globalId)) then
+			-- Spellstone
+			local spellRank = Necrosis.Spell.Spellstone[globalId]
+			UpdateSpellIfHigherRank(53, spellRank, spellID, spellNameOrg, globalId)
+		elseif (subSpellName and subSpellName ~= " " and subSpellName ~= "") then
+			-- For spells with numbered ranks, compare each one || Pour les sorts avec des rangs numérotés, on compare pour chaque sort les rangs 1 à 1
+			-- And preserve the highest rank || Le rang supérieur est conservé
+			local spellRank = Necrosis.Spells:GetRankNumberFromSubName(subSpellName)
+			if (spellRank ~= nil) then
+				for index = 1, #Necrosis.Spell, 1 do
+					--  a version of the spell is already in our table
+					if (Necrosis.Spell[index].Name == spellName) then
+						UpdateSpellIfHigherRank(index, spellRank, spellID, spellNameOrg, globalId)
+						break
+					end
+				end
+			end
+		end
+		spellID = spellID + 1
+	end
+
+	-- Update the spell durations according to their rank || On met à jour la durée de chaque sort en fonction de son rang
+	-- Fear || Peur
+	if (Necrosis.Spell[13].ID and Necrosis.Spell[13].Rank) then
+		Necrosis.Spell[13].Length = tonumber(Necrosis.Spell[13].Rank) * 5 + 5
+	end
+
+	-- Corruption
+	if (Necrosis.Spell[14].ID and Necrosis.Spell[14].Rank) then
+		if (Necrosis.Spell[14].Rank <= 2) then
+			Necrosis.Spell[14].Length = Necrosis.Spell[14].Rank * 3 + 9
+		end
+	end
+
+	-- WoW 3.0 :  Les montures se retrouvent dans une interface à part
+	-- if GetNumCompanions("MOUNT") > 0 then
+	-- 	for i = 1, GetNumCompanions("MOUNT"), 1 do
+	-- 		local _, NomCheval, SpellCheval = Necrosis:GetCompanionInfo("MOUNT", i)
+	-- 		if NomCheval == Necrosis.Spell[1].Name then
+	-- 			Necrosis.Spell[1].ID = SpellCheval
+	-- 		end
+	-- 		if NomCheval == Necrosis.Spell[2].Name then
+	-- 			Necrosis.Spell[2].ID = SpellCheval
+	-- 		end
+	-- 	end
+	-- end
+
+	-- associate the mounts to the sphere button || Association du sort de monture correct au bouton
+	if (Necrosis.Spell[1].ID or Necrosis.Spell[2].ID) then
+		Necrosis.CurrentEnv.SteedAvailable = true
+	else
+		Necrosis.CurrentEnv.SteedAvailable = false
+	end
+
+	if (not InCombatLockdown()) then
+		Necrosis:MainButtonAttribute()
+		Necrosis:BuffSpellAttribute()
+		Necrosis:PetSpellAttribute()
+		Necrosis:CurseSpellAttribute()
+		Necrosis:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
+	end
+
+	Necrosis:BindName()
 end
