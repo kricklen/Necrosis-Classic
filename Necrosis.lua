@@ -106,10 +106,9 @@ Necrosis.Spell = setmetatable({}, metatable)
 ------------------------------------------------------------------------------------------------------
 
 -- Detection of initialisation || Détection des initialisations du mod
-Local.LoggedIn = true
+Local.LoggedIn = false
 Local.InWorld = true
 -- Local.InWorld = false
-Local.SpellInitDone = false
 
 -- Events utilised by Necrosis || Events utilisés dans Necrosis
 Local.Events = {
@@ -342,18 +341,18 @@ local function InitializeMyself()
 	Necrosis.Chat:_Msg("initialized", "USER")
 end
 
-local loggedIn = false
+-- local loggedIn = false
 local weCanStart = false
 
 -- Function applied to loading || Fonction appliquée au chargement
 function Necrosis:OnLoad(event)
-	if (event == "PLAYER_LOGIN" and not loggedIn) then
+	if (event == "PLAYER_LOGIN" and not Local.LoggedIn) then
 		-- Logon is fired once, wait for it
 		local _, Class = UnitClass("player")
 		if (Class == "WARLOCK") then
-			loggedIn = true
+			Local.LoggedIn = true
 		end
-	elseif (event == "SKILL_LINES_CHANGED" and loggedIn and not weCanStart) then
+	elseif (event == "SKILL_LINES_CHANGED" and Local.LoggedIn and not weCanStart) then
 		-- Skill changed is fired more than once, seems like a more stable
 		-- indicator that tells when the spellbook is ready
 		InitializeMyself()
@@ -447,7 +446,7 @@ end
 -- Function started according to the intercepted event || Fonction lancée selon l'événement intercepté
 function Necrosis.OnEvent(self, event, ...)
 
-	local arg1,arg2,arg3,arg4,arg5,arg6 = ...
+	local arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9 = ...
 
 	if (event == "PLAYER_ENTERING_WORLD") then
 		Local.InWorld = true
@@ -639,18 +638,20 @@ print("LEARNED_SPELL_IN_TAB")
 					Necrosis:RetraitTimerParIndex(Local.TimerManagement.LastSpell.Index, Local.TimerManagement)
 			end
 		-- Detection application of a spell / fire stone on a weapon || Détection application d'une pierre de sort/feu sur une arme
-		elseif subevent == "ENCHANT_APPLIED"
+		elseif (subevent == "ENCHANT_APPLIED"
 			and destGUID == UnitGUID("player")
-			and (arg9 == NecrosisConfig.ItemSwitchCombat[1] or NecrosisConfig.ItemSwitchCombat[2])
-			then
+			and ((BagHelper.Spellstone_Name and arg9 == BagHelper.Spellstone_Name)
+			  or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
+		then
 print("ENCHANT_APPLIED: "..arg9)
 				Local.SomethingOnHand = arg9
 				Necrosis:UpdateIcons()
 		-- End of enchantment detection || Détection fin d'enchant
-		elseif subevent == "ENCHANT_REMOVE"
+		elseif (subevent == "ENCHANT_REMOVE"
 			and destGUID == UnitGUID("player")
-			and (arg9 == NecrosisConfig.ItemSwitchCombat[1] or NecrosisConfig.ItemSwitchCombat[2])
-			then
+			and ((BagHelper.Spellstone_Name and arg9 == BagHelper.Spellstone_Name)
+			  or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
+		then
 				Local.SomethingOnHand = "Rien"
 				Necrosis:UpdateIcons()
 		elseif subevent == "UNIT_DIED"
@@ -1312,18 +1313,18 @@ function Necrosis:UpdateIcons()
 --print("UpdateIcons...")
 
 	-- If the function was called to detect an enchantment, it is detected! || Si la fonction a été appelée pour détecter un enchantement, on le détecte !
-	if Local.SomethingOnHand == "Truc" then
+	if (Local.SomethingOnHand == "Truc") then
 		self:MoneyToggle()
 		NecrosisTooltip:SetInventoryItem("player", 16)
 		local itemName = tostring(NecrosisTooltipTextLeft8:GetText())
-		if itemName and NecrosisConfig.ItemSwitchCombat[1] then
-			if itemName:find(NecrosisConfig.ItemSwitchCombat[1]) then
-				Local.SomethingOnHand = NecrosisConfig.ItemSwitchCombat[1]
+		if (itemName and BagHelper.Spellstone_Name) then
+			if (itemName:find(BagHelper.Spellstone_Name)) then
+				Local.SomethingOnHand = BagHelper.Spellstone_Name
 			end
 		end
-		if itemName and NecrosisConfig.ItemSwitchCombat[2] then
-			if itemName:find(NecrosisConfig.ItemSwitchCombat[2]) then
-				Local.SomethingOnHand = NecrosisConfig.ItemSwitchCombat[2]
+		if (itemName and BagHelper.Firestone_Name) then
+			if (itemName:find(BagHelper.Firestone_Name)) then
+				Local.SomethingOnHand = BagHelper.Firestone_Name
 			end
 		end
 	end
@@ -1395,12 +1396,15 @@ function Necrosis:UpdateIcons()
 -- 	end
 
 	-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
-	if self.Spell[51].ID and NecrosisConfig.ItemSwitchCombat[4] and (Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 3) then
+	if (self.Spell[51].ID
+		and BagHelper.Soulstone_Name
+		and (Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 3))
+	then
 		self:SoulstoneUpdateAttribute("NoStone")
 	end
 
 	-- Display of the mode icon || Affichage de l'icone liée au mode
-	if _G["NecrosisSoulstoneButton"] then
+	if (_G["NecrosisSoulstoneButton"]) then
 		NecrosisSoulstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("SoulstoneButton-0")..Local.Stone.Soul.Mode)
 	end
 
@@ -1410,14 +1414,14 @@ function Necrosis:UpdateIcons()
 	-- Mode "I have one" (2) / "I have none" (1) || Mode "j'en ai une" (2) / "j'en ai pas" (1)
 	if (not BagHelper.Healthstone_IsAvailable) then
 		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
-		if self.Spell[52].ID and NecrosisConfig.ItemSwitchCombat[3] then
+		if (self.Spell[52].ID and BagHelper.Healthstone_Name) then
 			self:HealthstoneUpdateAttribute("NoStone")
 		end
 	end
 
 	--Display of the mode icon || Affichage de l'icone liée au mode
-	if _G["NecrosisHealthstoneButton"] then
-		if BagHelper.Healthstone_IsAvailable then
+	if (_G["NecrosisHealthstoneButton"]) then
+		if (BagHelper.Healthstone_IsAvailable) then
 			NecrosisHealthstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-02"))
 		else
 			NecrosisHealthstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-01"))
@@ -1429,9 +1433,9 @@ function Necrosis:UpdateIcons()
 
 	-- Stone in the inventory ... || Pierre dans l'inventaire...
 	-- if Local.Stone.Spell.OnHand then
-	if BagHelper.Spellstone_IsAvailable then
+	if (BagHelper.Spellstone_IsAvailable) then
 		-- ... and on the weapon = mode 3, otherwise = mode 2 || ... et sur l'arme = mode 3, sinon = mode 2
-		if Local.SomethingOnHand == NecrosisConfig.ItemSwitchCombat[1] then
+		if (Local.SomethingOnHand == BagHelper.Spellstone_Name) then
 			Local.Stone.Spell.Mode = 3
 		else
 			Local.Stone.Spell.Mode = 2
@@ -1439,13 +1443,13 @@ function Necrosis:UpdateIcons()
 	-- Stone nonexistent ... || Pierre inexistante...
 	else
 		-- ... but on the weapon = mode 4, otherwise = mode 1 || ... mais sur l'arme = mode 4, sinon = mode 1
-		if Local.SomethingOnHand == NecrosisConfig.ItemSwitchCombat[1] then
+		if (Local.SomethingOnHand == BagHelper.Spellstone_Name) then
 			Local.Stone.Spell.Mode = 4
 		else
 			Local.Stone.Spell.Mode = 1
 		end
 		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
-		if self.Spell[53].ID and NecrosisConfig.ItemSwitchCombat[3] then
+		if (self.Spell[53].ID and BagHelper.Spellstone_Name) then
 			self:SpellstoneUpdateAttribute("NoStone")
 		end
 	end
@@ -1460,9 +1464,9 @@ function Necrosis:UpdateIcons()
 
 	-- Stone in the inventory ... || Pierre dans l'inventaire...
 	-- if Local.Stone.Fire.OnHand then
-	if BagHelper.Firestone_IsAvailable then
+	if (BagHelper.Firestone_IsAvailable) then
 		-- ... and on the weapon = mode 3, otherwise = mode 2 || ... et sur l'arme = mode 3, sinon = mode 2
-		if Local.SomethingOnHand == NecrosisConfig.ItemSwitchCombat[2] then
+		if (Local.SomethingOnHand == BagHelper.Firestone_Name) then
 			Local.Stone.Fire.Mode = 3
 		else
 			Local.Stone.Fire.Mode = 2
@@ -1470,13 +1474,13 @@ function Necrosis:UpdateIcons()
 	-- Stone nonexistent ... || Pierre inexistante...
 	else
 		-- ... but on the weapon = mode 4, otherwise = mode 1 || ... mais sur l'arme = mode 4, sinon = mode 1
-		if Local.SomethingOnHand == NecrosisConfig.ItemSwitchCombat[2] then
+		if (Local.SomethingOnHand == BagHelper.Firestone_Name) then
 			Local.Stone.Fire.Mode = 4
 		else
 			Local.Stone.Fire.Mode = 1
 		end
 		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
-		if self.Spell[54].ID and NecrosisConfig.ItemSwitchCombat[2] then
+		if (self.Spell[54].ID and BagHelper.Firestone_Name) then
 			self:FirestoneUpdateAttribute("NoStone")
 		end
 	end

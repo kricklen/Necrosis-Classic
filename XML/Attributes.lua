@@ -426,15 +426,15 @@ function Necrosis:NoCombatAttribute(Pet, Buff, Curse)
 
 	-- Si on connait l'emplacement de la pierre de sort,
 	-- Alors cliquer sur le bouton de pierre de sort l'équipe.
-	if NecrosisConfig.ItemSwitchCombat[1] and _G["NecrosisSpellstoneButton"] then
+	if (BagHelper.Spellstone_Name and _G["NecrosisSpellstoneButton"]) then
 		NecrosisSpellstoneButton:SetAttribute("type1", "macro")
-		NecrosisSpellstoneButton:SetAttribute("macrotext*","/cast "..NecrosisConfig.ItemSwitchCombat[1].."\n/use 16")
+		NecrosisSpellstoneButton:SetAttribute("macrotext*","/cast "..BagHelper.Spellstone_Name.."\n/use 16")
 	end
 	-- Si on connait l'emplacement de la pierre de feu,
 	-- Alors cliquer sur le bouton de pierre de feu l'équipe.
-	if NecrosisConfig.ItemSwitchCombat[2] and _G["NecrosisFirestoneButton"] then
+	if (BagHelper.Firestone_Name and _G["NecrosisFirestoneButton"]) then
 		NecrosisFirestoneButton:SetAttribute("type1", "macro")
-		NecrosisFirestoneButton:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[2].."\n/use 16")
+		NecrosisFirestoneButton:SetAttribute("macrotext*", "/cast "..BagHelper.Firestone_Name.."\n/use 16")
 	end
 end
 
@@ -470,31 +470,31 @@ function Necrosis:InCombatAttribute(Pet, Buff, Curse)
 
 	-- Si on connait le nom de la pierre de sort,
 	-- Alors le clic gauche utiliser la pierre
-	if NecrosisConfig.ItemSwitchCombat[1] and _G["NecrosisSpellstoneButton"] then
+	if (BagHelper.Spellstone_Name and _G["NecrosisSpellstoneButton"]) then
 		NecrosisSpellstoneButton:SetAttribute("type1", "macro")
-		NecrosisSpellstoneButton:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[1].."\n/use 16")
+		NecrosisSpellstoneButton:SetAttribute("macrotext*", "/cast "..BagHelper.Spellstone_Name.."\n/use 16")
 	end
 
 	-- Si on connait le nom de la pierre de feu,
 	-- Alors le clic sur le bouton équipera la pierre
-	if NecrosisConfig.ItemSwitchCombat[2] and _G["NecrosisFirestoneButton"] then
+	if (BagHelper.Firestone_Name and _G["NecrosisFirestoneButton"]) then
 		NecrosisFirestoneButton:SetAttribute("type1", "macro")
-		NecrosisFirestoneButton:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[2].."\n/use 16")
+		NecrosisFirestoneButton:SetAttribute("macrotext*", "/cast "..BagHelper.Firestone_Name.."\n/use 16")
 	end
 
 	-- Si on connait le nom de la pierre de soin,
 	-- Alors le clic gauche sur le bouton utilisera la pierre
-	if NecrosisConfig.ItemSwitchCombat[3] and _G["NecrosisHealthstoneButton"] then
+	if (BagHelper.Healthstone_Name and _G["NecrosisHealthstoneButton"]) then
 		NecrosisHealthstoneButton:SetAttribute("type1", "macro")
-		NecrosisHealthstoneButton:SetAttribute("macrotext1", "/stopcasting \n/use "..NecrosisConfig.ItemSwitchCombat[3])
+		NecrosisHealthstoneButton:SetAttribute("macrotext1", "/stopcasting \n/use "..BagHelper.Healthstone_Name)
 	end
 
 	-- Si on connait le nom de la pierre d'âme,
 	-- Alors le clic gauche sur le bouton utilisera la pierre
-	if NecrosisConfig.ItemSwitchCombat[4] and _G["NecrosisSoulstoneButton"] then
+	if (BagHelper.Soulstone_Name and _G["NecrosisSoulstoneButton"]) then
 		NecrosisSoulstoneButton:SetAttribute("type1", "item")
 		NecrosisSoulstoneButton:SetAttribute("unit", "target")
-		NecrosisSoulstoneButton:SetAttribute("item1", NecrosisConfig.ItemSwitchCombat[4])
+		NecrosisSoulstoneButton:SetAttribute("item1", BagHelper.Soulstone_Name)
 	end
 end
 
@@ -504,13 +504,13 @@ end
 
 function Necrosis:SoulstoneUpdateAttribute(nostone)
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if InCombatLockdown() or not _G["NecrosisSoulstoneButton"] then
+	if (InCombatLockdown() or not _G["NecrosisSoulstoneButton"]) then
 		return
 	end
 
 	-- Si le démoniste n'a pas de pierre dans son inventaire,
 	-- Un clic gauche crée la pierre
-	if nostone then
+	if (nostone) then
 		NecrosisSoulstoneButton:SetAttribute("type1", "spell")
 		NecrosisSoulstoneButton:SetAttribute("spell1", self.Spell[51].NameOrg)
 		return
@@ -519,26 +519,26 @@ function Necrosis:SoulstoneUpdateAttribute(nostone)
 	NecrosisSoulstoneButton:SetAttribute("type1", "item")
 	NecrosisSoulstoneButton:SetAttribute("type3", "item")
 	NecrosisSoulstoneButton:SetAttribute("unit", "target")
-	NecrosisSoulstoneButton:SetAttribute("item1", NecrosisConfig.ItemSwitchCombat[4])
-	NecrosisSoulstoneButton:SetAttribute("item3", NecrosisConfig.ItemSwitchCombat[4])
+	NecrosisSoulstoneButton:SetAttribute("item1", BagHelper.Soulstone_Name)
+	NecrosisSoulstoneButton:SetAttribute("item3", BagHelper.Soulstone_Name)
 end
 
 function Necrosis:HealthstoneUpdateAttribute(nostone)
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if InCombatLockdown() or not _G["NecrosisHealthstoneButton"] then
+	if (InCombatLockdown() or not _G["NecrosisHealthstoneButton"]) then
 		return
 	end
 
 	-- Si le démoniste n'a pas de pierre dans son inventaire,
 	-- Un clic gauche crée la pierre
-	if nostone then
+	if (nostone) then
 		NecrosisHealthstoneButton:SetAttribute("type1", "spell")
 		NecrosisHealthstoneButton:SetAttribute("spell1", self.Spell[52].NameOrg)
 		return
 	end
 
 	NecrosisHealthstoneButton:SetAttribute("type1", "macro")
-	NecrosisHealthstoneButton:SetAttribute("macrotext1", "/stopcasting \n/use "..NecrosisConfig.ItemSwitchCombat[3])
+	NecrosisHealthstoneButton:SetAttribute("macrotext1", "/stopcasting \n/use "..BagHelper.Healthstone_Name)
 	NecrosisHealthstoneButton:SetAttribute("type3", "Trade")
 	NecrosisHealthstoneButton:SetAttribute("ctrl-type1", "Trade")
 	NecrosisHealthstoneButton.Trade = function () self:TradeStone() end
@@ -546,36 +546,36 @@ end
 
 function Necrosis:SpellstoneUpdateAttribute(nostone)
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if InCombatLockdown() or not _G["NecrosisSpellstoneButton"] then
+	if (InCombatLockdown() or not _G["NecrosisSpellstoneButton"]) then
 		return
 	end
 
 	-- Si le démoniste n'a pas de pierre dans son inventaire,
 	-- Un clic gauche crée la pierre
-	if nostone then
+	if (nostone) then
 		NecrosisSpellstoneButton:SetAttribute("type1", "spell")
-		NecrosisSpellstoneButton:SetAttribute("spell*", self.Spell[53].Name.."("..self.Spell[53].Rank..")")
+		NecrosisSpellstoneButton:SetAttribute("spell*", self.Spell[53].NameOrg)
 		return
 	end
 
 	NecrosisSpellstoneButton:SetAttribute("type1", "macro")
-	NecrosisSpellstoneButton:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[1].."\n/use 16")
+	NecrosisSpellstoneButton:SetAttribute("macrotext*", "/cast "..BagHelper.Spellstone_Name.."\n/use 16")
 end
 
 function Necrosis:FirestoneUpdateAttribute(nostone)
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if InCombatLockdown() or not _G["NecrosisFirestoneButton"] then
+	if (InCombatLockdown() or not _G["NecrosisFirestoneButton"]) then
 		return
 	end
 
 	-- Si le démoniste n'a pas de pierre dans son inventaire,
 	-- Un clic gauche crée la pierre
-	if nostone then
+	if (nostone) then
 		NecrosisFirestoneButton:SetAttribute("type1", "spell")
-		NecrosisFirestoneButton:SetAttribute("spell*", self.Spell[54].Name.."("..self.Spell[54].Rank..")")
+		NecrosisFirestoneButton:SetAttribute("spell*", self.Spell[54].NameOrg)
 		return
 	end
 
 	NecrosisFirestoneButton:SetAttribute("type1", "macro")
-	NecrosisFirestoneButton:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[2].."\n/use 16")
+	NecrosisFirestoneButton:SetAttribute("macrotext*", "/cast "..BagHelper.Firestone_Name.."\n/use 16")
 end

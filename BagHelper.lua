@@ -5,21 +5,25 @@ BagHelper = {
 	
 	Soulstone_IsAvailable = false,
 	Soulstone_Rank = 0,
+	Soulstone_Name = nil,
 	Soulstone_BagId = nil,
 	-- Soulstone_SlotId = nil,
 
 	Healthstone_IsAvailable = false,
 	Healthstone_Rank = 0,
+	Healthstone_Name = nil,
 	Healthstone_BagId = nil,
 	Healthstone_SlotId = nil,
 
 	Firestone_IsAvailable = false,
 	Firestone_Rank = 0,
+	Firestone_Name = nil,
 	Firestone_BagId = nil,
 	-- Firestone_SlotId = nil,
 
 	Spellstone_IsAvailable = false,
 	Spellstone_Rank = 0,
+	Spellstone_Name = nil,
 	Spellstone_BagId = nil,
 	-- Spellstone_SlotId = nil,
 
@@ -72,12 +76,16 @@ function _bh:BagExplore(bagId)
 	if (not bagId) then
 		self.Soulstone_IsAvailable = false
 		self.Soulstone_Rank = 0
+		self.Soulstone_Name = nil
 		self.Healthstone_IsAvailable = false
 		self.Healthstone_Rank = 0
+		self.Healthstone_Name = nil
 		self.Firestone_IsAvailable = false
 		self.Firestone_Rank = 0
+		self.Firestone_Name = nil
 		self.Spellstone_IsAvailable = false
 		self.Spellstone_Rank = 0
+		self.Spellstone_Name = nil
 		self.Hearthstone_IsAvailable = false
 		-- Search all bags || Parcours des sacs
 		for i,bag in ipairs(bagsArray) do
@@ -87,18 +95,22 @@ function _bh:BagExplore(bagId)
 		if (self.Soulstone_BagId == bagId) then
 			self.Soulstone_IsAvailable = false
 			self.Soulstone_Rank = 0
+			self.Soulstone_Name = nil
 		end
 		if (self.Healthstone_BagId == bagId) then
 			self.Healthstone_IsAvailable = false
 			self.Healthstone_Rank = 0
+			self.Healthstone_Name = nil
 		end
 		if (self.Firestone_BagId == bagId) then
 			self.Firestone_IsAvailable = false
 			self.Firestone_Rank = 0
+			self.Firestone_Name = nil
 		end
 		if (self.Spellstone_BagId == bagId) then
 			self.Spellstone_IsAvailable = false
 			self.Spellstone_Rank = 0
+			self.Spellstone_Name = nil
 		end
 		if (self.Hearthstone_BagId == bagId) then
 			self.Hearthstone_IsAvailable = false
@@ -130,49 +142,53 @@ function _bh:_FindStones(bag)
 -- end
 				-- Check if its a soulstone and of higher rank than the current one
 				if (ItemHelper:IsSoulstone(itemId)
-					and self.Soulstone_Rank < ItemHelper.Soulstone[itemId])
+					and self.Soulstone_Rank < ItemHelper.Soulstone[itemId].Rank)
 				then
 					self.Soulstone_IsAvailable = true
-					self.Soulstone_Rank = ItemHelper.Soulstone[itemId]
+					self.Soulstone_Rank = ItemHelper.Soulstone[itemId].Rank
 					self.Soulstone_BagId = bag.id
-					NecrosisConfig.ItemSwitchCombat[4] = GetItemInfo(itemId)
-print("NecrosisConfig.ItemSwitchCombat[4]: "..tostring(NecrosisConfig.ItemSwitchCombat[4]))
+					self.Soulstone_Name = ItemHelper.Soulstone[itemId].Name
+					-- NecrosisConfig.ItemSwitchCombat[4] = ItemHelper.Soulstone[itemId].Name
+print("NecrosisConfig.ItemSwitchCombat[4]: "..tostring(self.Soulstone_Name))
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:SoulstoneUpdateAttribute()
 
 				-- Check if its a healthstone and of higher rank than the current one
 				elseif (ItemHelper:IsHealthstone(itemId)
-					and self.Healthstone_Rank < ItemHelper.Healthstone[itemId])
+					and self.Healthstone_Rank < ItemHelper.Healthstone[itemId].Rank)
 				then
 print("Healthstone with rank found: "..tostring(ItemHelper.Healthstone[itemId]))
 					self.Healthstone_IsAvailable = true
-					self.Healthstone_Rank = ItemHelper.Healthstone[itemId]
+					self.Healthstone_Rank = ItemHelper.Healthstone[itemId].Rank
 					self.Healthstone_BagId = bag.id
 					self.Healthstone_SlotId = slot
-					NecrosisConfig.ItemSwitchCombat[3] = GetItemInfo(itemId)
-print("NecrosisConfig.ItemSwitchCombat[3]: "..tostring(NecrosisConfig.ItemSwitchCombat[3]))
+					self.Healthstone_Name = ItemHelper.Healthstone[itemId].Name
+					-- NecrosisConfig.ItemSwitchCombat[3] = ItemHelper.Healthstone[itemId].Name
+print("NecrosisConfig.ItemSwitchCombat[3]: "..tostring(self.Healthstone_Name))
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:HealthstoneUpdateAttribute()
 
 				-- Check if its a spellstone and of higher rank than the current one
 				elseif (ItemHelper:IsSpellstone(itemId)
-					and self.Spellstone_Rank < ItemHelper.Spellstone[itemId])
+					and self.Spellstone_Rank < ItemHelper.Spellstone[itemId].Rank)
 				then
 					self.Spellstone_IsAvailable = true
-					self.Spellstone_Rank = ItemHelper.Spellstone[itemId]
+					self.Spellstone_Rank = ItemHelper.Spellstone[itemId].Rank
 					self.Spellstone_BagId = bag.id
-					NecrosisConfig.ItemSwitchCombat[1] = GetItemInfo(itemId)
+					self.Spellstone_Name = ItemHelper.Spellstone[itemId].Name
+					-- NecrosisConfig.ItemSwitchCombat[1] = ItemHelper.Spellstone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:SpellstoneUpdateAttribute()
 
 				-- Check if its a firestone and of higher rank than the current one
 				elseif (ItemHelper:IsFirestone(itemId)
-					and self.Firestone_Rank < ItemHelper.Firestone[itemId])
+					and self.Firestone_Rank < ItemHelper.Firestone[itemId].Rank)
 				then
 					self.Firestone_IsAvailable = true
-					self.Firestone_Rank = ItemHelper.Firestone[itemId]
+					self.Firestone_Rank = ItemHelper.Firestone[itemId].Rank
 					self.Firestone_BagId = bag.id
-					NecrosisConfig.ItemSwitchCombat[2] = GetItemInfo(itemId)
+					self.Firestone_Name = ItemHelper.Firestone[itemId].Name
+					-- NecrosisConfig.ItemSwitchCombat[2] = ItemHelper.Firestone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:FirestoneUpdateAttribute()
 
@@ -186,17 +202,17 @@ print("NecrosisConfig.ItemSwitchCombat[3]: "..tostring(NecrosisConfig.ItemSwitch
 	end
 end
 
-function _bh:GetItemNameFromLink(link)
-	-- local s = gsub(link, "\124", "\124\124")
-	-- print(s)
-	local i = string.find(link, "[", 1, true)
-	local j = string.find(link, "]", i, true)
-	if (i < j) then
-		return string.sub(link, i+1, j-1)
-	else
-		return nil
-	end
-end
+-- function _bh:GetItemNameFromLink(link)
+-- 	-- local s = gsub(link, "\124", "\124\124")
+-- 	-- print(s)
+-- 	local i = string.find(link, "[", 1, true)
+-- 	local j = string.find(link, "]", i, true)
+-- 	if (i < j) then
+-- 		return string.sub(link, i+1, j-1)
+-- 	else
+-- 		return nil
+-- 	end
+-- end
 
 function _bh:DestroyShards(maxToKeep)
 	for i,bag in ipairs(self:GetPlayerBags()) do

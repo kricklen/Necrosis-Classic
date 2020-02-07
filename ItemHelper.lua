@@ -45,11 +45,14 @@ ItemHelper = {
 
 local _ih = ItemHelper
 
-local function MakeItemIdRanks(root)
+local function MakeItemIdRanksAndNames(root)
     -- i is the rank of the item
-    -- Create an entry in the form of [itemId] = rank
+    -- Create an entry in the form of [itemId] = { Rank = i, Name = blah }
     for i,id in ipairs(root.ItemIds) do
-        root[id] = i
+        root[id] = {
+            Rank = i,
+            Name = GetItemInfo(id)
+        }
     end
 end
 
