@@ -7,7 +7,6 @@ BagHelper = {
 	Soulstone_Rank = 0,
 	Soulstone_Name = nil,
 	Soulstone_BagId = nil,
-	-- Soulstone_SlotId = nil,
 
 	Healthstone_IsAvailable = false,
 	Healthstone_Rank = 0,
@@ -19,13 +18,11 @@ BagHelper = {
 	Firestone_Rank = 0,
 	Firestone_Name = nil,
 	Firestone_BagId = nil,
-	-- Firestone_SlotId = nil,
 
 	Spellstone_IsAvailable = false,
 	Spellstone_Rank = 0,
 	Spellstone_Name = nil,
 	Spellstone_BagId = nil,
-	-- Spellstone_SlotId = nil,
 
 	Hearthstone_IsAvailable = false,
 	Hearthstone_BagId = nil,
@@ -129,17 +126,9 @@ function _bh:_FindStones(bag)
 	if (not bag.isSoulBag) then
 		-- Iterate over the bag slots
 		for slot = 1,bag.capacity,1 do
-			-- local itemLink = GetContainerItemLink(bag.id, slot)
 			local itemId = GetContainerItemID(bag.id, slot)
 			-- If there is an item located in that bag slot || Dans le cas d'un emplacement non vide
-			-- if itemLink then
 			if (itemId) then
-				-- local itemName = self:GetItemNameFromLink(itemLink)
--- local itemName = GetItemInfo(itemId)
--- if (itemName:find("stone")) then
--- 	print("hs: "..tostring(tContains(ItemHelper.Healthstone.ItemIds, itemId)))
--- 	print("itemName, id: "..itemName..", "..itemId)
--- end
 				-- Check if its a soulstone and of higher rank than the current one
 				if (ItemHelper:IsSoulstone(itemId)
 					and self.Soulstone_Rank < ItemHelper.Soulstone[itemId].Rank)
@@ -149,7 +138,6 @@ function _bh:_FindStones(bag)
 					self.Soulstone_BagId = bag.id
 					self.Soulstone_Name = ItemHelper.Soulstone[itemId].Name
 					-- NecrosisConfig.ItemSwitchCombat[4] = ItemHelper.Soulstone[itemId].Name
-print("NecrosisConfig.ItemSwitchCombat[4]: "..tostring(self.Soulstone_Name))
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:SoulstoneUpdateAttribute()
 
@@ -157,14 +145,12 @@ print("NecrosisConfig.ItemSwitchCombat[4]: "..tostring(self.Soulstone_Name))
 				elseif (ItemHelper:IsHealthstone(itemId)
 					and self.Healthstone_Rank < ItemHelper.Healthstone[itemId].Rank)
 				then
-print("Healthstone with rank found: "..tostring(ItemHelper.Healthstone[itemId]))
 					self.Healthstone_IsAvailable = true
 					self.Healthstone_Rank = ItemHelper.Healthstone[itemId].Rank
 					self.Healthstone_BagId = bag.id
 					self.Healthstone_SlotId = slot
 					self.Healthstone_Name = ItemHelper.Healthstone[itemId].Name
 					-- NecrosisConfig.ItemSwitchCombat[3] = ItemHelper.Healthstone[itemId].Name
-print("NecrosisConfig.ItemSwitchCombat[3]: "..tostring(self.Healthstone_Name))
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:HealthstoneUpdateAttribute()
 
@@ -201,18 +187,6 @@ print("NecrosisConfig.ItemSwitchCombat[3]: "..tostring(self.Healthstone_Name))
 		end
 	end
 end
-
--- function _bh:GetItemNameFromLink(link)
--- 	-- local s = gsub(link, "\124", "\124\124")
--- 	-- print(s)
--- 	local i = string.find(link, "[", 1, true)
--- 	local j = string.find(link, "]", i, true)
--- 	if (i < j) then
--- 		return string.sub(link, i+1, j-1)
--- 	else
--- 		return nil
--- 	end
--- end
 
 function _bh:DestroyShards(maxToKeep)
 	for i,bag in ipairs(self:GetPlayerBags()) do

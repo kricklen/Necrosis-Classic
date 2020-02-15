@@ -380,7 +380,7 @@ function Necrosis:SpellSetup()
 
 	for index in ipairs(Necrosis.Spell) do
 		Necrosis.Spell[index].ID = nil
-		Necrosis.Spell[index].Rank = 0
+		Necrosis.Spell[index].Rank = -1
 	end
 
 	local spellID = 1
@@ -418,11 +418,22 @@ function Necrosis:SpellSetup()
 			local spellRank = Necrosis.Spells:GetRankNumberFromSubName(subSpellName)
 			if (spellRank ~= nil) then
 				for index = 1, #Necrosis.Spell, 1 do
-					--  a version of the spell is already in our table
+					-- A version of the spell is already in our table
 					if (Necrosis.Spell[index].Name == spellName) then
 						UpdateSpellIfHigherRank(index, spellRank, spellID, spellNameOrg, globalId)
 						break
 					end
+				end
+			end
+		else
+			-- The spell has no subSpellName, like Ritual of Summoning or
+			-- unavailable / not learned spells like Conflagrate
+			-- Set rank = 0 for those spells
+			for index = 1, #Necrosis.Spell, 1 do
+				-- a version of the spell is already in our table
+				if (Necrosis.Spell[index].Name == spellName) then
+					UpdateSpellIfHigherRank(index, 0, spellID, spellNameOrg, globalId)
+					break
 				end
 			end
 		end

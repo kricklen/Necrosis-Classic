@@ -227,7 +227,9 @@ function _tv:Show()
 			"Test timer",
 			-200, -250,
 			function(self)
-				Necrosis:InsertTimerParTable(11, "Test target", "", timerManagement)
+				-- Necrosis:InsertTimerParTable(11, "Test target", "", timerManagement)
+				--InsertSpellTimer(spellIndex, targetGuid, targetName, targetLevel)
+				Necrosis.Timers:InsertSpellTimer(UnitGUID("player"), 11, UnitGUID("target"), "targetName", "targetLevel")
 			end
 		)
 		self.btnTestTimer:SetWidth(100)
@@ -237,8 +239,14 @@ function _tv:Show()
 			"Clear timer",
 			-90, -250,
 			function(self)
-				while (#timerManagement.SpellTimer > 0) do
-					Necrosis:RetraitTimerParIndex(1, timerManagement)
+				print("#Necrosis.Timers.ActiveTimers: "..#Necrosis.Timers.ActiveTimers)
+				for data in pairs(Necrosis.Timers.ActiveTimers) do
+					Necrosis.Timers:RemoveSpellTimer(
+						Necrosis.Timers.ActiveTimers[data].CasterGuid,
+						Necrosis.Timers.ActiveTimers[data].SpellId,
+						Necrosis.Timers.ActiveTimers[data].TargetGuid
+					)
+					-- print("x: "..tostring(data))--.CasterGuid..", "..tostring(data.TargetGuid))
 				end
 			end
 		)

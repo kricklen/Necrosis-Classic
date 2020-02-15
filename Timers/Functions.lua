@@ -68,30 +68,56 @@ function _t.UpdateTimers(something, elapsed)
 	end
 end
 
-function _t:InsertSpellTimer(spellIndex, targetName, targetLevel, targetGuid)
+function _t:InsertSpellTimer(casterGuid, spellIndex, targetGuid, targetName, targetLevel)
 	local spell = Necrosis.Spell[spellIndex]
-	table.insert(
-		self.ActiveTimers,
-		{
-			SpellName = spell.Name,
-			SpellTime = Necrosis.Spells:GetSpellCooldownInSecs(spell.ID),
-			SpellTimeMax = floor(GetTime() + spell.Length),
-			SpellType = spell.Type,
-			TargetName = targetName,
-			TargetGUID = targetGuid,
-			TargetLevel = targetLevel,
-			Group = 0,
-			Gtimer = nil
-		}
-	)
-	print("self.ActiveTimers: "..self.ActiveTimers[#self.ActiveTimers].SpellTime)
+	local timerKey = casterGuid.."|"..spell.GlobalId
+	if (targetGuid) then
+		timerKey = timerKey.."|"..targetGuid
+	end
+	self.ActiveTimers[timerKey] =
+	{
+		CasterGuid = casterGuid,
+		SpellId = spell.GlobalId,
+		SpellName = spell.Name,
+		SpellTime = Necrosis.Spells:GetSpellCooldownInSecs(spell.ID),
+		SpellTimeMax = floor(GetTime() + spell.Length),
+		TimerType = spell.Type,
+		TargetGUID = targetGuid,
+		TargetName = targetName,
+		TargetLevel = targetLevel,
+		Group = 0,
+		Gtimer = nil
+	}
+	if (spell.Type == 1) then
+		print("Singleton timer")
+	else
+		print("Other timer")
+	end
+	-- Timer Groups:
+	-- Caster Guid + Target Guid + SpellId
+	-- Singleton with target
+	-- Multi with target
+
+	print("self.ActiveTimers: "..self.ActiveTimers[timerKey].SpellTimeMax)
 end
+
+function _t:RemoveSpellTimer(casterGuid, spellId, targetGuid)
+	local timerKey = casterGuid.."|"..spellId
+	if (targetGuid) then
+		timerKey = timerKey.."|"..targetGuid
+	end
+	print("RemoveSpellTimer: "..self.ActiveTimers[timerKey].SpellName)
+	self.ActiveTimers[timerKey] = nil
+end
+
+
 
 -- The timers' table is here for that. | La table des timers est là pour ça !
 function Necrosis:InsertTimerParTable(spellIndex, Target, LevelTarget, Timer, TargetGUID)
 	-- insert an entry into the table || Insertion de l'entrée dans le tableau
-	Necrosis.Timers:InsertSpellTimer(spellIndex, Target, LevelTarget, TargetGUID)
-print("Insert timer in table: "..tostring(spellIndex))
+	Necrosis.Timers:InsertSpellTimer(UnitGUID("player"), spellIndex, TargetGUID, Target, LevelTarget)
+print("Insert timer in table for spell: "..tostring(spellIndex)..", "..Necrosis.Spell[spellIndex].Name)
+
 	Timer.SpellTimer:insert(
 		{
 			Name = Necrosis.Spell[spellIndex].Name,
@@ -131,8 +157,6 @@ print("Insert timer in table: "..tostring(spellIndex))
 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax - Timer.SpellTimer[#Timer.SpellTimer].Time,
 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax
 		)
-print("TimerLibre: "..tostring(TimerLibre))
-print("StatusBar Height: "..tostring(StatusBar:GetHeight()))
 	end
 
 	-- if NecrosisConfig.TimerType > 0 then
@@ -309,10 +333,8 @@ end
 
 -- delete a timer by its index || Connaissant l'index du Timer dans la liste, on le supprime
 function Necrosis:RetraitTimerParIndex(index, Timer)
-	-- if NecrosisConfig.TimerType > 0 then
 	if NecrosisConfig.TimerType == "Graphical" or NecrosisConfig.TimerType == "Textual" then
 		-- remove the graphical timer || Suppression du timer graphique
-		-- if NecrosisConfig.TimerType == 1 and Timer.SpellTimer[index] then
 		if NecrosisConfig.TimerType == "Graphical" and Timer.SpellTimer[index] then
 			Timer.TimerTable[Timer.SpellTimer[index].Gtimer] = false
 			_G["NecrosisTimerFrame"..Timer.SpellTimer[index].Gtimer]:Hide()

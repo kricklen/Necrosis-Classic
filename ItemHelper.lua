@@ -45,21 +45,53 @@ ItemHelper = {
 
 local _ih = ItemHelper
 
+local _ih_countdown = 0
+local _ih_callback = nil
+
+function _ih:RegisterStonesLoadedHandler(callback)
+    _ih_callback = callback
+end
+
+function _ih:FireStonesLoadedHandler()
+    _ih_callback()
+end
+
 local function MakeItemIdRanksAndNames(root)
     -- i is the rank of the item
     -- Create an entry in the form of [itemId] = { Rank = i, Name = blah }
     for i,id in ipairs(root.ItemIds) do
-        root[id] = {
-            Rank = i,
-            Name = GetItemInfo(id)
-        }
+        -- Use callbacks to get item info because the client calls the server
+        -- for each itemId and caches the result locally when received.
+        local item = Item:CreateFromItemID(id)
+        item:ContinueOnItemLoad(
+            function()
+                root[id] = {
+                    Rank = i,
+                    Name = item:GetItemName()
+                }
+                -- This is usually a bad idea in multithreaded apps, but works here for now
+                _ih_countdown = _ih_countdown - 1
+                if (_ih_countdown == 0) then
+                    _ih:FireStonesLoadedHandler()
+                end
+            end
+        )
     end
 end
 
-MakeItemIdRanks(_ih.Healthstone)
-MakeItemIdRanks(_ih.Firestone)
-MakeItemIdRanks(_ih.Spellstone)
-MakeItemIdRanks(_ih.Soulstone)
+function _ih:Initialize()
+    -- Set the counter for when to fire the stones loaded callback
+    _ih_countdown
+        = #self.Healthstone.ItemIds
+        + #self.Firestone.ItemIds
+        + #self.Spellstone.ItemIds
+        + #self.Soulstone.ItemIds
+
+    MakeItemIdRanksAndNames(self.Healthstone)
+    MakeItemIdRanksAndNames(self.Firestone)
+    MakeItemIdRanksAndNames(self.Spellstone)
+    MakeItemIdRanksAndNames(self.Soulstone)
+end
 
 function _ih:IsFirestone(itemId)
     return tContains(self.Firestone.ItemIds, itemId)

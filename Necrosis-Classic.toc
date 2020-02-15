@@ -18,8 +18,10 @@
 
 Necrosis.xml
 
-InitializeNamespaces.lua
+BlizzardUI\AsyncCallbackSystem.lua
+BlizzardUI\Item.lua
 
+InitializeNamespaces.lua
 ItemHelper.lua
 BagHelper.lua
 GraphicsHelper.lua

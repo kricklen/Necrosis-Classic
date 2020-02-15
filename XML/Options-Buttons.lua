@@ -316,7 +316,6 @@ function _bv:Show()
 		-- local boutons = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu"}
 		-- local initY = 380
 		for i,btType in ipairs(self._ButtonTypes) do
-			print(i..", "..btType)
 			local btn = GraphicsHelper:CreateCheckButton(
 				self.Page1,
 				Necrosis.Config.Buttons.Name[i],

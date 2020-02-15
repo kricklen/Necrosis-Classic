@@ -333,15 +333,15 @@ local function InitializeMyself()
 	-- Recording of the events used || Enregistrement des events utilisés
 	NecrosisButton:RegisterEvent("PLAYER_ENTERING_WORLD")
 	NecrosisButton:RegisterEvent("PLAYER_LEAVING_WORLD")
-	for i in ipairs(Local.Events) do
-		NecrosisButton:RegisterEvent(Local.Events[i])
-	end
+	Necrosis:RegisterManagement(true)
+	-- for i in ipairs(Local.Events) do
+	-- 	NecrosisButton:RegisterEvent(Local.Events[i])
+	-- end
 	-- Detecting the type of demon present at the connection || Détection du Type de démon présent à la connexion
 	Necrosis.CurrentEnv.DemonType = UnitCreatureFamily("pet")
 	Necrosis.Chat:_Msg("initialized", "USER")
 end
 
--- local loggedIn = false
 local weCanStart = false
 
 -- Function applied to loading || Fonction appliquée au chargement
@@ -352,11 +352,20 @@ function Necrosis:OnLoad(event)
 		if (Class == "WARLOCK") then
 			Local.LoggedIn = true
 		end
+
 	elseif (event == "SKILL_LINES_CHANGED" and Local.LoggedIn and not weCanStart) then
 		-- Skill changed is fired more than once, seems like a more stable
-		-- indicator that tells when the spellbook is ready
-		InitializeMyself()
-		weCanStart = true
+		-- indicator that tells when the spellbook is ready.
+		-- Call ItemHelper first here, it uses async methods for loading item info
+		-- and we have to wait for the callbacks.
+		ItemHelper:RegisterStonesLoadedHandler(
+			function()
+				InitializeMyself()
+				weCanStart = true
+			end
+		)
+		ItemHelper:Initialize()
+
 	elseif (event == "SPELLS_CHANGED" and weCanStart) then
 		-- Spells changed fires each time a new spell is learned etc.
 		Necrosis:SpellSetup()
@@ -375,9 +384,7 @@ function Necrosis:OnUpdate(something, elapsed)
 		Local.LastUpdate[2] = Local.LastUpdate[2] + elapsed
 	end
 	-- If smooth scroll timers, we update them as soon as possible || Si défilement lisse des timers, on les met à jours le plus vite possible
-	-- if NecrosisConfig.Smooth then
 	NecrosisUpdateTimer(Local.TimerManagement.SpellTimer)
-	-- end
 
 	-- If timers texts, we update them very quickly also || Si timers textes, on les met à jour très vite également
 	if NecrosisConfig.TimerType == "Textual" then
@@ -424,10 +431,6 @@ function Necrosis:OnUpdate(something, elapsed)
 		Local.LastUpdate[1] = 0
 	-- Every half second || Toutes les demies secondes
 	elseif Local.LastUpdate[2] > 0.5 then
-		-- If normal graphical timers scroll, then we update every 0.5 seconds || Si défilement normal des timers graphiques, alors on met à jour toutes les 0.5 secondes
-		-- if not NecrosisConfig.Smooth then
-		-- 	NecrosisUpdateTimer(Local.TimerManagement.SpellTimer)
-		-- end
 		-- If configured, display warnings from Antifear || Si configuré, affichage des avertissements d'Antifear
 		if NecrosisConfig.AntiFearAlert then
 			Necrosis:ShowAntiFearWarning()
@@ -449,8 +452,12 @@ function Necrosis.OnEvent(self, event, ...)
 	local arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9 = ...
 
 	if (event == "PLAYER_ENTERING_WORLD") then
+		print("Entering world...")
+		Necrosis:RegisterManagement(true)
 		Local.InWorld = true
 	elseif (event == "PLAYER_LEAVING_WORLD") then
+		print("Leaving world...")
+		Necrosis:RegisterManagement(false)
 		Local.InWorld = false
 	end
 
@@ -459,18 +466,21 @@ function Necrosis.OnEvent(self, event, ...)
 		return
 	end
 
-	-- If the contents of the bags have changed, we check that Soul Fragments are always in the right bag || Si le contenu des sacs a changé, on vérifie que les Fragments d'âme sont toujours dans le bon sac
+	-- Some bag slot changed
 	if (event == "BAG_UPDATE") then
 		Necrosis:BagExplore(arg1)
 		if (NecrosisConfig.SoulshardSort) then
 			Necrosis:SoulshardSwitch("CHECK")
 		end
+
 	-- If the player wins or loses mana || Si le joueur gagne ou perd de la mana
-	elseif (event == "UNIT_MANA") and arg1 == "player" then
+	elseif (event == "UNIT_MANA" and arg1 == "player") then
 		Necrosis:UpdateMana()
+
 	-- If the player wins or loses his life || Si le joueur gagneou perd de la vie
-	elseif (event == "UNIT_HEALTH") and arg1 == "player" then
+	elseif (event == "UNIT_HEALTH" and arg1 == "player") then
 		Necrosis:UpdateHealth()
+
 	-- If the player dies || Si le joueur meurt
 	elseif (event == "PLAYER_DEAD") then
 		-- It may hide the Twilight or Backlit buttons. || On cache éventuellement les boutons de Crépuscule ou Contrecoup.
@@ -492,6 +502,7 @@ function Necrosis.OnEvent(self, event, ...)
 				_G["NecrosisCurseMenu"..i]:GetNormalTexture():SetDesaturated(1)
 			end
 		end
+
 	-- If the player resurrects || Si le joueur ressucite
 	elseif 	(event == "PLAYER_ALIVE" or event == "PLAYER_UNGHOST") then
 		-- We are sobering all the spell buttons || On dégrise tous les boutons de sort
@@ -512,12 +523,14 @@ function Necrosis.OnEvent(self, event, ...)
 		-- We reset the gray button list || On réinitialise la liste des boutons grisés
 		Local.Desatured = {}
 		Local.Dead = false
+
 	-- Successful spell casting management || Gestion de l'incantation des sorts réussie
 	elseif (event == "UNIT_SPELLCAST_SUCCEEDED") and arg1 == "player" then
 		_, Local.SpellCasted.Name = arg1, arg3
 		Local.SpellCasted.Name = GetSpellInfo(arg3)
 		-- print ('GUUUID'..Local.SpellCasted.TargetGUID)
 		Necrosis:SpellManagement()
+
 	-- When the warlock begins to cast a spell, we intercept the spell's name || Quand le démoniste commence à incanter un sort, on intercepte le nom de celui-ci
 	-- We also save the name of the target of the spell as well as its level || On sauve également le nom de la cible du sort ainsi que son niveau
 	elseif (event == "UNIT_SPELLCAST_SENT") then
@@ -555,18 +568,22 @@ function Necrosis.OnEvent(self, event, ...)
 	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
 	elseif (event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == player then
 		Local.SpellCasted = {}
-	-- Flag if a Trade window is open, so you can automatically trade the healing stones || Flag si une fenetre de Trade est ouverte, afin de pouvoir trader automatiquement les pierres de soin
+
+		-- Flag if a Trade window is open, so you can automatically trade the healing stones || Flag si une fenetre de Trade est ouverte, afin de pouvoir trader automatiquement les pierres de soin
 	elseif event == "TRADE_REQUEST" or event == "TRADE_SHOW" then
 		Local.Trade.Request = true
+
 	elseif event == "TRADE_REQUEST_CANCEL" or event == "TRADE_CLOSED" then
 		Local.Trade.Request = false
+
 	elseif event=="TRADE_ACCEPT_UPDATE" then
 		if Local.Trade.Request and Local.Trade.Complete then
 			AcceptTrade()
 			Local.Trade.Request = false
 			Local.Trade.Complete = false
 		end
-	-- AntiFear button hide on target change || AntiFear button hide on target change
+
+		-- AntiFear button hide on target change || AntiFear button hide on target change
 	elseif event == "PLAYER_TARGET_CHANGED" then
 		if NecrosisConfig.AntiFearAlert and Local.Warning.Antifear.Immune then
 			Local.Warning.Antifear.Immune = false
@@ -679,7 +696,6 @@ print("ENCHANT_APPLIED: "..arg9)
 		-- Spell button attributes are negated situational || On annule les attributs des boutons de sorts de manière situationnelle
 		Necrosis:InCombatAttribute(Local.Menu.Pet, Local.Menu.Buff, Local.Menu.Curse)
 	end
-	return
 end
 
 ------------------------------------------------------------------------------------------------------
@@ -691,9 +707,9 @@ end
 -- When you leave an area, you stop watching the surroundings || Quand on sort d'une zone, on arrête de surveiller les envents
 -- When we enter an area, we resume surveillance || Quand on rentre dans une zone, on reprend la surveillance
 -- This makes it possible to avoid a loading time that is too long for the mod || Cela permet d'éviter un temps de chargement trop long du mod
-function Necrosis:RegisterManagement(RegistrationType)
+function Necrosis:RegisterManagement(doRegister)
 	print("RegisterManagement")
-	if RegistrationType == "IN" then
+	if (doRegister) then
 		for i in ipairs(Local.Events) do
 			NecrosisButton:RegisterEvent(Local.Events[i])
 		end
@@ -702,7 +718,6 @@ function Necrosis:RegisterManagement(RegistrationType)
 			NecrosisButton:UnregisterEvent(Local.Events[i])
 		end
 	end
-	return
 end
 
 -- Event : UNIT_PET
