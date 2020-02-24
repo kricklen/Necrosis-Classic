@@ -2,7 +2,9 @@ Localization = {}
 
 Necrosis = {
 	Config = {},
-	CurrentEnv = {},
+	CurrentEnv = {
+		PlayerGuid = UnitGUID("player")
+	},
 	Gui = {},
 	Speech = {},
 	Translation = {},

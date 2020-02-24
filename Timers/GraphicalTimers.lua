@@ -114,7 +114,7 @@ end
 -- Creation of the timers || Création des timers
 function Necrosis:AddFrame(FrameName)
 
-print("Necrosis:AddFrame FrameName: "..tostring(FrameName))
+	print("Necrosis:AddFrame FrameName: "..tostring(FrameName))
 
 	if _G[FrameName] then
 		f = _G[FrameName]
@@ -190,7 +190,6 @@ print("Necrosis:AddFrame FrameName: "..tostring(FrameName))
 	-- StatusBar:SetPoint(NecrosisConfig.SpellTimerJust, FrameName, NecrosisConfig.SpellTimerJust, 0, 0)
 	StatusBar:SetPoint("TOPLEFT", 0, 0)
 	StatusBar:Show()
-print("NecrosisConfig.SpellTimerJust: "..tostring(NecrosisConfig.SpellTimerJust))
 
 	-- Definition of the spark at the end of the bar | Définition de l'étincelle en bout de barre
 	texture = StatusBar:CreateTexture(FrameName.."Spark", "OVERLAY")

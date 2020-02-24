@@ -108,34 +108,7 @@ Necrosis.Spell = setmetatable({}, metatable)
 -- Detection of initialisation || Détection des initialisations du mod
 Local.LoggedIn = false
 Local.InWorld = true
--- Local.InWorld = false
 
--- Events utilised by Necrosis || Events utilisés dans Necrosis
-Local.Events = {
-	"BAG_UPDATE",
-	"PLAYER_REGEN_DISABLED",
-	"PLAYER_REGEN_ENABLED",
-	"PLAYER_DEAD",
-	"PLAYER_ALIVE",
-	"PLAYER_UNGHOST",
-	"UNIT_PET",
-	"UNIT_SPELLCAST_FAILED",
-	"UNIT_SPELLCAST_INTERRUPTED",
-	"UNIT_SPELLCAST_SUCCEEDED",
-	"UNIT_SPELLCAST_SENT",
-	"UNIT_MANA",
-	"UNIT_HEALTH",
-	"LEARNED_SPELL_IN_TAB",
-	"PLAYER_TARGET_CHANGED",
-	"TRADE_REQUEST",
-	"TRADE_REQUEST_CANCEL",
-	"TRADE_ACCEPT_UPDATE",
-	"TRADE_SHOW",
-	"TRADE_CLOSED",
-	"COMBAT_LOG_EVENT_UNFILTERED",
-	"SKILL_LINES_CHANGED"
-	-- "BAG_UPDATE_DELAYED"
-}
 
 -- Configuration defaults || Configuration par défaut
 -- To be used if the configuration savedvariables is missing, or if the NecrosisConfig.Version number is changed. || Se charge en cas d'absence de configuration ou de changement de version
@@ -259,23 +232,6 @@ Local.TimerManagement = {
 	LastSpell = {}
 }
 
--- -- Variables of the invocation messages || Variables des messages d'invocation
--- Local.SpeechManagement = {
--- 	-- Latest messages selected || Derniers messages sélectionnés
--- 	-- Added 'RoS = 0' by Draven (April 3rd, 2008) || Added 'RoS = 0' by Draven (April 3rd, 2008)
--- 	LastSpeech = {Pet = 0, Steed = 0, Rez = 0, TP = 0, RoS = 0},
--- 	-- Messages to use after the spell succeeds || Messages à utiliser après la réussite du sort
--- 	SpellSucceed = {
--- 		-- Added 'RoS = setmetatable ({}, metatable),' by Draven (April 3rd, 2008) || Added 'RoS = setmetatable({}, metatable),' by Draven (April 3rd, 2008)
--- 		RoS = setmetatable({}, metatable),
--- 		Pet = setmetatable({}, metatable),
--- 		Steed = setmetatable({}, metatable),
--- 		Rez = setmetatable({}, metatable),
--- 		TP = setmetatable({}, metatable),
--- 		Sacrifice = setmetatable({}, metatable)
--- 	},
--- }
-
 -- Variables used for managing summoning and stone buttons || Variables utilisées pour la gestion des boutons d'invocation et d'utilisation des pierres
 Local.Stone = {
 	Soul = {Mode = 1, Location = {}},
@@ -333,13 +289,10 @@ local function InitializeMyself()
 	-- Recording of the events used || Enregistrement des events utilisés
 	NecrosisButton:RegisterEvent("PLAYER_ENTERING_WORLD")
 	NecrosisButton:RegisterEvent("PLAYER_LEAVING_WORLD")
-	Necrosis:RegisterManagement(true)
-	-- for i in ipairs(Local.Events) do
-	-- 	NecrosisButton:RegisterEvent(Local.Events[i])
-	-- end
+	EventHub:AttachApiEvents()
 	-- Detecting the type of demon present at the connection || Détection du Type de démon présent à la connexion
 	Necrosis.CurrentEnv.DemonType = UnitCreatureFamily("pet")
-	Necrosis.Chat:_Msg("initialized", "USER")
+	Necrosis.Chat:_Msg("Initialized", "USER")
 end
 
 local weCanStart = false
@@ -452,12 +405,10 @@ function Necrosis.OnEvent(self, event, ...)
 	local arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9 = ...
 
 	if (event == "PLAYER_ENTERING_WORLD") then
-		print("Entering world...")
-		Necrosis:RegisterManagement(true)
+		EventHub:AttachApiEvents()
 		Local.InWorld = true
 	elseif (event == "PLAYER_LEAVING_WORLD") then
-		print("Leaving world...")
-		Necrosis:RegisterManagement(false)
+		EventHub:ReleaseApiEvents()
 		Local.InWorld = false
 	end
 
@@ -525,15 +476,30 @@ function Necrosis.OnEvent(self, event, ...)
 		Local.Dead = false
 
 	-- Successful spell casting management || Gestion de l'incantation des sorts réussie
-	elseif (event == "UNIT_SPELLCAST_SUCCEEDED") and arg1 == "player" then
-		_, Local.SpellCasted.Name = arg1, arg3
+	elseif (event == "UNIT_SPELLCAST_SUCCEEDED" and arg1 == "player")
+	then
+		if (not Necrosis.CurrentEnv.SpellIdCast) then
+			Necrosis.CurrentEnv.SpellIdCast = arg3
+		end
 		Local.SpellCasted.Name = GetSpellInfo(arg3)
-		-- print ('GUUUID'..Local.SpellCasted.TargetGUID)
 		Necrosis:SpellManagement()
+-- print("UNIT_SPELLCAST_SUCCEEDED: spellId "..tostring(arg3))
+	-- ..tostring(arg1)..", "
+	-- ..tostring(arg2)..", "
+	-- ..tostring(arg3)..", ")
 
 	-- When the warlock begins to cast a spell, we intercept the spell's name || Quand le démoniste commence à incanter un sort, on intercepte le nom de celui-ci
 	-- We also save the name of the target of the spell as well as its level || On sauve également le nom de la cible du sort ainsi que son niveau
-	elseif (event == "UNIT_SPELLCAST_SENT") then
+	elseif (event == "UNIT_SPELLCAST_SENT")
+	then
+-- print("UNIT_SPELLCAST_SENT: spellId "..tostring(arg4))
+	-- ..tostring(arg1)..", "
+	-- ..tostring(arg2)..", "
+	-- ..tostring(arg3)..", "
+	-- ..tostring(arg4)..", ")
+		if (not Necrosis.CurrentEnv.SpellIdCast) then
+			Necrosis.CurrentEnv.SpellIdCast = arg4
+		end
 
 		-- print('spellcast send : arg 1 =   ' .. tostring(arg1) )
 		-- print('spellcast send : arg 2 =   ' .. tostring(arg2) )
@@ -566,8 +532,10 @@ function Necrosis.OnEvent(self, event, ...)
 		Necrosis.Chat:BeforeSpellCast(Local.SpellCasted)
 
 	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
-	elseif (event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == player then
+	elseif ((event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == player)
+	then
 		Local.SpellCasted = {}
+		Necrosis.CurrentEnv.SpellIdCast = nil
 
 		-- Flag if a Trade window is open, so you can automatically trade the healing stones || Flag si une fenetre de Trade est ouverte, afin de pouvoir trader automatiquement les pierres de soin
 	elseif event == "TRADE_REQUEST" or event == "TRADE_SHOW" then
@@ -629,52 +597,8 @@ print("LEARNED_SPELL_IN_TAB")
 
 	-- Reading the combat log || Lecture du journal de combat
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags , noidea, Effect = CombatLogGetCurrentEventInfo()
-		-- Detection of Shadow Trance and Contrecoup || Détection de la transe de l'ombre et de  Contrecoup
-		if subevent == "SPELL_AURA_APPLIED" and destGUID == UnitGUID("player") then
-			Necrosis:SelfEffect("BUFF", Effect)
-		-- Detection of the end of Shadow Trance and Contrecoup || Détection de la fin de la transe de l'ombre et de Contrecoup
-		elseif subevent == "SPELL_AURA_REMOVED" and destGUID == UnitGUID("player") then
-			Necrosis:SelfEffect("DEBUFF", Effect)
-		-- Debian Detection || Détection du Déban
-		elseif subevent == "SPELL_AURA_REMOVED" and destGUID == UnitGUID("focus") and Local.TimerManagement.Banish and Effect == Necrosis.Spell[9].Name then
-			Necrosis.Chat:_Msg("BAN ! BAN ! BAN !")
-			Necrosis:RetraitTimerParNom(Necrosis.Spell[9], Local.TimerManagement)
-				Local.TimerManagement.Banish = false
-		-- Resist / immune detection || Détection des résists / immunes
-		elseif subevent == "SPELL_MISSED" and sourceGUID == UnitGUID("player") and destGUID == UnitGUID("target") then
-			if NecrosisConfig.AntiFearAlert
-				and (Effect == Necrosis.Spell[13].Name or Effect == Necrosis.Spell[19].Name)
-				and arg12 == "IMMUNE"
-				then
-					Local.Warning.Antifear.Immune = true
-			end
-			if Effect == Local.TimerManagement.LastSpell.Name
-				and GetTime() <= (Local.TimerManagement.LastSpell.Time + 1.5)
-				then
-					Necrosis:RetraitTimerParIndex(Local.TimerManagement.LastSpell.Index, Local.TimerManagement)
-			end
-		-- Detection application of a spell / fire stone on a weapon || Détection application d'une pierre de sort/feu sur une arme
-		elseif (subevent == "ENCHANT_APPLIED"
-			and destGUID == UnitGUID("player")
-			and ((BagHelper.Spellstone_Name and arg9 == BagHelper.Spellstone_Name)
-			  or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
-		then
-print("ENCHANT_APPLIED: "..arg9)
-				Local.SomethingOnHand = arg9
-				Necrosis:UpdateIcons()
-		-- End of enchantment detection || Détection fin d'enchant
-		elseif (subevent == "ENCHANT_REMOVE"
-			and destGUID == UnitGUID("player")
-			and ((BagHelper.Spellstone_Name and arg9 == BagHelper.Spellstone_Name)
-			  or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
-		then
-				Local.SomethingOnHand = "Rien"
-				Necrosis:UpdateIcons()
-		elseif subevent == "UNIT_DIED"
-			then
-				Necrosis:RetraitTimerParGuid(sourceGUID,Local.TimerManagement)
-		end
+
+		Necrosis:OnCombatLogEvent(event, CombatLogGetCurrentEventInfo())
 
 	-- If we change weapons, we look at whether a spell / fire enchantment is on the new || Si on change d'arme, on regarde si un enchantement de sort / feu est sur la nouvelle
 	elseif event == "SKILL_LINES_CHANGED" then
@@ -698,27 +622,172 @@ print("ENCHANT_APPLIED: "..arg9)
 	end
 end
 
+function Necrosis:OnCombatLogEvent(event, ...)
+
+	local timestamp, subevent, hideCaster,
+		sourceGUID, sourceName, sourceFlags, sourceRaidFlags,
+		destGUID, destName, destFlags, destRaidFlags = ...
+
+	local spellId, spellName, spellSchool, auraType, amount, zzz = select(12, ...)
+	-- local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand
+
+	-- print("CLEU: "..tostring(subevent).." on "..tostring(destGUID).." (self: "..tostring(destGUID == Necrosis.CurrentEnv.PlayerGuid)..")")
+
+	-- Detection of Shadow Trance and Contrecoup || Détection de la transe de l'ombre et de  Contrecoup
+	if (subevent == "UNIT_DIED")
+	then
+		-- print("UNIT_DIED: "..tostring(destGUID)..", "..tostring(spellId)..", "..tostring(sourceGUID))
+		Necrosis.Timers:RemoveSpellTimerTarget(destGUID)
+		
+	elseif (subevent == "UNIT_DESTROYED")
+	then
+		-- print("UNIT_DESTROYED: "..tostring(destGUID)..", "..tostring(spellId)..", "..tostring(sourceGUID))
+		Necrosis.Timers:RemoveSpellTimerTarget(destGUID)
+
+	elseif (subevent == "UNIT_DISSIPATES")
+	then
+		-- print("UNIT_DISSIPATES: "..tostring(destGUID)..", "..tostring(spellId)..", "..tostring(sourceGUID))
+		Necrosis.Timers:RemoveSpellTimerTarget(destGUID)
+	
+	elseif (subevent == "SPELL_AURA_APPLIED")-- and destGUID == UnitGUID("target"))
+	then
+-- print("SPELL_AURA_APPLIED: "
+-- 	..tostring(spellName)..", "
+-- 	..tostring(Necrosis.CurrentEnv.SpellIdCast))
+
+		if (destGUID == Necrosis.CurrentEnv.PlayerGuid) then
+			Necrosis:SelfEffect("BUFF", spellName)
+		end
+		-- Add timer if a duration is available
+		if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid
+			and Necrosis.Spell.AuraDuration[Necrosis.CurrentEnv.SpellIdCast])
+		then
+			-- casterGuid, targetGuid, targetName, targetLevel, spellId, spellName, duration
+			Necrosis.Timers:InsertSpellTimer(
+				Necrosis.CurrentEnv.PlayerGuid,
+				destGUID, destName, 0,
+				Necrosis.CurrentEnv.SpellIdCast,
+				spellName,
+				Necrosis.Spell.AuraDuration[Necrosis.CurrentEnv.SpellIdCast],
+				Necrosis.Spell.AuraType[Necrosis.CurrentEnv.SpellIdCast]
+			)
+		end
+		Necrosis.CurrentEnv.SpellIdCast = nil
+
+	elseif (subevent == "SPELL_AURA_REFRESH"
+		and sourceGUID == Necrosis.CurrentEnv.PlayerGuid
+		and destGUID == UnitGUID("target"))
+	then
+		-- print("Refresh: "
+		-- 	..tostring(destGUID)..", "
+		-- 	..tostring(destName)..", "
+		-- 	..tostring(spellName))
+
+		-- Reset a timer if a duration is available
+		if (Necrosis.Spell.AuraDuration[Necrosis.CurrentEnv.SpellIdCast]) then
+			Necrosis.Timers:ResetTimer(
+				Necrosis.CurrentEnv.PlayerGuid,
+				destGUID,
+				Necrosis.CurrentEnv.SpellIdCast,
+				Necrosis.Spell.AuraDuration[Necrosis.CurrentEnv.SpellIdCast]
+			)
+		end
+		Necrosis.CurrentEnv.SpellIdCast = nil
+
+	-- Detection of the end of Shadow Trance and Contrecoup || Détection de la fin de la transe de l'ombre et de Contrecoup
+	elseif (subevent == "SPELL_AURA_REMOVED")
+	then
+
+		-- print("SPELL_AURA_REMOVED: "
+		-- 	..tostring(destGUID)..", "
+		-- 	..tostring(destName)..", "
+		-- 	..tostring(sourceGUID)..", "
+		-- 	..tostring(spellName))
+
+		if (destGUID == Necrosis.CurrentEnv.PlayerGuid) then
+			Necrosis:SelfEffect("DEBUFF", spellName)
+		end
+
+		if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid) then
+			Necrosis.Timers:RemoveSpellTimerTargetName(destGUID, spellName)
+		end
+
+		if (destGUID == UnitGUID("focus")
+			and Local.TimerManagement.Banish
+			and spellName == Necrosis.Spell[9].Name)
+		then
+			Necrosis.Chat:_Msg("BAN ! BAN ! BAN !")
+			Necrosis:RetraitTimerParNom(Necrosis.Spell[9], Local.TimerManagement)
+			Local.TimerManagement.Banish = false
+		end	
+
+	-- Debian Detection || Détection du Déban
+	-- elseif (subevent == "SPELL_AURA_REMOVED" and destGUID == UnitGUID("focus") and Local.TimerManagement.Banish and spellName == Necrosis.Spell[9].Name)
+	-- then
+	-- 	Necrosis.Chat:_Msg("BAN ! BAN ! BAN !")
+	-- 	Necrosis:RetraitTimerParNom(Necrosis.Spell[9], Local.TimerManagement)
+	-- 	Local.TimerManagement.Banish = false
+
+	-- Resist / immune detection || Détection des résists / immunes
+	elseif (subevent == "SPELL_MISSED"
+			and sourceGUID == Necrosis.CurrentEnv.PlayerGuid
+			and destGUID == UnitGUID("target"))
+	then
+print("Spell resisted")
+		
+		Necrosis.CurrentEnv.SpellIdCast = nil
+	
+		if NecrosisConfig.AntiFearAlert
+			and (spellName == Necrosis.Spell[13].Name or spellName == Necrosis.Spell[19].Name)
+			and arg12 == "IMMUNE"
+		then
+			Local.Warning.Antifear.Immune = true
+		end
+		if spellName == Local.TimerManagement.LastSpell.Name
+			and GetTime() <= (Local.TimerManagement.LastSpell.Time + 1.5)
+		then
+			Necrosis:RetraitTimerParIndex(Local.TimerManagement.LastSpell.Index, Local.TimerManagement)
+		end
+
+	-- Detection application of a spell / fire stone on a weapon || Détection application d'une pierre de sort/feu sur une arme
+	elseif (subevent == "ENCHANT_APPLIED"
+		and destGUID == UnitGUID("player")
+		and ((BagHelper.Spellstone_Name and arg9 == BagHelper.Spellstone_Name)
+		or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
+	then
+	print("ENCHANT_APPLIED: "..arg9)
+			Local.SomethingOnHand = arg9
+			Necrosis:UpdateIcons()
+	-- End of enchantment detection || Détection fin d'enchant
+	elseif (subevent == "ENCHANT_REMOVE"
+		and destGUID == UnitGUID("player")
+		and ((BagHelper.Spellstone_Name and arg9 == BagHelper.Spellstone_Name)
+		or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
+	then
+			Local.SomethingOnHand = "Rien"
+			Necrosis:UpdateIcons()
+	elseif subevent == "UNIT_DIED"
+	then
+		Necrosis:RetraitTimerParGuid(sourceGUID,Local.TimerManagement)
+	end
+end
+
+function CheckUnitDebuff()
+	-- Duration is always 0 despite API descriptions, bug?
+	local name, icon, count, debuffType, duration, expirationTime, source, isStealable, 
+		nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
+		 = UnitDebuff("target", 1, "PLAYER")
+
+	print("UnitDebuff: "..tostring(name)..", "..tostring(icon)..", "..tostring(count)..", "
+		..tostring(debuffType)..", "..tostring(duration)..", "..tostring(expirationTime)..", "
+		..tostring(source)..", "..tostring(isStealable)..", "..tostring(nameplateShowPersonal)..", "
+		..tostring(spellId)..", "..tostring(canApplyAura)..", "..tostring(isBossDebuff)
+	)
+end
+
 ------------------------------------------------------------------------------------------------------
 -- FUNCTIONS NECROSIS "ON EVENT" || FONCTIONS NECROSIS "ON EVENT"
 ------------------------------------------------------------------------------------------------------
-
--- Events: PLAYER_ENTERING_WORLD and PLAYER_LEAVING_WORLD || Events : PLAYER_ENTERING_WORLD et PLAYER_LEAVING_WORLD
--- Function applied to each loading screen || Fonction appliquée à chaque écran de chargement
--- When you leave an area, you stop watching the surroundings || Quand on sort d'une zone, on arrête de surveiller les envents
--- When we enter an area, we resume surveillance || Quand on rentre dans une zone, on reprend la surveillance
--- This makes it possible to avoid a loading time that is too long for the mod || Cela permet d'éviter un temps de chargement trop long du mod
-function Necrosis:RegisterManagement(doRegister)
-	print("RegisterManagement")
-	if (doRegister) then
-		for i in ipairs(Local.Events) do
-			NecrosisButton:RegisterEvent(Local.Events[i])
-		end
-	else
-		for i in ipairs(Local.Events) do
-			NecrosisButton:UnregisterEvent(Local.Events[i])
-		end
-	end
-end
 
 -- Event : UNIT_PET
 -- Allows the servo to be timed, as well as to prevent for servo breaks || Permet de timer les asservissements, ainsi que de prévenir pour les ruptures d'asservissement
@@ -971,7 +1040,6 @@ function Necrosis:SpellManagement()
 							end
 							Local.TimerManagement.Banish = true
 						end
-
 						-- now insert a timer for the spell that has been casted
 						Local.TimerManagement = Necrosis:InsertTimerParTable(spell, Local.SpellCasted.TargetName, Local.SpellCasted.TargetLevel, Local.TimerManagement,Local.SpellCasted.TargetGUID)
 						break
@@ -1324,7 +1392,6 @@ end
 
 -- Function updating the buttons Necrosis and giving the state of the button of the soul stone || Fonction mettant à jour les boutons Necrosis et donnant l'état du bouton de la pierre d'âme
 function Necrosis:UpdateIcons()
-
 --print("UpdateIcons...")
 
 	-- If the function was called to detect an enchantment, it is detected! || Si la fonction a été appelée pour détecter un enchantement, on le détecte !

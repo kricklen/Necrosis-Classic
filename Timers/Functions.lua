@@ -43,71 +43,285 @@ local _G = getfenv(0)
 ------------------------------------------------------------------------------------------------------
 
 Necrosis.Timers = {
-	ActiveTimers = {}
+	ActiveTimers = {},
+	ActiveTimersCount = 0,
+	SingleCount = 0
 }
 
 local _t = Necrosis.Timers
+local BAR_HEIGHT = 25
 
 function _t:GetFormattedTime(secs)
 	local mins = math.modf(secs / 60)
 	secs = math.fmod(secs, 60)
 	if (mins > 0) then
-		return string.format("%d Mins %02d Secs", mins, secs)
+		-- return string.format("%d Mins %02d Secs", mins, secs)
+		return string.format("%d:%02d", mins, secs)
 	end
-	return string.format("%d Secs", secs)
+	-- return string.format("%d Secs", secs)
+	return string.format("%d", secs)
 end
 
-local count = 0
-function _t.UpdateTimers(something, elapsed)
-	if (not elapsed) then
+local function FindFreeTimer()
+	for i,timerData in ipairs(_t.ActiveTimers) do
+		if (timerData.Finished) then
+			timerData.Finished = false
+			return timerData
+		end
+	end
+	return nil
+end
+
+local function MakeNewTimer()
+	-- Définition de ses attributs
+	local frame = CreateFrame("Frame", nil, UIParent)
+	frame:SetWidth(150)
+	frame:SetHeight(BAR_HEIGHT)
+	frame:ClearAllPoints()
+
+
+	-- --Définition de sa texture
+	-- local texture = frame:CreateTexture(nil, "BACKGROUND")
+	-- _t.TimerGui[#_t.TimerGui] = texture
+
+	-- texture:SetWidth(150)
+	-- texture:SetHeight(BAR_HEIGHT)
+	-- texture:SetTexture(0, 0, 0, 0.5)
+	-- texture:ClearAllPoints()
+	-- -- texture:SetPoint(NecrosisConfig.SpellTimerJust, FrameName, NecrosisConfig.SpellTimerJust, 0, 0)
+	-- texture:SetPoint("TOPLEFT", 0, 0)
+	-- texture:Show()
+
+
+	-- Définition de ses textes
+	-- Extérieur
+	local lblCountdown = frame:CreateFontString(nil, "OVERLAY", "TextStatusBarText")
+	lblCountdown:SetWidth(30)
+	lblCountdown:SetHeight(BAR_HEIGHT)
+	lblCountdown:SetJustifyH("LEFT")
+	lblCountdown:SetTextColor(1, 1, 1)
+	lblCountdown:ClearAllPoints()
+	if (NecrosisConfig.SpellTimerPos == -1) then
+		lblCountdown:SetPoint("RIGHT", frame, "LEFT", 32, 1)
+		lblCountdown:SetJustifyH("LEFT")
+	else
+		lblCountdown:SetPoint("LEFT", frame, "RIGHT", 5, 1)
+		lblCountdown:SetJustifyH("LEFT")
+	end
+
+
+	-- Définition de ses textes
+	-- Intérieur
+	local lblSpellname = frame:CreateFontString(nil, "OVERLAY", "TextStatusBarText")
+	lblSpellname:SetWidth(150)
+	lblSpellname:SetHeight(BAR_HEIGHT)
+	-- lblSpellname:SetTextHeight(14)
+	lblSpellname:SetJustifyH("RIGHT")
+	lblSpellname:SetJustifyV("MIDDLE")
+	lblSpellname:ClearAllPoints()
+	lblSpellname:SetPoint("LEFT", frame, "LEFT", -5, 0)
+	lblSpellname:SetTextColor(1, 1, 1)
+
+
+	-- Definition of the colored bar | Définition de la barre colorée
+	local StatusBar = CreateFrame("StatusBar", nil, frame)
+	StatusBar:SetWidth(150)
+	StatusBar:SetHeight(BAR_HEIGHT)
+	StatusBar:SetStatusBarTexture(GraphicsHelper:GetWoWTexture("TargetingFrame", "UI-StatusBar"))
+	StatusBar:SetStatusBarColor(1, 1, 0)
+	StatusBar:SetFrameLevel(StatusBar:GetFrameLevel() - 1)
+	StatusBar:ClearAllPoints()
+	StatusBar:SetPoint("TOPLEFT", 0, 0)
+
+	-- Definition of the spark at the end of the bar | Définition de l'étincelle en bout de barre
+	local texture = StatusBar:CreateTexture(nil, "OVERLAY")
+	texture:SetWidth(32)
+	texture:SetHeight(32)
+	texture:SetTexture(GraphicsHelper:GetWoWTexture("CastingBar", "UI-CastingBar-Spark"))
+	texture:SetBlendMode("ADD")
+	texture:ClearAllPoints()
+	texture:SetPoint("CENTER", StatusBar, "LEFT", 0, 0)
+
+	local icon = StatusBar:CreateTexture(nil, "OVERLAY")
+	icon:SetWidth(BAR_HEIGHT)
+	icon:SetHeight(BAR_HEIGHT)
+	icon:SetBlendMode("ADD")
+	icon:ClearAllPoints()
+	icon:SetPoint("RIGHT", BAR_HEIGHT, 0)
+
+	return
+		{
+			Finished = false,
+			Frame = frame,
+			lblCountdown = lblCountdown,
+			lblSpellname = lblSpellname,
+			bar = StatusBar,
+			texture = texture,
+			icon = icon
+		}
+end
+
+local function StartTimer(timerData)
+	-- Position the gui elements
+	if (timerData.SpellType == "single") then
+		timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 330, -110 + (_t.SingleCount * 28))
+		_t.SingleCount = _t.SingleCount + 1
+	else
+		timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 160, -110 + (_t.ActiveTimersCount * 28))
+		_t.ActiveTimersCount = _t.ActiveTimersCount + 1
+	end
+
+	-- Set starting values
+	timerData.bar:SetMinMaxValues(0, timerData.SpellTime)
+	timerData.bar:SetValue(timerData.SpellTime)
+	timerData.lblCountdown:SetText(timerData.SpellTime)
+	timerData.lblSpellname:SetText(timerData.SpellName)
+	timerData.icon:SetTexture(GetSpellTexture(timerData.SpellId))
+
+	-- Show the gui elements
+	timerData.Frame:Show()
+	timerData.bar:Show()
+	timerData.texture:Show()
+	timerData.lblCountdown:Show()
+	timerData.lblSpellname:Show()
+
+	-- Start the timer
+	timerData.Frame:SetScript("OnUpdate", Necrosis.Timers.UpdateTimers)
+end
+
+local function RemoveTimer(timerData)
+	if (timerData.Finished) then
+		-- Timer already finished
 		return
 	end
-	count = count + elapsed
-	if (count > 1) then
-		count = 0
+	timerData.Finished = true
+	timerData.Frame:SetScript("OnUpdate", nil)
+	timerData.Frame:Hide()
+	timerData.Frame:SetParent(nil)
+	-- Decrease the counters for positioning next timers
+	if (timerData.SpellType == "single") then
+		_t.SingleCount = _t.SingleCount - 1
+	else
+		_t.ActiveTimersCount = _t.ActiveTimersCount - 1
 	end
 end
 
-function _t:InsertSpellTimer(casterGuid, spellIndex, targetGuid, targetName, targetLevel)
-	local spell = Necrosis.Spell[spellIndex]
-	local timerKey = casterGuid.."|"..spell.GlobalId
-	if (targetGuid) then
-		timerKey = timerKey.."|"..targetGuid
-	end
-	self.ActiveTimers[timerKey] =
-	{
-		CasterGuid = casterGuid,
-		SpellId = spell.GlobalId,
-		SpellName = spell.Name,
-		SpellTime = Necrosis.Spells:GetSpellCooldownInSecs(spell.ID),
-		SpellTimeMax = floor(GetTime() + spell.Length),
-		TimerType = spell.Type,
-		TargetGUID = targetGuid,
-		TargetName = targetName,
-		TargetLevel = targetLevel,
-		Group = 0,
-		Gtimer = nil
-	}
-	if (spell.Type == 1) then
-		print("Singleton timer")
-	else
-		print("Other timer")
-	end
+function _t:InsertSpellTimer(casterGuid, targetGuid, targetName, targetLevel, spellId, spellName, spellDuration, spellType)
 	-- Timer Groups:
 	-- Caster Guid + Target Guid + SpellId
 	-- Singleton with target
 	-- Multi with target
 
-	print("self.ActiveTimers: "..self.ActiveTimers[timerKey].SpellTimeMax)
+	-- Find a finished timer
+	local timerData = FindFreeTimer()
+	if (not timerData) then
+		-- Create timer gui elements
+		timerData = MakeNewTimer()
+		timerData.Frame:SetAttribute("TimerData", timerData)
+		-- timerData.texture:SetPoint("CENTER", timerData.StatusBar, "LEFT", 0, 0)
+		table.insert(self.ActiveTimers, timerData)
+	end
+
+	-- Set payload
+	timerData.CasterGuid = casterGuid
+	timerData.SpellId = spellId
+	timerData.SpellName = spellName
+	timerData.SpellTime = spellDuration
+	timerData.SpellType = spellType
+	timerData.TargetGUID = targetGuid
+	timerData.TargetName = targetName
+	timerData.TargetLevel = targetLevel
+	timerData.Group = 0
+	timerData.Gtimer = nil
+
+	StartTimer(timerData)
+	-- if (spellType == "single") then
+	-- 	timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 330, -110 + (self.SingleCount * 28))
+	-- 	self.SingleCount = self.SingleCount + 1
+	-- else
+	-- 	timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 160, -110 + (self.ActiveTimersCount * 28))
+	-- 	self.ActiveTimersCount = self.ActiveTimersCount + 1
+	-- end
+
+	-- -- Set starting values
+	-- timerData.bar:SetMinMaxValues(0, spellDuration)
+	-- timerData.bar:SetValue(spellDuration)
+	-- timerData.lblCountdown:SetText(spellDuration)
+	-- timerData.lblSpellname:SetText(spellName)
+	-- timerData.icon:SetTexture(GetSpellTexture(spellId))
+
+	-- -- Show gui elements
+	-- StartTimer(timerData)
+
+	-- -- Start the timer
+	-- timerData.Frame:SetScript("OnUpdate", Necrosis.Timers.UpdateTimers)
 end
 
-function _t:RemoveSpellTimer(casterGuid, spellId, targetGuid)
-	local timerKey = casterGuid.."|"..spellId
-	if (targetGuid) then
-		timerKey = timerKey.."|"..targetGuid
+-- Reset an existing timer, a debuff has been casted on a tareget while it was still active
+function _t:ResetTimer(casterGuid, targetGuid, spellId, spellDuration)
+	for i,timerData in ipairs(_t.ActiveTimers) do
+		if (timerData.CasterGuid == casterGuid and timerData.TargetGUID == targetGuid and timerData.SpellId == spellId) then
+			timerData.bar:SetValue(spellDuration)
+			return
+		end
 	end
-	print("RemoveSpellTimer: "..self.ActiveTimers[timerKey].SpellName)
-	self.ActiveTimers[timerKey] = nil
+
+end
+
+-- The target died, remove all timers for it
+function _t:RemoveSpellTimerTarget(targetGuid)
+	for i,timerData in ipairs(self.ActiveTimers) do
+		if (timerData.TargetGUID == targetGuid) then
+			RemoveTimer(timerData)
+		end
+	end
+end
+
+-- The spell was removed from target
+function _t:RemoveSpellTimerTargetName(targetGuid, spellName)
+	for i,timerData in ipairs(self.ActiveTimers) do
+		if (timerData.TargetGUID == targetGuid and timerData.SpellName == spellName) then
+			RemoveTimer(timerData)
+		end
+	end
+end
+
+function _t.UpdateTimers(frame, elapsed)
+	if (not elapsed) then
+		return
+	end
+
+	local timerData = frame:GetAttribute("TimerData")
+
+	local value = timerData.bar:GetValue()
+	local fraction = value / timerData.SpellTime
+
+	timerData.bar:SetValue(value - elapsed)
+	-- timerData.bar:SetStatusBarColor(1 - fraction, fraction, 0)
+	
+	timerData.texture:ClearAllPoints()
+	timerData.texture:SetPoint("CENTER", timerData.bar, "LEFT", fraction * 150, 0)
+
+	local idx = string.find(value, ".", 1, true)
+	if (idx) then
+		local str = string.sub(value, 1, idx + 1)
+		timerData.lblCountdown:SetText(str)
+	end
+
+	if (fraction <= 0) then
+		RemoveTimer(timerData)
+	end
+
+	-- local r, g
+	-- local b = 37/255
+	-- if (fraction > 0.5) then
+	-- 	r = (207/255) - (1 - fraction) * 2 * (207/255)
+	-- 	g = 1
+	-- else
+	-- 	r = 1
+	-- 	g = (207/255) - (0.5 - fraction) * 2 * (207/255)
+	-- end
+	-- StatusBar:SetStatusBarColor(r, g, b)
 end
 
 
@@ -115,8 +329,9 @@ end
 -- The timers' table is here for that. | La table des timers est là pour ça !
 function Necrosis:InsertTimerParTable(spellIndex, Target, LevelTarget, Timer, TargetGUID)
 	-- insert an entry into the table || Insertion de l'entrée dans le tableau
-	Necrosis.Timers:InsertSpellTimer(UnitGUID("player"), spellIndex, TargetGUID, Target, LevelTarget)
-print("Insert timer in table for spell: "..tostring(spellIndex)..", "..Necrosis.Spell[spellIndex].Name)
+	-- if (spellIndex == 14) then
+		-- Necrosis.Timers:InsertSpellTimer(UnitGUID("player"), spellIndex, TargetGUID, Target, LevelTarget)
+	-- end
 
 	Timer.SpellTimer:insert(
 		{
