@@ -273,11 +273,11 @@ function Necrosis:SpellLocalize(tooltip)
 		AddAuraDuration({5484}, 10) -- Howl of Terror 1
 		AddAuraDuration({17928}, 15) -- Howl of Terror 2
 		-- Demonology
-		AddAuraDuration({710}, 20, "single") -- Banish 1
-		AddAuraDuration({18647}, 30, "single") -- Banish 2
+		AddAuraDuration({710}, 20, "banish") -- Banish 1
+		AddAuraDuration({18647}, 30, "banish") -- Banish 2
 		AddAuraDuration({1098, 11725, 11726}, 300) -- Enslave Demon 1-3
 		AddAuraDuration({1122}, 300) -- Inferno
-		AddAuraDuration(self.Spell.Soulstone, 1800, "single") -- Soulstone 1-5
+		AddAuraDuration(self.Spell.Soulstone, 1800, "soulstone") -- Soulstone 1-5
 		-- Destruction
 		AddAuraDuration({348, 707, 1094, 2941, 11665, 11667, 11668}, 15) -- Immolate 1-7
 		AddAuraDuration({17877, 18867, 18868, 18869, 18870, 18871}, 5) -- Shadowburn 1-6

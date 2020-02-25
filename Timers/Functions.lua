@@ -50,6 +50,8 @@ Necrosis.Timers = {
 
 local _t = Necrosis.Timers
 local BAR_HEIGHT = 25
+local BAR_WIDTH = 150
+local BAR_PADDING = 3
 
 function _t:GetFormattedTime(secs)
 	local mins = math.modf(secs / 60)
@@ -74,11 +76,12 @@ end
 
 local function MakeNewTimer()
 	-- Définition de ses attributs
-	local frame = CreateFrame("Frame", nil, UIParent)
-	frame:SetWidth(150)
+	-- local frame = CreateFrame("Frame", nil, UIParent)
+	-- Attach the gui to the timer button
+	local frame = CreateFrame("Frame", nil, NecrosisSpellTimerButton)
+	frame:SetWidth(BAR_WIDTH)
 	frame:SetHeight(BAR_HEIGHT)
 	frame:ClearAllPoints()
-
 
 	-- --Définition de sa texture
 	-- local texture = frame:CreateTexture(nil, "BACKGROUND")
@@ -91,7 +94,6 @@ local function MakeNewTimer()
 	-- -- texture:SetPoint(NecrosisConfig.SpellTimerJust, FrameName, NecrosisConfig.SpellTimerJust, 0, 0)
 	-- texture:SetPoint("TOPLEFT", 0, 0)
 	-- texture:Show()
-
 
 	-- Définition de ses textes
 	-- Extérieur
@@ -109,11 +111,10 @@ local function MakeNewTimer()
 		lblCountdown:SetJustifyH("LEFT")
 	end
 
-
 	-- Définition de ses textes
 	-- Intérieur
 	local lblSpellname = frame:CreateFontString(nil, "OVERLAY", "TextStatusBarText")
-	lblSpellname:SetWidth(150)
+	lblSpellname:SetWidth(BAR_WIDTH)
 	lblSpellname:SetHeight(BAR_HEIGHT)
 	-- lblSpellname:SetTextHeight(14)
 	lblSpellname:SetJustifyH("RIGHT")
@@ -122,10 +123,9 @@ local function MakeNewTimer()
 	lblSpellname:SetPoint("LEFT", frame, "LEFT", -5, 0)
 	lblSpellname:SetTextColor(1, 1, 1)
 
-
 	-- Definition of the colored bar | Définition de la barre colorée
 	local StatusBar = CreateFrame("StatusBar", nil, frame)
-	StatusBar:SetWidth(150)
+	StatusBar:SetWidth(BAR_WIDTH)
 	StatusBar:SetHeight(BAR_HEIGHT)
 	StatusBar:SetStatusBarTexture(GraphicsHelper:GetWoWTexture("TargetingFrame", "UI-StatusBar"))
 	StatusBar:SetStatusBarColor(1, 1, 0)
@@ -162,19 +162,46 @@ local function MakeNewTimer()
 end
 
 local function StartTimer(timerData)
+	-- Timers are split into 3 types: banish, soulstone and the rest
+	-- Banish and soulstone are displayed in the same frame group, banishes on top, soulstones at the bottom
+	-- The rest is displayed in a frame group per mob since it's dots etc.
+
 	-- Position the gui elements
-	if (timerData.SpellType == "single") then
-		timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 330, -110 + (_t.SingleCount * 28))
+	if (timerData.SpellType == "banish" or timerData.SpellType == "soulstone") then
+		-- timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 330, -110 + (_t.SingleCount * (BAR_HEIGHT + BAR_PADDING)))
+		-- timerData.Frame:SetPoint("CENTER", NecrosisSpellTimerButton, "CENTER", 330, -110 + (_t.SingleCount * (BAR_HEIGHT + BAR_PADDING)))
 		_t.SingleCount = _t.SingleCount + 1
+	
+		-- Sort timers: soulstone bottom, banish up
+		local dat = {}
+		for i,d in ipairs(_t.ActiveTimers) do
+			if (d.SpellType == "banish") then
+				-- Add banish at the end
+				table.insert(dat, d)
+			elseif (d.SpellType == "soulstone") then
+				-- Add soulstone at the beginning
+				table.insert(dat, 1, d)
+			end
+		end
+		-- Position the frames
+		for i,d in ipairs(dat) do
+			d.Frame:SetPoint("CENTER", NecrosisSpellTimerButton, "CENTER", 330, (i * (BAR_HEIGHT + BAR_PADDING)))
+		end
+	-- elseif (timerData.SpellType == "soulstone") then
+	-- 	-- timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 160, -110 + (_t.ActiveTimersCount * (BAR_HEIGHT + BAR_PADDING)))
+	-- 	timerData.Frame:SetPoint("CENTER", NecrosisSpellTimerButton, "CENTER", 330, -110 + (_t.SingleCount * (BAR_HEIGHT + BAR_PADDING)))
+	-- 	_t.SingleCount = _t.SingleCount + 1
 	else
-		timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 160, -110 + (_t.ActiveTimersCount * 28))
+		-- timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 160, -110 + (_t.ActiveTimersCount * (BAR_HEIGHT + BAR_PADDING)))
+		timerData.Frame:SetPoint("CENTER", NecrosisSpellTimerButton, "CENTER", 160, (_t.ActiveTimersCount * (BAR_HEIGHT + BAR_PADDING)))
+		-- Group by targetGuid
 		_t.ActiveTimersCount = _t.ActiveTimersCount + 1
 	end
 
 	-- Set starting values
-	timerData.bar:SetMinMaxValues(0, timerData.SpellTime)
-	timerData.bar:SetValue(timerData.SpellTime)
-	timerData.lblCountdown:SetText(timerData.SpellTime)
+	timerData.bar:SetMinMaxValues(0, timerData.SpellDuration)
+	timerData.bar:SetValue(timerData.SpellDuration)
+	timerData.lblCountdown:SetText(timerData.SpellDuration)
 	timerData.lblSpellname:SetText(timerData.SpellName)
 	timerData.icon:SetTexture(GetSpellTexture(timerData.SpellId))
 
@@ -191,7 +218,6 @@ end
 
 local function RemoveTimer(timerData)
 	if (timerData.Finished) then
-		-- Timer already finished
 		return
 	end
 	timerData.Finished = true
@@ -199,7 +225,7 @@ local function RemoveTimer(timerData)
 	timerData.Frame:Hide()
 	timerData.Frame:SetParent(nil)
 	-- Decrease the counters for positioning next timers
-	if (timerData.SpellType == "single") then
+	if (timerData.SpellType == "banish" or timerData.SpellType == "soulstone") then
 		_t.SingleCount = _t.SingleCount - 1
 	else
 		_t.ActiveTimersCount = _t.ActiveTimersCount - 1
@@ -218,7 +244,6 @@ function _t:InsertSpellTimer(casterGuid, targetGuid, targetName, targetLevel, sp
 		-- Create timer gui elements
 		timerData = MakeNewTimer()
 		timerData.Frame:SetAttribute("TimerData", timerData)
-		-- timerData.texture:SetPoint("CENTER", timerData.StatusBar, "LEFT", 0, 0)
 		table.insert(self.ActiveTimers, timerData)
 	end
 
@@ -226,52 +251,31 @@ function _t:InsertSpellTimer(casterGuid, targetGuid, targetName, targetLevel, sp
 	timerData.CasterGuid = casterGuid
 	timerData.SpellId = spellId
 	timerData.SpellName = spellName
-	timerData.SpellTime = spellDuration
+	timerData.SpellDuration = spellDuration
 	timerData.SpellType = spellType
-	timerData.TargetGUID = targetGuid
+	timerData.TargetGuid = targetGuid
 	timerData.TargetName = targetName
 	timerData.TargetLevel = targetLevel
 	timerData.Group = 0
 	timerData.Gtimer = nil
 
 	StartTimer(timerData)
-	-- if (spellType == "single") then
-	-- 	timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 330, -110 + (self.SingleCount * 28))
-	-- 	self.SingleCount = self.SingleCount + 1
-	-- else
-	-- 	timerData.Frame:SetPoint("CENTER", UIParent, "CENTER", 160, -110 + (self.ActiveTimersCount * 28))
-	-- 	self.ActiveTimersCount = self.ActiveTimersCount + 1
-	-- end
-
-	-- -- Set starting values
-	-- timerData.bar:SetMinMaxValues(0, spellDuration)
-	-- timerData.bar:SetValue(spellDuration)
-	-- timerData.lblCountdown:SetText(spellDuration)
-	-- timerData.lblSpellname:SetText(spellName)
-	-- timerData.icon:SetTexture(GetSpellTexture(spellId))
-
-	-- -- Show gui elements
-	-- StartTimer(timerData)
-
-	-- -- Start the timer
-	-- timerData.Frame:SetScript("OnUpdate", Necrosis.Timers.UpdateTimers)
 end
 
 -- Reset an existing timer, a debuff has been casted on a tareget while it was still active
 function _t:ResetTimer(casterGuid, targetGuid, spellId, spellDuration)
 	for i,timerData in ipairs(_t.ActiveTimers) do
-		if (timerData.CasterGuid == casterGuid and timerData.TargetGUID == targetGuid and timerData.SpellId == spellId) then
+		if (timerData.CasterGuid == casterGuid and timerData.TargetGuid == targetGuid and timerData.SpellId == spellId) then
 			timerData.bar:SetValue(spellDuration)
 			return
 		end
 	end
-
 end
 
 -- The target died, remove all timers for it
 function _t:RemoveSpellTimerTarget(targetGuid)
 	for i,timerData in ipairs(self.ActiveTimers) do
-		if (timerData.TargetGUID == targetGuid) then
+		if (timerData.TargetGuid == targetGuid) then
 			RemoveTimer(timerData)
 		end
 	end
@@ -280,7 +284,7 @@ end
 -- The spell was removed from target
 function _t:RemoveSpellTimerTargetName(targetGuid, spellName)
 	for i,timerData in ipairs(self.ActiveTimers) do
-		if (timerData.TargetGUID == targetGuid and timerData.SpellName == spellName) then
+		if (timerData.TargetGuid == targetGuid and timerData.SpellName == spellName) then
 			RemoveTimer(timerData)
 		end
 	end
@@ -294,7 +298,7 @@ function _t.UpdateTimers(frame, elapsed)
 	local timerData = frame:GetAttribute("TimerData")
 
 	local value = timerData.bar:GetValue()
-	local fraction = value / timerData.SpellTime
+	local fraction = value / timerData.SpellDuration
 
 	timerData.bar:SetValue(value - elapsed)
 	-- timerData.bar:SetStatusBarColor(1 - fraction, fraction, 0)

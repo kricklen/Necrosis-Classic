@@ -651,9 +651,15 @@ function Necrosis:OnCombatLogEvent(event, ...)
 	
 	elseif (subevent == "SPELL_AURA_APPLIED")-- and destGUID == UnitGUID("target"))
 	then
--- print("SPELL_AURA_APPLIED: "
--- 	..tostring(spellName)..", "
--- 	..tostring(Necrosis.CurrentEnv.SpellIdCast))
+local name, rank, texture, count, debuffType, duration, timeLeft = UnitDebuff("target", spellName, nil, "player")
+print("SPELL_AURA_APPLIED: "
+	..tostring(name)..", "
+	..tostring(rank)..", "
+	..tostring(texture)..", "
+	..tostring(count)..", "
+	..tostring(debuffType)..", "
+	..tostring(duration)..", "
+	..tostring(timeLeft))
 
 		if (destGUID == Necrosis.CurrentEnv.PlayerGuid) then
 			Necrosis:SelfEffect("BUFF", spellName)
