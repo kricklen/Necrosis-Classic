@@ -272,7 +272,7 @@ function _sv:Show()
 			self.ddCount_Init
 		)
 
-		EventHub:RegisterLanguageChangedHandler(self.UpdateTexts)
+		EventHelper:RegisterLanguageChangedHandler(self.UpdateTexts)
 	end
 	self.Frame:Show()
 end

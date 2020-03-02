@@ -22,10 +22,13 @@ BlizzardUI\AsyncCallbackSystem.lua
 BlizzardUI\Item.lua
 
 InitializeNamespaces.lua
-ItemHelper.lua
-BagHelper.lua
-GraphicsHelper.lua
-EventHub.lua
+
+Helpers\TableHelper.lua
+Helpers\ItemHelper.lua
+Helpers\BagHelper.lua
+Helpers\GraphicsHelper.lua
+Helpers\EventHelper.lua
+
 Chat.lua
 
 Localization\Functions-fr.lua

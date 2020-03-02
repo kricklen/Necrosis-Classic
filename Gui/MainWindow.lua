@@ -217,7 +217,7 @@ function _mw:Show()
 		self:SetPanel(1)
 
 		-- Register handler to update texts when language changes
-		EventHub:RegisterLanguageChangedHandler(_mw.UpdateTexts)
+		EventHelper:RegisterLanguageChangedHandler(_mw.UpdateTexts)
 	end
 
 	self.Frame:Show()

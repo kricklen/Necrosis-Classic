@@ -254,7 +254,7 @@ function Necrosis:SpellLocalize(tooltip)
 		MakeSpellIdRanks(self.Spell.Spellstone)
 
 		-- Add durations for each debuff that might be tracked by timers
-		-- Inspired by WeakAuras2 to hard-code it since UnitDebuff(..) API always returns 0
+		-- Inspired by LibClassicDurations to hard-code it since UnitDebuff(..) API always returns 0
 		-- Affliction
 		AddAuraDuration({172}, 12) -- Corruption 1
 		AddAuraDuration({6222}, 15) -- Corruption 2
@@ -277,7 +277,7 @@ function Necrosis:SpellLocalize(tooltip)
 		AddAuraDuration({18647}, 30, "banish") -- Banish 2
 		AddAuraDuration({1098, 11725, 11726}, 300) -- Enslave Demon 1-3
 		AddAuraDuration({1122}, 300) -- Inferno
-		AddAuraDuration(self.Spell.Soulstone, 1800, "soulstone") -- Soulstone 1-5
+		AddAuraDuration({20707, 20762, 20763, 20764, 20765}, 1800, "soulstone") -- Soulstone Resurrection 1-5
 		-- Destruction
 		AddAuraDuration({348, 707, 1094, 2941, 11665, 11667, 11668}, 15) -- Immolate 1-7
 		AddAuraDuration({17877, 18867, 18868, 18869, 18870, 18871}, 5) -- Shadowburn 1-6

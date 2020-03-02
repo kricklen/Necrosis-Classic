@@ -1,5 +1,5 @@
 -- Class for central event management
-EventHub = {
+EventHelper = {
     -- Events utilised by Necrosis || Events utilisés dans Necrosis
     ApiEvents = {
         "BAG_UPDATE",
@@ -30,7 +30,7 @@ EventHub = {
 -- Array with references to text change functions
 local _languageChangedHandlers = {}
 
-local _eh = EventHub
+local _eh = EventHelper
 
 -- Localization event and handler
 function _eh:RegisterLanguageChangedHandler(handler)

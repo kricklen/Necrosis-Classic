@@ -60,6 +60,13 @@ function _tv:cbEnableTimers_Click()
 	end
 end
 
+function _tv:cbEnableTimerBars_Click()
+	NecrosisConfig.EnableTimerBars = self:GetChecked()
+	if (not NecrosisConfig.EnableTimerBars) then
+		Necrosis.Timers.RemoveAllTimers()
+	end
+end
+
 function _tv:cbTimersOnLeftSide_Click()
 	Necrosis:SymetrieTimer(self:GetChecked())
 end
@@ -81,16 +88,16 @@ function _tv.ddTimers_Init(dd)
 			func = _tv.ddTimers_Click,
 			arg1 = dd
 		})
-		if data == NecrosisConfig.TimerType then
+		if (data == NecrosisConfig.TimerType) then
 			UIDropDownMenu_SetSelectedValue(dd, data)
 			UIDropDownMenu_SetText(dd, Necrosis.Config.Timers.Type[NecrosisConfig.TimerType])
 		end
 	end
-	if NecrosisConfig.TimerType == "Disabled" then
+	if (NecrosisConfig.TimerType == "Disabled") then
 		_tv.DisableTimers()
 	else
 		Necrosis:CreateTimerAnchor()
-		if NecrosisConfig.TimerType == "Textual" then
+		if (NecrosisConfig.TimerType == "Textual") then
 			_tv.EnableTextualTimers()
 		else
 			_tv.EnableGraphicalTimers()
@@ -150,34 +157,6 @@ function _tv.UpdateTexts()
 end
 
 
--- Testing
-local metatable = {
-	__index = {
-		["insert"] = table.insert,
-		["remove"] = table.remove,
-		["sort"] = table.sort,
-	}
-}
-
-local timerManagement = {
-	-- Spells to timer || Sorts à timer
-	SpellTimer = setmetatable({}, metatable),
-	-- Association of timers to Frames || Association des timers aux Frames
-	TimerTable = setmetatable({}, metatable),
-	-- Groups of timers by mobs || Groupes de timers par mobs
-	SpellGroup = setmetatable(
-		{
-			{Name = "Rez", SubName = " ", Visible = 0},
-			{Name = "Main", SubName = " ", Visible = 0},
-			{Name = "Cooldown", SubName = " ", Visible = 0}
-		},
-		metatable
-	),
-	-- Last cast spell || Dernier sort casté
-	LastSpell = {}
-}
-
-
 function _tv:Show()
 	if not self.Frame then
 		-- Création de la fenêtre
@@ -187,10 +166,19 @@ function _tv:Show()
 		self.cbEnableTimers = GraphicsHelper:CreateCheckButton(
 			self.Frame,
 			Necrosis.Config.Timers["Afficher le bouton des timers"],
-			0, -88,
+			0, -66,
 			self.cbEnableTimers_Click
 		)
 		self.cbEnableTimers:SetChecked(NecrosisConfig.ShowSpellTimers)
+
+		-- Affiche ou masque le bouton des timers
+		self.cbEnableTimerBars = GraphicsHelper:CreateCheckButton(
+			self.Frame,
+			"Enable timer bars",
+			0, -88,
+			self.cbEnableTimerBars_Click
+		)
+		self.cbEnableTimerBars:SetChecked(NecrosisConfig.EnableTimerBars)
 
 		-- Affiche les timers sur la gauche du bouton
 		self.cbTimersOnLeftSide = GraphicsHelper:CreateCheckButton(
@@ -211,14 +199,14 @@ function _tv:Show()
 		self.cbTimersGrowUpwards:SetChecked(NecrosisConfig.SensListe == -1)
 
 		-- Handler to update texts when language changes
-		EventHub:RegisterLanguageChangedHandler(self.UpdateTexts)
+		EventHelper:RegisterLanguageChangedHandler(self.UpdateTexts)
 
 		-- Choix du timer graphique
 		-- Initialize dropdown here so the checkboxes can be disabled/enabled
 		self.ddTimers, self.lblTimers = GraphicsHelper:CreateDropDown(
 			self.Frame,
 			Necrosis.Config.Timers["Type de timers"],
-			0, -60,
+			0, -40,
 			self.ddTimers_Init
 		)
 	
@@ -227,24 +215,60 @@ function _tv:Show()
 			"Test timer",
 			-200, -250,
 			function(self)
+				local spellId = 20765
 				Necrosis.Timers:InsertSpellTimer(
 					Necrosis.CurrentEnv.PlayerGuid,
-					UnitGUID("target"), "target", 20,
-					6222,
-					"Corruption",
-					Necrosis.Spell.AuraDuration[6222],
-					Necrosis.Spell.AuraType[6222]
+					UnitGUID("target"), UnitName("target"), 0,
+					spellId,
+					GetSpellInfo(spellId),
+					Necrosis.Spell.AuraDuration[spellId],
+					Necrosis.Spell.AuraType[spellId]
 				)
 			end
 		)
 		self.btnTestTimer:SetWidth(100)
+		
+		self.btnTestTimerBanish = GraphicsHelper:CreateButton(
+			self.Frame,
+			"Test Banish",
+			-200, -278,
+			function(self)
+				local spellId = 18647
+				Necrosis.Timers:InsertSpellTimer(
+					Necrosis.CurrentEnv.PlayerGuid,
+					UnitGUID("target"), UnitName("target"), 0,
+					spellId,
+					GetSpellInfo(spellId),
+					Necrosis.Spell.AuraDuration[spellId],
+					Necrosis.Spell.AuraType[spellId]
+				)
+			end
+		)
+		self.btnTestTimerBanish:SetWidth(100)
+
+		self.btnTestCorruptionBanish = GraphicsHelper:CreateButton(
+			self.Frame,
+			"Test Corruption",
+			-200, -306,
+			function(self)
+				local spellId = 11672
+				Necrosis.Timers:InsertSpellTimer(
+					Necrosis.CurrentEnv.PlayerGuid,
+					UnitGUID("target"), UnitName("target"), 0,
+					spellId,
+					GetSpellInfo(spellId),
+					Necrosis.Spell.AuraDuration[spellId],
+					Necrosis.Spell.AuraType[spellId]
+				)
+			end
+		)
+		self.btnTestCorruptionBanish:SetWidth(100)
 
 		self.btnClearTimer = GraphicsHelper:CreateButton(
 			self.Frame,
 			"Clear timer",
 			-90, -250,
 			function(self)
-				print("#Necrosis.Timers.ActiveTimers: "..#Necrosis.Timers.ActiveTimers)
 				for data in pairs(Necrosis.Timers.ActiveTimers) do
 					Necrosis.Timers:RemoveSpellTimerTarget(Necrosis.Timers.ActiveTimers[data].TargetGuid)
 				end

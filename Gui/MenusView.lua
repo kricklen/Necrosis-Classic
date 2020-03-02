@@ -758,7 +758,7 @@ function _mv:Show()
 		end
 
 		-- Handler to update texts when language changes
-		EventHub:RegisterLanguageChangedHandler(self.UpdateTexts)
+		EventHelper:RegisterLanguageChangedHandler(self.UpdateTexts)
 	end
 
 	self.Frame:Show()

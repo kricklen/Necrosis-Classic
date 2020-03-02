@@ -289,7 +289,7 @@ local function InitializeMyself()
 	-- Recording of the events used || Enregistrement des events utilisés
 	NecrosisButton:RegisterEvent("PLAYER_ENTERING_WORLD")
 	NecrosisButton:RegisterEvent("PLAYER_LEAVING_WORLD")
-	EventHub:AttachApiEvents()
+	EventHelper:AttachApiEvents()
 	-- Detecting the type of demon present at the connection || Détection du Type de démon présent à la connexion
 	Necrosis.CurrentEnv.DemonType = UnitCreatureFamily("pet")
 	Necrosis.Chat:_Msg("Initialized", "USER")
@@ -336,18 +336,18 @@ function Necrosis:OnUpdate(something, elapsed)
 		Local.LastUpdate[1] = Local.LastUpdate[1] + elapsed
 		Local.LastUpdate[2] = Local.LastUpdate[2] + elapsed
 	end
-	-- If smooth scroll timers, we update them as soon as possible || Si défilement lisse des timers, on les met à jours le plus vite possible
-	NecrosisUpdateTimer(Local.TimerManagement.SpellTimer)
+	-- -- If smooth scroll timers, we update them as soon as possible || Si défilement lisse des timers, on les met à jours le plus vite possible
+	-- NecrosisUpdateTimer(Local.TimerManagement.SpellTimer)
 
-	-- If timers texts, we update them very quickly also || Si timers textes, on les met à jour très vite également
-	if NecrosisConfig.TimerType == "Textual" then
-		self:TextTimerUpdate(Local.TimerManagement.SpellTimer, Local.TimerManagement.SpellGroup)
-	end
+	-- -- If timers texts, we update them very quickly also || Si timers textes, on les met à jour très vite également
+	-- if NecrosisConfig.TimerType == "Textual" then
+	-- 	self:TextTimerUpdate(Local.TimerManagement.SpellTimer, Local.TimerManagement.SpellGroup)
+	-- end
 
 	-- Every second || Toutes les secondes
-	if Local.LastUpdate[1] > 1 then
+	if (Local.LastUpdate[1] > 1) then
 	-- If configured, sorting fragments every second || Si configuré, tri des fragment toutes les secondes
-		if NecrosisConfig.SoulshardSort and Local.Soulshard.Move > 0  then
+		if (NecrosisConfig.SoulshardSort and Local.Soulshard.Move > 0) then
 			Necrosis:SoulshardSwitch("MOVE")
 		end
 
@@ -369,7 +369,7 @@ function Necrosis:OnUpdate(something, elapsed)
 						end
 						-- Otherwise we remove the timer silently (but not in case of enslave) || Sinon on enlève le timer silencieusement (mais pas en cas d'enslave)
 						if not (Local.TimerManagement.SpellTimer[index].Name == self.Spell[10].Name) then
-							Local.TimerManagement = self:RetraitTimerParIndex(index, Local.TimerManagement)
+							-- Local.TimerManagement = self:RetraitTimerParIndex(index, Local.TimerManagement)
 							index = 0
 							if StoneFade then
 								-- We update the appearance of the button of the soul stone || On met à jour l'apparence du bouton de la pierre d'âme
@@ -392,7 +392,7 @@ function Necrosis:OnUpdate(something, elapsed)
 		if (NecrosisConfig.CountType == "RezTimer" or NecrosisConfig.Circle == "RezTimer")
 			and (Local.Stone.Soul.Mode == 3 or Local.Stone.Soul.Mode == 4)
 		then
-			Local.LastSphereSkin = self:RezTimerUpdate(Local.TimerManagement.SpellTimer, Local.LastSphereSkin)
+			-- Local.LastSphereSkin = self:RezTimerUpdate(Local.TimerManagement.SpellTimer, Local.LastSphereSkin)
 		end
 		Local.LastUpdate[2] = 0
 	end
@@ -405,10 +405,10 @@ function Necrosis.OnEvent(self, event, ...)
 	local arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9 = ...
 
 	if (event == "PLAYER_ENTERING_WORLD") then
-		EventHub:AttachApiEvents()
+		EventHelper:AttachApiEvents()
 		Local.InWorld = true
 	elseif (event == "PLAYER_LEAVING_WORLD") then
-		EventHub:ReleaseApiEvents()
+		EventHelper:ReleaseApiEvents()
 		Local.InWorld = false
 	end
 
@@ -474,31 +474,30 @@ function Necrosis.OnEvent(self, event, ...)
 		-- We reset the gray button list || On réinitialise la liste des boutons grisés
 		Local.Desatured = {}
 		Local.Dead = false
-
+			
 	-- Successful spell casting management || Gestion de l'incantation des sorts réussie
 	elseif (event == "UNIT_SPELLCAST_SUCCEEDED" and arg1 == "player")
 	then
-		if (not Necrosis.CurrentEnv.SpellIdCast) then
-			Necrosis.CurrentEnv.SpellIdCast = arg3
-		end
 		Local.SpellCasted.Name = GetSpellInfo(arg3)
 		Necrosis:SpellManagement()
--- print("UNIT_SPELLCAST_SUCCEEDED: spellId "..tostring(arg3))
 	-- ..tostring(arg1)..", "
 	-- ..tostring(arg2)..", "
 	-- ..tostring(arg3)..", ")
 
 	-- When the warlock begins to cast a spell, we intercept the spell's name || Quand le démoniste commence à incanter un sort, on intercepte le nom de celui-ci
 	-- We also save the name of the target of the spell as well as its level || On sauve également le nom de la cible du sort ainsi que son niveau
-	elseif (event == "UNIT_SPELLCAST_SENT")
+	elseif (event == "UNIT_SPELLCAST_SENT" and arg1 == "player")
 	then
--- print("UNIT_SPELLCAST_SENT: spellId "..tostring(arg4))
-	-- ..tostring(arg1)..", "
-	-- ..tostring(arg2)..", "
-	-- ..tostring(arg3)..", "
-	-- ..tostring(arg4)..", ")
-		if (not Necrosis.CurrentEnv.SpellIdCast) then
-			Necrosis.CurrentEnv.SpellIdCast = arg4
+		-- Check if timers are enabled
+		if (NecrosisConfig.EnableTimerBars) then
+			if (Necrosis.Spell.AuraDuration[arg4]) then
+				local nme = GetSpellInfo(arg4)
+				Necrosis.CurrentEnv.SpellCast[nme] =
+					{
+						id = arg4,
+						duration = Necrosis.Spell.AuraDuration[arg4]
+					}
+			end
 		end
 
 		-- print('spellcast send : arg 1 =   ' .. tostring(arg1) )
@@ -534,8 +533,9 @@ function Necrosis.OnEvent(self, event, ...)
 	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
 	elseif ((event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == player)
 	then
+print("Failed or interrupted: "..tostring(arg2))
 		Local.SpellCasted = {}
-		Necrosis.CurrentEnv.SpellIdCast = nil
+		Necrosis.CurrentEnv.SpellCast[arg2] = nil
 
 		-- Flag if a Trade window is open, so you can automatically trade the healing stones || Flag si une fenetre de Trade est ouverte, afin de pouvoir trader automatiquement les pierres de soin
 	elseif event == "TRADE_REQUEST" or event == "TRADE_SHOW" then
@@ -585,7 +585,7 @@ print("LEARNED_SPELL_IN_TAB")
 	-- We remove the spell timers and the names of mobs || On enlève les timers de sorts ainsi que les noms des mobs
 	elseif (event == "PLAYER_REGEN_ENABLED") then
 		Local.PlayerInCombat = false
-		Local.TimerManagement = Necrosis:RetraitTimerCombat(Local.TimerManagement)
+		-- Local.TimerManagement = Necrosis:RetraitTimerCombat(Local.TimerManagement)
 
 		-- We are redefining the attributes of spell buttons in a situational way || On redéfinit les attributs des boutons de sorts de manière situationnelle
 		Necrosis:NoCombatAttribute(Local.Menu.Pet, Local.Menu.Buff, Local.Menu.Curse)
@@ -634,88 +634,65 @@ function Necrosis:OnCombatLogEvent(event, ...)
 	-- print("CLEU: "..tostring(subevent).." on "..tostring(destGUID).." (self: "..tostring(destGUID == Necrosis.CurrentEnv.PlayerGuid)..")")
 
 	-- Detection of Shadow Trance and Contrecoup || Détection de la transe de l'ombre et de  Contrecoup
-	if (subevent == "UNIT_DIED")
+	if (subevent == "UNIT_DIED"
+		or subevent == "UNIT_DESTROYED"
+		or subevent == "UNIT_DISSIPATES")
 	then
-		-- print("UNIT_DIED: "..tostring(destGUID)..", "..tostring(spellId)..", "..tostring(sourceGUID))
-		Necrosis.Timers:RemoveSpellTimerTarget(destGUID)
-		
-	elseif (subevent == "UNIT_DESTROYED")
-	then
-		-- print("UNIT_DESTROYED: "..tostring(destGUID)..", "..tostring(spellId)..", "..tostring(sourceGUID))
-		Necrosis.Timers:RemoveSpellTimerTarget(destGUID)
-
-	elseif (subevent == "UNIT_DISSIPATES")
-	then
-		-- print("UNIT_DISSIPATES: "..tostring(destGUID)..", "..tostring(spellId)..", "..tostring(sourceGUID))
-		Necrosis.Timers:RemoveSpellTimerTarget(destGUID)
+		if (NecrosisConfig.EnableTimerBars) then
+			Necrosis.Timers:RemoveSpellTimerTarget(destGUID)
+		end
 	
-	elseif (subevent == "SPELL_AURA_APPLIED")-- and destGUID == UnitGUID("target"))
+	elseif (subevent == "SPELL_AURA_APPLIED" and destGUID == Necrosis.CurrentEnv.PlayerGuid)-- and destGUID == UnitGUID("target"))
 	then
-local name, rank, texture, count, debuffType, duration, timeLeft = UnitDebuff("target", spellName, nil, "player")
-print("SPELL_AURA_APPLIED: "
-	..tostring(name)..", "
-	..tostring(rank)..", "
-	..tostring(texture)..", "
-	..tostring(count)..", "
-	..tostring(debuffType)..", "
-	..tostring(duration)..", "
-	..tostring(timeLeft))
+		Necrosis:SelfEffect("BUFF", spellName)
 
-		if (destGUID == Necrosis.CurrentEnv.PlayerGuid) then
-			Necrosis:SelfEffect("BUFF", spellName)
+	elseif (subevent == "SPELL_AURA_APPLIED" and sourceGUID == Necrosis.CurrentEnv.PlayerGuid)-- and destGUID == UnitGUID("target"))
+	then
+		if (NecrosisConfig.EnableTimerBars) then
+			local spellData = Necrosis.CurrentEnv.SpellCast[spellName]
+			if (spellData) then
+				Necrosis.Timers:InsertSpellTimer(
+					Necrosis.CurrentEnv.PlayerGuid,
+					destGUID, destName, 0,
+					spellData.id,
+					spellName,
+					spellData.duration,
+					Necrosis.Spell.AuraType[spellData.id]
+				)
+				Necrosis.CurrentEnv.SpellCast[spellName] = nil
+			end
 		end
-		-- Add timer if a duration is available
-		if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid
-			and Necrosis.Spell.AuraDuration[Necrosis.CurrentEnv.SpellIdCast])
-		then
-			-- casterGuid, targetGuid, targetName, targetLevel, spellId, spellName, duration
-			Necrosis.Timers:InsertSpellTimer(
-				Necrosis.CurrentEnv.PlayerGuid,
-				destGUID, destName, 0,
-				Necrosis.CurrentEnv.SpellIdCast,
-				spellName,
-				Necrosis.Spell.AuraDuration[Necrosis.CurrentEnv.SpellIdCast],
-				Necrosis.Spell.AuraType[Necrosis.CurrentEnv.SpellIdCast]
-			)
-		end
-		Necrosis.CurrentEnv.SpellIdCast = nil
 
 	elseif (subevent == "SPELL_AURA_REFRESH"
 		and sourceGUID == Necrosis.CurrentEnv.PlayerGuid
 		and destGUID == UnitGUID("target"))
 	then
-		-- print("Refresh: "
-		-- 	..tostring(destGUID)..", "
-		-- 	..tostring(destName)..", "
-		-- 	..tostring(spellName))
-
-		-- Reset a timer if a duration is available
-		if (Necrosis.Spell.AuraDuration[Necrosis.CurrentEnv.SpellIdCast]) then
-			Necrosis.Timers:ResetTimer(
-				Necrosis.CurrentEnv.PlayerGuid,
-				destGUID,
-				Necrosis.CurrentEnv.SpellIdCast,
-				Necrosis.Spell.AuraDuration[Necrosis.CurrentEnv.SpellIdCast]
-			)
+		if (NecrosisConfig.EnableTimerBars) then
+			-- Reset a timer if a duration is available
+			local spellData = Necrosis.CurrentEnv.SpellCast[spellName]
+			if (spellData) then
+				Necrosis.Timers:ResetTimer(
+					Necrosis.CurrentEnv.PlayerGuid,
+					destGUID,
+					spellData.id,
+					spellData.duration
+				)
+				Necrosis.CurrentEnv.SpellCast[spellName] = nil
+			end
 		end
-		Necrosis.CurrentEnv.SpellIdCast = nil
 
 	-- Detection of the end of Shadow Trance and Contrecoup || Détection de la fin de la transe de l'ombre et de Contrecoup
 	elseif (subevent == "SPELL_AURA_REMOVED")
 	then
 
-		-- print("SPELL_AURA_REMOVED: "
-		-- 	..tostring(destGUID)..", "
-		-- 	..tostring(destName)..", "
-		-- 	..tostring(sourceGUID)..", "
-		-- 	..tostring(spellName))
-
 		if (destGUID == Necrosis.CurrentEnv.PlayerGuid) then
 			Necrosis:SelfEffect("DEBUFF", spellName)
 		end
 
-		if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid) then
-			Necrosis.Timers:RemoveSpellTimerTargetName(destGUID, spellName)
+		if (NecrosisConfig.EnableTimerBars) then
+			if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid) then
+				Necrosis.Timers:RemoveSpellTimerTargetName(destGUID, spellName)
+			end
 		end
 
 		if (destGUID == UnitGUID("focus")
@@ -723,7 +700,7 @@ print("SPELL_AURA_APPLIED: "
 			and spellName == Necrosis.Spell[9].Name)
 		then
 			Necrosis.Chat:_Msg("BAN ! BAN ! BAN !")
-			Necrosis:RetraitTimerParNom(Necrosis.Spell[9], Local.TimerManagement)
+			-- Necrosis:RetraitTimerParNom(Necrosis.Spell[9], Local.TimerManagement)
 			Local.TimerManagement.Banish = false
 		end	
 
@@ -740,8 +717,8 @@ print("SPELL_AURA_APPLIED: "
 			and destGUID == UnitGUID("target"))
 	then
 print("Spell resisted")
-		
-		Necrosis.CurrentEnv.SpellIdCast = nil
+
+		Necrosis.CurrentEnv.SpellCast[spellName] = nil
 	
 		if NecrosisConfig.AntiFearAlert
 			and (spellName == Necrosis.Spell[13].Name or spellName == Necrosis.Spell[19].Name)
@@ -752,14 +729,14 @@ print("Spell resisted")
 		if spellName == Local.TimerManagement.LastSpell.Name
 			and GetTime() <= (Local.TimerManagement.LastSpell.Time + 1.5)
 		then
-			Necrosis:RetraitTimerParIndex(Local.TimerManagement.LastSpell.Index, Local.TimerManagement)
+			-- Necrosis:RetraitTimerParIndex(Local.TimerManagement.LastSpell.Index, Local.TimerManagement)
 		end
 
 	-- Detection application of a spell / fire stone on a weapon || Détection application d'une pierre de sort/feu sur une arme
 	elseif (subevent == "ENCHANT_APPLIED"
 		and destGUID == UnitGUID("player")
 		and ((BagHelper.Spellstone_Name and arg9 == BagHelper.Spellstone_Name)
-		or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
+			or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
 	then
 	print("ENCHANT_APPLIED: "..arg9)
 			Local.SomethingOnHand = arg9
@@ -774,7 +751,7 @@ print("Spell resisted")
 			Necrosis:UpdateIcons()
 	elseif subevent == "UNIT_DIED"
 	then
-		Necrosis:RetraitTimerParGuid(sourceGUID,Local.TimerManagement)
+		-- Necrosis:RetraitTimerParGuid(sourceGUID,Local.TimerManagement)
 	end
 end
 
@@ -803,13 +780,11 @@ function Necrosis:ChangeDemon()
 	if (self:UnitHasEffect("pet", self.Spell[10].Name)) then
 		if (not Necrosis.CurrentEnv.DemonEnslaved) then
 			Necrosis.CurrentEnv.DemonEnslaved = true
-			Local.TimerManagement = Necrosis:InsertTimerParTable(10, "","", Local.TimerManagement)
 		end
 	else
 		-- When the enslaved demon is lost, remove the timer and warn the warlock || Quand le démon asservi est perdu, on retire le Timer et on prévient le Démoniste
 		if (Necrosis.CurrentEnv.DemonEnslaved) then
 			Necrosis.CurrentEnv.DemonEnslaved = false
-			Local.TimerManagement = self:RetraitTimerParNom(self.Spell[10].Name, Local.TimerManagement)
 			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.EnslaveEnd) end
 			self.Chat:_Msg(self.ChatMessage.Information.EnslaveBreak, "USER")
 		end
@@ -821,9 +796,6 @@ function Necrosis:ChangeDemon()
 
 	if Necrosis.CurrentEnv.DemonType then
 		NecrosisConfig.PetName[Necrosis.CurrentEnv.DemonType] = UnitName("pet")
-	else
-		print("Demon vanished")
-		-- Demon vanished, might have been a corpse already
 	end
 
 	for i = 1, #self.Translation.DemonName, 1 do
@@ -927,31 +899,15 @@ function Necrosis:SpellManagement()
 		-- Messages Posts Cast (Démons et TP)
 		Necrosis.Chat:AfterSpellCast()
 
-		-- Special case: Haunt refreshes Corruption (if present) on a target
-		-- if (Local.SpellCasted.Name == self.Spell[42].Name) then
-		-- 	-- Check if the target is afflicted with Corruption
-		-- 	if (self:UnitHasEffect("target", self.Spell[14].Name)) then
-		-- 	  Local.TimerManagement.LastSpell.Time = GetTime()
-
-		-- 		-- Remove the old corruption timer
-		-- 		Local.TimerManagement = self:RetraitTimerParNom(self.Spell[14].Name, Local.TimerManagement)
-
-		-- 		-- Insert a new Corruption timer
-		-- 		Local.TimerManagement = self:InsertTimerParTable(14, Local.SpellCasted.TargetName, Local.SpellCasted.TargetLevel, Local.TimerManagement)
-		-- 	end
-		-- end
-
-
 		-- Create a timer when a soulstone has been used || Si le sort lancé à été une Résurrection de Pierre d'âme, on place un timer
 		if (Local.SpellCasted.Name == self.Spell[11].Name) then
 			if Local.SpellCasted.TargetName == UnitName("player") then
 				Local.SpellCasted.TargetName = ""
 				Local.SpellCasted.TargetGUID = ""
 			end
-			Local.TimerManagement = Necrosis:InsertTimerParTable(11, Local.SpellCasted.TargetName, "", Local.TimerManagement)
 		-- Create a timer if a healthstone was used || Si le sort était une pierre de soin
 		elseif Local.SpellCasted.Name:find(self.Translation.Item.Healthstone) and not Local.SpellCasted.Name:find(self.Translation.Misc.Create) then
-			Local.TimerManagement = self:InsertTimerStone("Healthstone", nil, nil, Local.TimerManagement)
+			-- Local.TimerManagement = self:InsertTimerStone("Healthstone", nil, nil, Local.TimerManagement)
 		-- Create a timer for any other spell cast (if valid) || Pour les autres sorts castés, tentative de timer si valable
 		else
 			for spell=1, #self.Spell, 1 do
@@ -985,14 +941,14 @@ function Necrosis:SpellManagement()
 								and not
 									(Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID)
 								then
-								Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
+								-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
 								SortActif = false
 								break
 							end
 
 							-- If we have cast fear, then remove the previous timer || Si c'est un fear, on supprime le timer du fear précédent
 							if Local.TimerManagement.SpellTimer[thisspell].Name == Local.SpellCasted.Name and spell == 13 then
-								Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
+								-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
 								SortActif = false
 								break
 							end
@@ -1012,7 +968,7 @@ function Necrosis:SpellManagement()
 								if Local.TimerManagement.SpellTimer[thisspell].Type == 4
 									and Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID
 									then
-									Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
+									-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
 									break
 								end
 							end
@@ -1023,7 +979,7 @@ function Necrosis:SpellManagement()
 								if Local.TimerManagement.SpellTimer[thisspell].Type == 5
 									and Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID
 									then
-									Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
+									-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
 									break
 								end
 							end
@@ -1047,7 +1003,7 @@ function Necrosis:SpellManagement()
 							Local.TimerManagement.Banish = true
 						end
 						-- now insert a timer for the spell that has been casted
-						Local.TimerManagement = Necrosis:InsertTimerParTable(spell, Local.SpellCasted.TargetName, Local.SpellCasted.TargetLevel, Local.TimerManagement,Local.SpellCasted.TargetGUID)
+						-- Local.TimerManagement = Necrosis:InsertTimerParTable(spell, Local.SpellCasted.TargetName, Local.SpellCasted.TargetLevel, Local.TimerManagement,Local.SpellCasted.TargetGUID)
 						break
 					end
 				end

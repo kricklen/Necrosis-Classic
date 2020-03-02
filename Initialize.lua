@@ -145,7 +145,10 @@ function Necrosis:Initialize(Config)
 	end
 
 	--On affiche ou on cache le bouton, d'ailleurs !
-	if not NecrosisConfig.ShowSpellTimers then NecrosisSpellTimerButton:Hide() end
+	if not NecrosisConfig.ShowSpellTimers then
+		NecrosisSpellTimerButton:Hide()
+	end
+	
 	-- Le Shard est-il verrouillé sur l'interface ?
 	if NecrosisConfig.NoDragAll then
 		self:NoDrag()

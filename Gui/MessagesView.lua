@@ -88,7 +88,7 @@ end
 function _mv._LanuageDropDownItemClick(item, dd, initFunc)
     UIDropDownMenu_SetSelectedValue(dd, item.value)
     initFunc()
-    EventHub:FireLanguageChangedEvent(item.value)
+    EventHelper:FireLanguageChangedEvent(item.value)
 end
 
 function _mv:cbShowTooltip_Click()
@@ -313,7 +313,7 @@ function _mv:Show()
 		self.cbTranceAlert:SetChecked(NecrosisConfig.ShadowTranceAlert)
 
 		-- Handler to update texts when language changes
-		EventHub:RegisterLanguageChangedHandler(self.UpdateTexts)
+		EventHelper:RegisterLanguageChangedHandler(self.UpdateTexts)
 
 		-- Apply initial configuration
 		if not NecrosisConfig.ChatMsg then
