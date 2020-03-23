@@ -281,6 +281,7 @@ function Necrosis:SpellLocalize(tooltip)
 		-- Destruction
 		AddAuraDuration({348, 707, 1094, 2941, 11665, 11667, 11668}, 15) -- Immolate 1-7
 		AddAuraDuration({17877, 18867, 18868, 18869, 18870, 18871}, 5) -- Shadowburn 1-6
+		AddAuraDuration({17794, 17797, 17798, 17799, 17800}, 12) -- Shadow Vulnerability
 
 
 		-- Type 0 = Pas de Timer || no timer

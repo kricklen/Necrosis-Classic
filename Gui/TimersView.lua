@@ -51,6 +51,16 @@ Necrosis.Gui.TimersView = {
 
 local _tv = Necrosis.Gui.TimersView
 
+function _tv:cbLockTimers_Click()
+	if (self:GetChecked()) then
+		Necrosis.Timers:HideMobAnchor()
+		Necrosis.Timers:HideSingleAnchor()
+	else
+		Necrosis.Timers:ShowMobAnchor()
+		Necrosis.Timers:ShowSingleAnchor()
+	end
+end
+
 function _tv:cbEnableTimers_Click()
 	NecrosisConfig.ShowSpellTimers = self:GetChecked()
 	if NecrosisConfig.ShowSpellTimers then
@@ -62,8 +72,10 @@ end
 
 function _tv:cbEnableTimerBars_Click()
 	NecrosisConfig.EnableTimerBars = self:GetChecked()
-	if (not NecrosisConfig.EnableTimerBars) then
-		Necrosis.Timers.RemoveAllTimers()
+	if (NecrosisConfig.EnableTimerBars) then
+		Necrosis.Timers:Initialize()
+	else
+		Necrosis.Timers:RemoveAllTimers()
 	end
 end
 
@@ -120,6 +132,50 @@ function _tv.ddTimers_Click(item, dd)
 	end
 end
 
+function _tv.ddTimerFont_Init(dd)
+	for i,font in ipairs(Necrosis.Config.Fonts) do
+		UIDropDownMenu_AddButton({
+			text = font.Name,
+			value = font,
+			checked = false,
+			func = _tv.ddTimerFont_Click,
+			arg1 = dd
+		})
+		if (font.Name == NecrosisConfig.TimerFont.Name) then
+			UIDropDownMenu_SetSelectedValue(dd, font)
+			UIDropDownMenu_SetText(dd, font.Name)
+		end
+	end
+end
+
+function _tv.ddTimerFont_Click(item, dd)
+	UIDropDownMenu_SetSelectedValue(dd, item.value)
+	NecrosisConfig.TimerFont = item.value
+	Necrosis.Timers:SetFont(item.value.Path, NecrosisConfig.TimerFontSize)
+end
+
+function _tv.ddTimerFontSize_Init(dd)
+	for i = 6,30,1 do
+		UIDropDownMenu_AddButton({
+			text = i,
+			value = i,
+			checked = false,
+			func = _tv.ddTimerFontSize_Click,
+			arg1 = dd
+		})
+		if (i == NecrosisConfig.TimerFontSize) then
+			UIDropDownMenu_SetSelectedValue(dd, i)
+			UIDropDownMenu_SetText(dd, i)
+		end
+	end
+end
+
+function _tv.ddTimerFontSize_Click(item, dd)
+	UIDropDownMenu_SetSelectedValue(dd, item.value)
+	NecrosisConfig.TimerFontSize = item.value
+	Necrosis.Timers:SetFont(NecrosisConfig.TimerFont.Path, item.value)
+end
+
 function _tv.DisableTimers()
 	_tv.cbTimersGrowUpwards:Disable()
 	_tv.cbTimersOnLeftSide:Disable()
@@ -161,6 +217,14 @@ function _tv:Show()
 	if not self.Frame then
 		-- Création de la fenêtre
 		self.Frame = GraphicsHelper:CreateDialog(NecrosisGeneralFrame)
+
+		self.cbLockTimers = GraphicsHelper:CreateCheckButton(
+			self.Frame,
+			"Lock timers",
+			0, -18,
+			self.cbLockTimers_Click
+		)
+		self.cbLockTimers:SetChecked(true)
 
 		-- Affiche ou masque le bouton des timers
 		self.cbEnableTimers = GraphicsHelper:CreateCheckButton(
@@ -209,16 +273,35 @@ function _tv:Show()
 			0, -40,
 			self.ddTimers_Init
 		)
+
+		-- Timer font
+		self.ddTimerFont, self.lblTimerFont = GraphicsHelper:CreateDropDown(
+			self.Frame,
+			"Font",
+			0, -154,
+			self.ddTimerFont_Init
+		)
+	
+		-- Timer font size
+		self.ddTimerFontSize, self.lblTimerFontSize = GraphicsHelper:CreateDropDown(
+			self.Frame,
+			"Font Size",
+			0, -176,
+			self.ddTimerFontSize_Init
+		)
 	
 		self.btnTestTimer = GraphicsHelper:CreateButton(
 			self.Frame,
-			"Test timer",
+			"Test Soulstone",
 			-200, -250,
 			function(self)
 				local spellId = 20765
 				Necrosis.Timers:InsertSpellTimer(
-					Necrosis.CurrentEnv.PlayerGuid,
-					UnitGUID("target"), UnitName("target"), 0,
+					"12345",
+					"Testman",
+					-- Necrosis.CurrentEnv.PlayerGuid,
+					-- Necrosis.CurrentEnv.PlayerName,
+					UnitGUID("target"), UnitName("target"), 0, 0,
 					spellId,
 					GetSpellInfo(spellId),
 					Necrosis.Spell.AuraDuration[spellId],
@@ -236,7 +319,8 @@ function _tv:Show()
 				local spellId = 18647
 				Necrosis.Timers:InsertSpellTimer(
 					Necrosis.CurrentEnv.PlayerGuid,
-					UnitGUID("target"), UnitName("target"), 0,
+					Necrosis.CurrentEnv.PlayerName,
+					UnitGUID("target"), UnitName("target"), 0, 0,
 					spellId,
 					GetSpellInfo(spellId),
 					Necrosis.Spell.AuraDuration[spellId],
@@ -254,7 +338,8 @@ function _tv:Show()
 				local spellId = 11672
 				Necrosis.Timers:InsertSpellTimer(
 					Necrosis.CurrentEnv.PlayerGuid,
-					UnitGUID("target"), UnitName("target"), 0,
+					Necrosis.CurrentEnv.PlayerName,
+					UnitGUID("target"), UnitName("target"), 0, 0,
 					spellId,
 					GetSpellInfo(spellId),
 					Necrosis.Spell.AuraDuration[spellId],
@@ -269,12 +354,20 @@ function _tv:Show()
 			"Clear timer",
 			-90, -250,
 			function(self)
-				for data in pairs(Necrosis.Timers.ActiveTimers) do
-					Necrosis.Timers:RemoveSpellTimerTarget(Necrosis.Timers.ActiveTimers[data].TargetGuid)
-				end
+				Necrosis.Timers:RemoveAllTimers()
 			end
 		)
 		self.btnClearTimer:SetWidth(100)
+
+		self.btnKillSoulstoneTimer = GraphicsHelper:CreateButton(
+			self.Frame,
+			"Kill Soulstone",
+			-90, -278,
+			function(self)
+				Necrosis.Timers:RemoveSpellTimerTarget(UnitGUID("target"))
+			end
+		)
+		self.btnKillSoulstoneTimer:SetWidth(100)
 	end
 
 	self.Frame:Show()

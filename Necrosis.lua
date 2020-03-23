@@ -207,6 +207,7 @@ Local.DefaultConfig = {
 		["NecrosisMountButton"] = {"CENTER", "UIParent", "CENTER", 53,-100},
 		["NecrosisPetMenuButton"] = {"CENTER", "UIParent", "CENTER", 87,-100},
 		["NecrosisCurseMenuButton"] = {"CENTER", "UIParent", "CENTER", 121,-100},
+		["NecrosisMobTimerAnchor"] = {"CENTER", "UIParent", "CENTER", -200,-100},
 	},
 }
 
@@ -284,6 +285,7 @@ Local.LastUpdate = {0, 0}
 ------------------------------------------------------------------------------------------------------
 
 local function InitializeMyself()
+	Necrosis.CurrentEnv.PlayerFullName = UnitName("player").."-"..GetNormalizedRealmName()
 	-- Initialization of the mod || Initialisation du mod
 	Necrosis:Initialize(Local.DefaultConfig)
 	-- Recording of the events used || Enregistrement des events utilisés
@@ -619,19 +621,53 @@ print("LEARNED_SPELL_IN_TAB")
 		end
 		-- Spell button attributes are negated situational || On annule les attributs des boutons de sorts de manière situationnelle
 		Necrosis:InCombatAttribute(Local.Menu.Pet, Local.Menu.Buff, Local.Menu.Curse)
+
+	-- elseif (event == "RAID_TARGET_UPDATE") then
+	-- 	print("RAID_TARGET_UPDATE: "..tostring(arg1)..", "..tostring(GetRaidTargetIndex("target")))
+	-- 	local icon = GetRaidTargetIndex("unit")
+
+	-- 	elseif (event == "UNIT_FLAGS") then
+	-- print("UNIT_FLAGS: "..tostring(arg1)..", "..tostring(arg2)..", "..tostring(arg3))
+
+	-- Keep track of party/raid status
+	elseif (event == "GROUP_ROSTER_UPDATE") then
+		CheckGroupStatus()
+
+	-- Used for receiving raid and party messages from other warlocks that use this addon
+	elseif (event == "CHAT_MSG_ADDON") then
+		-- "prefix", "text", "channel", "sender", "target", zoneChannelID, localID, "name", instanceID
+		if (arg1 == Necrosis.CurrentEnv.ChatPrefix) then
+			print("CHAT_MSG_ADDON: "
+				.."\nprefix: "..tostring(arg1)
+				.."\n, text: "..tostring(arg2)
+				.."\n, channel: "..tostring(arg3)
+				.."\n, sender: "..tostring(arg4)
+				.."\n, target: "..tostring(arg5)
+				.."\n, zoneChannelID: "..tostring(arg6)
+				.."\n, localID: "..tostring(arg7)
+				.."\n, name: "..tostring(arg8)
+				.."\n, instanceID: "..tostring(arg9)
+			)
+
+			if (arg4 ~= Necrosis.CurrentEnv.PlayerFullName) then
+				EventHelper:ProcessAddonMessage(arg2)
+			end
+		end
 	end
 end
 
 function Necrosis:OnCombatLogEvent(event, ...)
-
 	local timestamp, subevent, hideCaster,
-		sourceGUID, sourceName, sourceFlags, sourceRaidFlags,
-		destGUID, destName, destFlags, destRaidFlags = ...
+		  sourceGUID, sourceName, sourceFlags, sourceRaidFlags,
+		  destGUID, destName, destFlags, destRaidFlags,
+		  -- Spell event specific values
+		  spellId, spellName, spellSchool, auraType, amount, zzz =  ...
 
-	local spellId, spellName, spellSchool, auraType, amount, zzz = select(12, ...)
-	-- local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand
-
-	-- print("CLEU: "..tostring(subevent).." on "..tostring(destGUID).." (self: "..tostring(destGUID == Necrosis.CurrentEnv.PlayerGuid)..")")
+	-- Update raid icon in timers
+	if (NecrosisConfig.EnableTimerBars) then
+		local destIcon = GraphicsHelper:GetRaidIconNumber(destRaidFlags)
+		Necrosis.Timers:UpdateRaidIcon(destGUID, destIcon)
+	end
 
 	-- Detection of Shadow Trance and Contrecoup || Détection de la transe de l'ombre et de  Contrecoup
 	if (subevent == "UNIT_DIED"
@@ -642,24 +678,35 @@ function Necrosis:OnCombatLogEvent(event, ...)
 			Necrosis.Timers:RemoveSpellTimerTarget(destGUID)
 		end
 	
-	elseif (subevent == "SPELL_AURA_APPLIED" and destGUID == Necrosis.CurrentEnv.PlayerGuid)-- and destGUID == UnitGUID("target"))
+	elseif (subevent == "SPELL_AURA_APPLIED")
 	then
-		Necrosis:SelfEffect("BUFF", spellName)
+		if (destGUID == Necrosis.CurrentEnv.PlayerGuid) then
+			Necrosis:SelfEffect("BUFF", spellName)
+		end
 
-	elseif (subevent == "SPELL_AURA_APPLIED" and sourceGUID == Necrosis.CurrentEnv.PlayerGuid)-- and destGUID == UnitGUID("target"))
-	then
-		if (NecrosisConfig.EnableTimerBars) then
-			local spellData = Necrosis.CurrentEnv.SpellCast[spellName]
-			if (spellData) then
-				Necrosis.Timers:InsertSpellTimer(
-					Necrosis.CurrentEnv.PlayerGuid,
-					destGUID, destName, 0,
-					spellData.id,
-					spellName,
-					spellData.duration,
-					Necrosis.Spell.AuraType[spellData.id]
-				)
-				Necrosis.CurrentEnv.SpellCast[spellName] = nil
+		if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid) then
+			if (NecrosisConfig.EnableTimerBars) then
+				if (not destGUID) then
+					-- If target is empty the spell (likely soustone) hits ourself
+					destGUID = Necrosis.CurrentEnv.PlayerGuid
+					destName = Necrosis.CurrentEnv.PlayerName
+				end
+				-- Capture the icon of the spell target also
+				local destIconNumber = GetRaidTargetIndex("target")
+
+				local spellData = Necrosis.CurrentEnv.SpellCast[spellName]
+				if (spellData) then
+					Necrosis.Timers:InsertSpellTimer(
+						Necrosis.CurrentEnv.PlayerGuid,
+						Necrosis.CurrentEnv.PlayerName,
+						destGUID, destName, 0, destIconNumber,
+						spellData.id,
+						spellName,
+						spellData.duration,
+						Necrosis.Spell.AuraType[spellData.id]
+					)
+					Necrosis.CurrentEnv.SpellCast[spellName] = nil
+				end
 			end
 		end
 
@@ -684,7 +731,6 @@ function Necrosis:OnCombatLogEvent(event, ...)
 	-- Detection of the end of Shadow Trance and Contrecoup || Détection de la fin de la transe de l'ombre et de Contrecoup
 	elseif (subevent == "SPELL_AURA_REMOVED")
 	then
-
 		if (destGUID == Necrosis.CurrentEnv.PlayerGuid) then
 			Necrosis:SelfEffect("DEBUFF", spellName)
 		end
@@ -749,9 +795,20 @@ print("Spell resisted")
 	then
 			Local.SomethingOnHand = "Rien"
 			Necrosis:UpdateIcons()
-	elseif subevent == "UNIT_DIED"
-	then
-		-- Necrosis:RetraitTimerParGuid(sourceGUID,Local.TimerManagement)
+	end
+end
+
+function CheckGroupStatus()
+	local groupMembersCount = GetNumGroupMembers()
+	if (groupMembersCount > 5) then
+		Necrosis.CurrentEnv.InRaid = true
+		Necrosis.CurrentEnv.InParty = false
+	elseif (groupMembersCount > 0) then
+		Necrosis.CurrentEnv.InRaid = false
+		Necrosis.CurrentEnv.InParty = true
+	else
+		Necrosis.CurrentEnv.InRaid = false
+		Necrosis.CurrentEnv.InParty = false
 	end
 end
 

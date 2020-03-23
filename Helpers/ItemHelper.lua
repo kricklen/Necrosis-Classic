@@ -123,6 +123,11 @@ function _ih:GetSoulstoneCooldown()
 	return self:GetItemCooldownTime(self.Soulstone.ItemIds[1])
 end
 
+function _ih:GetSoulstoneCooldownSecs()
+	local secs = self:GetItemCooldownInSecs(self.Soulstone.ItemIds[1])
+	return (secs > 0), secs
+end
+
 function _ih:GetHealthstoneCooldown()
 	return self:GetItemCooldownTime(self.Healthstone.ItemIds[1])
 end

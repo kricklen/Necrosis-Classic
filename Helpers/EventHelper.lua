@@ -22,8 +22,13 @@ EventHelper = {
         "TRADE_ACCEPT_UPDATE",
         "TRADE_SHOW",
         "TRADE_CLOSED",
+        "SKILL_LINES_CHANGED",
         "COMBAT_LOG_EVENT_UNFILTERED",
-        "SKILL_LINES_CHANGED"
+        "CHAT_MSG_ADDON",
+        "GROUP_ROSTER_UPDATE",
+        -- "RAID_TARGET_UPDATE",
+        -- "UNIT_FLAGS",
+        -- GROUP_ROSTER_CHANGED
     }
 }
 
@@ -60,5 +65,37 @@ end
 function _eh:ReleaseApiEvents()
     for i,e in ipairs(_eh.ApiEvents) do
         NecrosisButton:UnregisterEvent(e)
+    end
+end
+
+function _eh:SendAddonMessage(message)
+    local channel = "say"
+    if (Necrosis.CurrentEnv.InRaid) then
+        channel = "RAID"
+    elseif (Necrosis.CurrentEnv.InParty) then
+        channel = "PARTY"
+    end
+    local success = C_ChatInfo.SendAddonMessage(Necrosis.CurrentEnv.ChatPrefix, message, channel)
+    print("_eh:SendAddonMessage: "..tostring(success))
+end
+
+-- Process messages from other warlocks in the raid or party
+function _eh:ProcessAddonMessage(text)
+    local split_cmd = split(text, "~")
+    print("command: "..tostring(split_cmd[1])..", "..tostring(split_cmd[2]))
+    if (split_cmd[1] == "InsertTimer") then
+        local split_timer = split(split_cmd[2], "|")
+        Necrosis.Timers:InsertSpellTimer(
+            split_timer[1],
+            split_timer[2],
+            split_timer[3],
+            split_timer[4],
+            split_timer[5],
+            split_timer[6],
+            split_timer[7],
+            split_timer[8],
+            split_timer[9],
+            split_timer[10]
+        )
     end
 end

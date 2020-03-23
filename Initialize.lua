@@ -84,6 +84,7 @@ local function ApplyLocalization()
 end
 
 function Necrosis:Initialize(Config)
+	CheckGroupStatus()
 	ApplyLocalization()
 
 	-- On charge (ou on crée la configuration pour le joueur et on l'affiche sur la console
@@ -109,6 +110,9 @@ function Necrosis:Initialize(Config)
 	self:SpellSetup()
 	self:CreateMenu()
 	self:ButtonSetup()
+
+	local successfulRequest = C_ChatInfo.RegisterAddonMessagePrefix(Necrosis.CurrentEnv.ChatPrefix)
+	print("request chat: "..tostring(successfulRequest))
 
     -- Enregistrement de la commande console
 	SlashCmdList["NecrosisCommand"] = Necrosis.SlashHandler
@@ -171,6 +175,8 @@ function Necrosis:Initialize(Config)
 	if NecrosisConfig.SoulshardSort then
 		self:SoulshardSwitch("CHECK")
 	end
+	
+	Necrosis.Timers:Initialize()
 end
 
 

@@ -23,6 +23,23 @@ function _gh:CreateTexture(parentFrame, type, height, width, texturePath, anchor
 	return tx
 end
 
+function _gh:CreateMovableDialog(name, height, width)
+	local dia = CreateFrame("Frame", name, UIParent)
+	dia:SetFrameStrata("DIALOG")
+	dia:SetMovable(true)
+	dia:EnableMouse(true)
+	dia:SetToplevel(true)
+	dia:SetSize(width, height)
+	dia:Show()
+	dia:ClearAllPoints()
+
+	dia:RegisterForDrag("LeftButton")
+	dia:SetScript("OnMouseUp", _gh.OnDragStop)
+	dia:SetScript("OnDragStart", _gh.OnDragStart)
+	dia:SetScript("OnDragStop", _gh.OnDragStop)
+	return dia
+end
+
 -- Create a dialog frame for the options panels
 function _gh:CreateDialog(parentFrame, height)
 	local dia = CreateFrame("Frame", nil, parentFrame)
@@ -139,4 +156,68 @@ function _gh:CreateButtonNext(parentFrame, onClickFunction)
 	btn:SetPushedTexture(_gh:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Down"))
 	btn:SetDisabledTexture(_gh:GetWoWTexture("Buttons", "UI-SpellbookIcon-NextPage-Disabled"))
 	return btn
+end
+
+function _gh.OnDragStart(uiElement)
+	uiElement:StartMoving()
+end
+
+-- Function stopping the movement of Necrosis elements on the screen ||Fonction arrêtant le déplacement d'éléments de Necrosis sur l'écran
+function _gh.OnDragStop(uiElement)
+	-- We stop the movement effectively ||On arrête le déplacement de manière effective
+	uiElement:StopMovingOrSizing()
+	-- We save the location of the button ||On sauvegarde l'emplacement du bouton
+	local name = uiElement:GetName()
+	local anchor, parentFrame, anchorParent, x, y = uiElement:GetPoint()
+	if (parentFrame) then
+		parentFrame = parentFrame:GetName()
+	else
+		parentFrame = "UIParent"
+	end
+	NecrosisConfig.FramePosition[name] = {
+		anchor,
+		parentFrame,
+		anchorParent,
+		x,
+		y
+	}
+end
+
+function _gh:LoadPosition(frame)
+	local name = frame:GetName()
+	if (not NecrosisConfig.FramePosition[name]) then
+		return false
+	end
+	frame:SetPoint(
+		NecrosisConfig.FramePosition[name][1],
+		NecrosisConfig.FramePosition[name][2],
+		NecrosisConfig.FramePosition[name][3],
+		NecrosisConfig.FramePosition[name][4],
+		NecrosisConfig.FramePosition[name][5]
+	)
+	return true
+end
+
+function _gh:GetRaidIconNumber(raidFlags)
+	local flag = bit.band(raidFlags, COMBATLOG_OBJECT_RAIDTARGET_MASK)
+	if (flag > 0) then
+		if (flag == COMBATLOG_OBJECT_RAIDTARGET1) then
+			return 1 -- Star
+		elseif (flag == COMBATLOG_OBJECT_RAIDTARGET2) then
+			return 2 -- Circle
+		elseif (flag == COMBATLOG_OBJECT_RAIDTARGET3) then
+			return 3 -- Diamond
+		elseif (flag == COMBATLOG_OBJECT_RAIDTARGET4) then
+			return 4 -- Triangle
+		elseif (flag == COMBATLOG_OBJECT_RAIDTARGET5) then
+			return 5 -- Moon
+		elseif (flag == COMBATLOG_OBJECT_RAIDTARGET6) then
+			return 6 -- Square
+		elseif (flag == COMBATLOG_OBJECT_RAIDTARGET7) then
+			return 7 -- Cross
+		elseif (flag == COMBATLOG_OBJECT_RAIDTARGET8) then
+			return 8 -- Skull
+		end
+		return nil
+	end
 end

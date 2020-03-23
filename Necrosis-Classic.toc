@@ -23,6 +23,8 @@ BlizzardUI\Item.lua
 
 InitializeNamespaces.lua
 
+Fonts\RegisterFonts.lua
+
 Helpers\TableHelper.lua
 Helpers\ItemHelper.lua
 Helpers\BagHelper.lua

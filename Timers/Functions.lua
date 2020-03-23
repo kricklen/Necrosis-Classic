@@ -44,36 +44,233 @@
 
 Necrosis.Timers = {
 	Instances = {},
-	SingleTimers = {},
-	MobMatrix = {},
+	SingleFrame = nil,
+	SingleAnchor = nil,
+	MobFrames = {},
+	MobAnchor = nil,
 	Font = CreateFont("NecrosisTimerFont")
 }
 
 local _t = Necrosis.Timers
-_t.Font:SetFont("Interface\\Addons\\Necrosis-Classic\\Fonts\\Roboto-Black.ttf", 10)
 
+local TICK_SECS = 0.1
 local BAR_HEIGHT = 20
 local BAR_WIDTH = 140
 local BAR_PADDING = 1
-local SS_BAN_ANCHOR = {x = 0, y = 0}
-local MOB_ANCHOR = {x = -60, y = 0}
 local BAR_COLOR = {r = 1, g = 0.5, b = 0}
 local TEXT_COLOR = {r = 1, g = 1, b = 1}
+local SS_BAN_ANCHOR = {x = 0, y = 0}
+local MOB_ANCHOR = {x = -60, y = 0}
+local BACKGROUND_COLOR = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
 
 function _t:GetFormattedTime(secs)
 	local mins = math.modf(secs / 60)
 	secs = math.fmod(secs, 60)
 	if (mins > 0) then
-		-- return string.format("%d Mins %02d Secs", mins, secs)
 		return string.format("%d:%02d", mins, secs)
 	end
-	-- return string.format("%d Secs", secs)
 	return string.format("%d", secs)
+end
+
+function _t:SetFont(path, size)
+	local result = _t.Font:SetFont(path, size)
+end
+
+local function FindMobTimerGroup(targetGuid)
+	for i,mobFrame in pairs(_t.MobFrames) do
+		if (mobFrame.Guid == targetGuid) then
+			return mobFrame
+		end
+	end
+	return nil
+end
+
+local function FindFreeMobTimerGroup()
+	for i,mobFrame in pairs(_t.MobFrames) do
+		-- A mobFrame is unused when it has no timers
+		if (#mobFrame.Timers == 0 and mobFrame.Frame) then
+			return mobFrame
+		end
+	end
+	return nil
+end
+
+local function PositionMobTimerGroups()
+	local activeCount = 0
+	for i,mobFrame in pairs(_t.MobFrames) do
+		-- Only reposition active frames
+		if (#mobFrame.Timers > 0) then
+			mobFrame.Frame:ClearAllPoints()
+			if (_t.MobAnchor) then
+				mobFrame.Frame:SetPoint(
+					"LEFT",
+					_t.MobAnchor,
+					"LEFT",
+					0 - (activeCount * (BAR_HEIGHT + BAR_WIDTH + BAR_PADDING)),
+					0)
+			else
+				mobFrame.Frame:SetPoint(
+					NecrosisConfig.FramePosition["NecrosisMobTimerAnchor"][1],
+					NecrosisConfig.FramePosition["NecrosisMobTimerAnchor"][2],
+					NecrosisConfig.FramePosition["NecrosisMobTimerAnchor"][3],
+					NecrosisConfig.FramePosition["NecrosisMobTimerAnchor"][4] - (activeCount * (BAR_HEIGHT + BAR_WIDTH + BAR_PADDING)),
+					NecrosisConfig.FramePosition["NecrosisMobTimerAnchor"][5]
+				)
+			end
+			activeCount = activeCount + 1
+		end
+	end
+end
+
+local function PositionSingleTimerGroup()
+	if (not _t.SingleFrame) then
+		return
+	end
+	_t.SingleFrame.Frame:ClearAllPoints()
+	if (_t.SingleAnchor) then
+		-- Capture the single frame if it exists
+		_t.SingleFrame.Frame:SetParent(_t.SingleAnchor)
+		_t.SingleFrame.Frame:SetPoint(
+			"LEFT",
+			_t.SingleAnchor,
+			"LEFT",
+			0,
+			0)
+	else
+		_t.SingleFrame.Frame:SetPoint(
+			NecrosisConfig.FramePosition["NecrosisSingleTimerAnchor"][1],
+			NecrosisConfig.FramePosition["NecrosisSingleTimerAnchor"][2],
+			NecrosisConfig.FramePosition["NecrosisSingleTimerAnchor"][3],
+			NecrosisConfig.FramePosition["NecrosisSingleTimerAnchor"][4],
+			NecrosisConfig.FramePosition["NecrosisSingleTimerAnchor"][5]
+		)
+	end
+end
+
+local function MakeTimerGroupGui(parentFrame)
+	local mf = CreateFrame("Frame", nil, parentFrame)
+	mf:SetMovable(false)
+	-- mf:SetAllPoints(parentFrame)
+	mf:ClearAllPoints()
+	mf:SetSize(BAR_WIDTH, BAR_HEIGHT)
+
+	local bg = mf:CreateTexture(nil, "BACKGROUND")
+	bg:SetSize(BAR_WIDTH, BAR_HEIGHT)
+	bg:SetColorTexture(BACKGROUND_COLOR.r, BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a)
+	bg:SetAllPoints()
+
+	local title = mf:CreateFontString(nil, "OVERLAY", "NecrosisTimerFont")
+	title:SetSize(BAR_WIDTH, BAR_HEIGHT)
+	title:SetJustifyH("MIDDLE")
+	title:SetJustifyV("MIDDLE")
+	title:ClearAllPoints()
+	title:SetPoint("CENTER", mf, "CENTER")
+	title:SetTextColor(TEXT_COLOR.r, TEXT_COLOR.g, TEXT_COLOR.b)
+
+	local icon = mf:CreateTexture(nil, "OVERLAY")
+	icon:SetSize(BAR_HEIGHT, BAR_HEIGHT)
+	icon:SetBlendMode("ADD")
+	icon:ClearAllPoints()
+	icon:SetPoint("LEFT", mf, "LEFT", BAR_PADDING, 0)
+
+	return
+		{
+			Frame = mf,
+			Background = bg,
+			Title = title,
+			RaidIcon = icon,
+			Timers = {}
+		}
+end
+
+local function SortTimerGroup(timerGroup)
+	-- Sort timers by time when they are finished, lowest on top
+	table.sort(timerGroup.Timers,
+		function(a,b)
+			return (a.EndTime > b.EndTime)
+		end
+	)
+	for i,timerData in ipairs(timerGroup.Timers) do
+		timerData.Frame:ClearAllPoints()
+		timerData.Frame:SetPoint(
+			"CENTER",
+			timerGroup.Frame,
+			"CENTER",
+			0,
+			i * (BAR_HEIGHT + BAR_PADDING))
+	end
+end
+
+local function UpdateRaidIcon(iconFrame, iconNumber)
+	if (iconNumber) then
+		iconFrame:SetTexture(GraphicsHelper:GetWoWTexture("TargetingFrame", "UI-RaidTargetingIcon_"..iconNumber))
+	else
+		iconFrame:SetTexture(nil)
+	end
+end
+
+local function RemoveTimer(timerData)
+	if (timerData.Finished) then
+		return
+	end
+	timerData.Finished = true
+	-- Hide the timer, stopping the countdown
+	timerData.Frame:SetScript("OnUpdate", nil)
+	timerData.Frame:Hide()
+	-- Remove the raid icon from the timer (might have been banish)
+	UpdateRaidIcon(timerData.RaidIcon, nil)
+	-- Remove the timer from the group
+	local idx = table.indexOf(timerData.Group.Timers, timerData)
+	table.remove(timerData.Group.Timers, idx)
+	if (#timerData.Group.Timers > 0) then
+		SortTimerGroup(timerData.Group)
+	else
+		-- Remove the raid icon from the timer group
+		UpdateRaidIcon(timerData.Group.RaidIcon, nil)
+		timerData.Group.Frame:Hide()
+		if (timerData.SpellType ~= "soulstone" and timerData.SpellType ~= "banish") then
+			PositionMobTimerGroups()
+		end
+	end
+	-- Remove reference to the timer group as well
+	timerData.Group = nil
+end
+
+local function UpdateTimer()
+	for i,timerData in pairs(_t.Instances) do
+		if (not timerData.Finished) then
+			local value = timerData.ProgressBar:GetValue() - TICK_SECS
+			local fraction = value / timerData.SpellDuration
+			
+			timerData.ProgressBar:SetValue(value)
+			
+			timerData.Spark:ClearAllPoints()
+			timerData.Spark:SetPoint("CENTER", timerData.ProgressBar, "LEFT", fraction * (BAR_WIDTH - BAR_HEIGHT), 0)
+			
+			if (value > 60) then
+				timerData.lblCountdown:SetText(_t:GetFormattedTime(value))
+			else
+				local idx = string.find(value, ".", 1, true)
+				if (idx) then
+					local str = string.sub(value, 1, idx + 1)
+					timerData.lblCountdown:SetText(str)
+				end
+			end
+
+			if (fraction <= 0) then
+				RemoveTimer(timerData)
+			end
+		end
+	end
+	if (NecrosisConfig.EnableTimerBars) then
+		-- Repeat after 0.1 secs
+		C_Timer.After(TICK_SECS, UpdateTimer)
+	end
 end
 
 local function FindFreeTimer()
 	for i,timerData in ipairs(_t.Instances) do
-		if (timerData.Finished) then
+		if (timerData.Finished and timerData.Frame) then
 			timerData.Finished = false
 			return timerData
 		end
@@ -81,73 +278,66 @@ local function FindFreeTimer()
 	return nil
 end
 
-local function MakeNewTimer()
-	-- Définition de ses attributs
-	-- local frame = CreateFrame("Frame", nil, UIParent)
-	-- Attach the gui to the timer button
-	local frame = CreateFrame("Frame", nil, NecrosisSpellTimerButton)
+local function SetTimerParent(timerData, parentFrame)
+	timerData.Frame:ClearAllPoints()
+	timerData.Frame:SetAllPoints(parentFrame)
+	timerData.Frame:SetParent(parentFrame)
+end
+
+local function MakeTimerGui(parentFrame)
+	-- Frame will be positioned later
+	local frame = CreateFrame("Frame", nil, parentFrame)
 	frame:SetSize(BAR_WIDTH, BAR_HEIGHT)
-	frame:ClearAllPoints()
-
-	-- --Définition de sa texture
-	-- local texture = frame:CreateTexture(nil, "BACKGROUND")
-	-- _t.TimerGui[#_t.TimerGui] = texture
-
-	-- texture:SetWidth(150)
-	-- texture:SetHeight(BAR_HEIGHT)
-	-- texture:SetTexture(0, 0, 0, 0.5)
-	-- texture:ClearAllPoints()
-	-- -- texture:SetPoint(NecrosisConfig.SpellTimerJust, FrameName, NecrosisConfig.SpellTimerJust, 0, 0)
-	-- texture:SetPoint("TOPLEFT", 0, 0)
-	-- texture:Show()
 	
-	-- Définition de ses textes
-	-- Extérieur
 	local lblCountdown = frame:CreateFontString(nil, "OVERLAY", "NecrosisTimerFont")
-	lblCountdown:SetSize(50, BAR_HEIGHT)
+	lblCountdown:SetSize(2 * BAR_HEIGHT + BAR_PADDING, BAR_HEIGHT)
 	lblCountdown:SetJustifyH("LEFT")
 	lblCountdown:SetTextColor(TEXT_COLOR.r, TEXT_COLOR.g, TEXT_COLOR.b)
 	lblCountdown:ClearAllPoints()
 	if (NecrosisConfig.SpellTimerPos == -1) then
-		lblCountdown:SetPoint("RIGHT", frame, "LEFT", 52, 0)
-		lblCountdown:SetJustifyH("LEFT")
+		lblCountdown:SetPoint("LEFT", frame, "LEFT", 1, 0)
 	else
 		lblCountdown:SetPoint("LEFT", frame, "RIGHT", 5, 0)
-		lblCountdown:SetJustifyH("LEFT")
 	end
 
-	-- Définition de ses textes
-	-- Intérieur
-	local lblSpellname = frame:CreateFontString(nil, "OVERLAY", "NecrosisTimerFont")
-	lblSpellname:SetSize(BAR_WIDTH, BAR_HEIGHT)
+	local bar = CreateFrame("StatusBar", nil, frame)
+	bar:SetSize(BAR_WIDTH - BAR_HEIGHT, BAR_HEIGHT)
+	bar:SetStatusBarTexture(GraphicsHelper:GetWoWTexture("TargetingFrame", "UI-StatusBar"))
+	bar:SetStatusBarColor(BAR_COLOR.r, BAR_COLOR.g, BAR_COLOR.b)
+	bar:SetFrameLevel(bar:GetFrameLevel() - 1)
+	bar:ClearAllPoints()
+	bar:SetPoint("LEFT", frame, "LEFT")
+
+	local lblSpellname = bar:CreateFontString(nil, "OVERLAY", "NecrosisTimerFont")
+	lblSpellname:SetSize(BAR_WIDTH - BAR_HEIGHT, BAR_HEIGHT)
 	lblSpellname:SetJustifyH("RIGHT")
 	lblSpellname:SetJustifyV("MIDDLE")
 	lblSpellname:ClearAllPoints()
-	lblSpellname:SetPoint("LEFT", frame, "LEFT", -5, 0)
+	lblSpellname:SetPoint("LEFT", bar, "LEFT", -3, 0)
 	lblSpellname:SetTextColor(TEXT_COLOR.r, TEXT_COLOR.g, TEXT_COLOR.b)
 
-	-- Definition of the colored bar | Définition de la barre colorée
-	local StatusBar = CreateFrame("StatusBar", nil, frame)
-	StatusBar:SetSize(BAR_WIDTH, BAR_HEIGHT)
-	StatusBar:SetStatusBarTexture(GraphicsHelper:GetWoWTexture("TargetingFrame", "UI-StatusBar"))
-	StatusBar:SetStatusBarColor(BAR_COLOR.r, BAR_COLOR.g, BAR_COLOR.b)
-	StatusBar:SetFrameLevel(StatusBar:GetFrameLevel() - 1)
-	StatusBar:ClearAllPoints()
-	StatusBar:SetPoint("TOPLEFT", 0, 0)
+	local bg = bar:CreateTexture(nil, "BACKGROUND")
+	bg:SetAllPoints()
+	bg:SetColorTexture(BACKGROUND_COLOR.r, BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a)
 
-	-- Definition of the spark at the end of the bar | Définition de l'étincelle en bout de barre
-	local spark = StatusBar:CreateTexture(nil, "OVERLAY")
+	local spark = bar:CreateTexture(nil, "OVERLAY")
 	spark:SetSize(BAR_HEIGHT, BAR_HEIGHT)
 	spark:SetTexture(GraphicsHelper:GetWoWTexture("CastingBar", "UI-CastingBar-Spark"))
 	spark:SetBlendMode("ADD")
 	spark:ClearAllPoints()
-	spark:SetPoint("CENTER", StatusBar, "LEFT", 0, 0)
+	spark:SetPoint("CENTER", bar, "LEFT", 0, 0)
 
-	local icon = StatusBar:CreateTexture(nil, "OVERLAY")
-	icon:SetSize(BAR_HEIGHT, BAR_HEIGHT)
-	icon:SetBlendMode("ADD")
-	icon:ClearAllPoints()
-	icon:SetPoint("RIGHT", BAR_HEIGHT, 0)
+	local spellIcon = bar:CreateTexture(nil, "OVERLAY")
+	spellIcon:SetSize(BAR_HEIGHT, BAR_HEIGHT)
+	spellIcon:SetBlendMode("ADD")
+	spellIcon:ClearAllPoints()
+	spellIcon:SetPoint("RIGHT", frame, "RIGHT", BAR_PADDING, 0)
+
+	local raidIcon = bar:CreateTexture(nil, "OVERLAY")
+	raidIcon:SetSize(BAR_HEIGHT, BAR_HEIGHT)
+	raidIcon:SetBlendMode("ADD")
+	raidIcon:ClearAllPoints()
+	raidIcon:SetPoint("LEFT", frame, "RIGHT", BAR_PADDING, 0)
 
 	return
 		{
@@ -155,122 +345,29 @@ local function MakeNewTimer()
 			Frame = frame,
 			lblCountdown = lblCountdown,
 			lblSpellname = lblSpellname,
-			bar = StatusBar,
-			spark = spark,
-			icon = icon
+			ProgressBar = bar,
+			Spark = spark,
+			SpellIcon = spellIcon,
+			RaidIcon = raidIcon
 		}
 end
 
-local function PositionSingleTimers()
-	table.sort(_t.SingleTimers,
-		function(a,b)
-			return (a.SpellId + a.bar:GetValue()) > (b.SpellId + b.bar:GetValue())
-		end
-	)
-	-- Position the frames
-	for i,timerData in ipairs(_t.SingleTimers) do
-		timerData.Frame:ClearAllPoints()
-		timerData.Frame:SetPoint(
-			"CENTER",
-			NecrosisSpellTimerButton,
-			"CENTER",
-			SS_BAN_ANCHOR.x,
-			SS_BAN_ANCHOR.y + (i * (BAR_HEIGHT + BAR_PADDING)))
+local function InsertTimer(timerGroup)
+	-- Find a finished timer
+	local timerData = FindFreeTimer()
+	if (not timerData) then
+		-- Create a new timer with gui elements
+		timerData = MakeTimerGui(timerGroup.Frame)
+		timerData.Frame:SetAttribute("TimerData", timerData)
+		table.insert(_t.Instances, timerData)
 	end
-end
+	-- Change references to the current timer group
+	SetTimerParent(timerData, timerGroup.Frame)
 
-local function PositionMobMatrixCells(timerList, mobIndex)
-	for i,timerData in ipairs(timerList) do
-		timerData.Frame:ClearAllPoints()
-		timerData.Frame:SetPoint(
-			"CENTER",
-			NecrosisSpellTimerButton,
-			"LEFT",
-			MOB_ANCHOR.x - (mobIndex * (BAR_HEIGHT + BAR_WIDTH + BAR_PADDING)),
-			MOB_ANCHOR.y + (i * (BAR_HEIGHT + BAR_PADDING)))
-	end
-end
-
-local function RemoveMobMatrixColumn(mobIndex)
-	table.remove(_t.MobMatrix, mobIndex)
-	-- Shift the remaining lists if required
-	for i = mobIndex,#_t.MobMatrix,1 do
-		PositionMobMatrixCells(_t.MobMatrix[i].Timers, i)
-	end
-end
-
-local function SortMobMatrixColumn(timerData)
-	-- Sort timers by duration, lowest on top
-	table.sort(timerData.TimerList,
-		function(a,b)
-			return (a.TargetGuid..a.lblCountdown:GetText()) > (b.TargetGuid..b.lblCountdown:GetText())
-		end
-	)
-	PositionMobMatrixCells(timerData.TimerList, timerData.MobIndex)
-end
-
-local function RemoveMobMatrixCell(timerData)
-	table.remove(timerData.TimerList, table.indexOf(timerData.TimerList, timerData))
-	if (#timerData.TimerList == 0) then
-		-- The last timer for the mob has been removed
-		-- Remove the entire timer list for the mob
-		RemoveMobMatrixColumn(timerData.MobIndex)
-	else
-		SortMobMatrixColumn(timerData)
-	end
-end
-
-local function StopTimer(timerData)
-	if (timerData.Finished) then
-		return false
-	end
-	timerData.Finished = true
-	timerData.Frame:SetScript("OnUpdate", nil)
-	timerData.Frame:Hide()
-	return true
-end
-
-local function RemoveTimer(timerData)
-	if (not StopTimer(timerData)) then
-		return
-	end
-	-- Reposition other timers
-	if (timerData.SpellType == "banish" or timerData.SpellType == "soulstone") then
-		table.remove(_t.SingleTimers, table.indexOf(_t.SingleTimers, timerData))
-		PositionSingleTimers()
-	else
-		RemoveMobMatrixCell(timerData)
-	end
-end
-
-local function UpdateTimer(frame, elapsed)
-	if (not elapsed) then
-		return
-	end
-
-	local timerData = frame:GetAttribute("TimerData")
-
-	local value = timerData.bar:GetValue() - elapsed
-	local fraction = value / timerData.SpellDuration
-
-	timerData.bar:SetValue(value)
-	
-	timerData.spark:ClearAllPoints()
-	timerData.spark:SetPoint("CENTER", timerData.bar, "LEFT", fraction * BAR_WIDTH, 0)
-
-	if (value > 60) then
-		timerData.lblCountdown:SetText(_t:GetFormattedTime(value))
-	else
-		local idx = string.find(value, ".", 1, true)
-		if (idx) then
-			local str = string.sub(value, 1, idx + 1)
-			timerData.lblCountdown:SetText(str)
-		end
-	end
-
-	if (fraction <= 0) then
-		RemoveTimer(timerData)
-	end
+	-- Link and reverse link timer to group
+	timerData.Group = timerGroup
+	table.insert(timerGroup.Timers, timerData)
+	return timerData
 end
 
 local function StartTimer(timerData)
@@ -279,82 +376,76 @@ local function StartTimer(timerData)
 	-- The rest is displayed in a frame group per mob since it's dots etc.
 
 	-- Set starting values
-	timerData.bar:SetMinMaxValues(0, timerData.SpellDuration)
-	timerData.bar:SetValue(timerData.SpellDuration)
+	timerData.ProgressBar:SetMinMaxValues(0, timerData.SpellDuration)
+	timerData.ProgressBar:SetValue(timerData.SpellDuration)
 	timerData.lblCountdown:SetText(timerData.SpellDuration)
-	timerData.icon:SetTexture(GetSpellTexture(timerData.SpellId))
 
-	-- Position the gui elements
-	if (timerData.SpellType == "banish" or timerData.SpellType == "soulstone") then
-		table.insert(_t.SingleTimers, timerData)
+	if (timerData.SpellType == "soulstone") then
+		-- Soulstone Resurrection has no SpellIcon texture
+		timerData.SpellIcon:SetTexture(GetSpellTexture("Create Soulstone"))
+	else
+		timerData.SpellIcon:SetTexture(GetSpellTexture(timerData.SpellName))
+	end
 
-		-- Keep metadata
-		timerData.TimerList = _t.SingleTimers
-		timerData.MobIndex = nil
-
-		PositionSingleTimers()
+	-- Assign the spell name or target
+	if (timerData.SpellType == "soulstone" or timerData.SpellType == "banish") then
 		timerData.lblSpellname:SetText(timerData.TargetName)
 	else
-		local timerList = nil
-		local mobIndex = 1
-		for i,mob in pairs(_t.MobMatrix) do
-			if (mob.Guid == timerData.TargetGuid) then
-				timerList = mob.Timers
-				mobIndex = i
-				break
-			end
-		end
-		if (not timerList) then
-			timerList = {}
-			table.insert(
-				_t.MobMatrix,
-				{
-					Guid = timerData.TargetGuid,
-					Timers = timerList,
-					MobName = timerData.TargetName
-				}
-			)
-			mobIndex = #_t.MobMatrix
-		end
-		table.insert(timerList, timerData)
-
-		-- Keep metadata
-		timerData.TimerList = timerList
-		timerData.MobIndex = mobIndex
-
-		SortMobMatrixColumn(timerData)
-		
 		timerData.lblSpellname:SetText(timerData.SpellName)
 	end
 
-	-- Show the gui elements
-	timerData.Frame:Show()
-	timerData.bar:Show()
-	timerData.spark:Show()
-	timerData.lblCountdown:Show()
-	timerData.lblSpellname:Show()
+	SortTimerGroup(timerData.Group)
 
-	-- Start the timer
-	timerData.Frame:SetScript("OnUpdate", UpdateTimer)
+	-- Show the gui elements, starting the timer
+	timerData.Group.Frame:Show()
+	timerData.Frame:Show()
 end
 
-function _t:InsertSpellTimer(casterGuid, targetGuid, targetName, targetLevel, spellId, spellName, spellDuration, spellType)
-	-- Timer Groups:
-	-- Caster Guid + Target Guid + SpellId
-	-- Singleton with target
-	-- Multi with target
-
-	-- Find a finished timer
-	local timerData = FindFreeTimer()
-	if (not timerData) then
-		-- Create timer gui elements
-		timerData = MakeNewTimer()
-		timerData.Frame:SetAttribute("TimerData", timerData)
-		table.insert(self.Instances, timerData)
+function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, targetLevel, targetIcon, spellId, spellName, spellDuration, spellType)
+	local timerData
+	if (spellType == "soulstone" or spellType == "banish") then
+		-- If we cast soulstone or banish, tell our fellow warlocks
+		if (casterGuid == Necrosis.CurrentEnv.PlayerGuid) then
+			-- Broadcast to raid/party if applicable
+			EventHelper:SendAddonMessage("InsertTimer~"
+				..tostring(casterGuid).."|"
+				..tostring(casterName).."|"
+				..tostring(targetGuid).."|"
+				..tostring(targetName).."|"
+				..tostring(targetLevel).."|"
+				..tostring(targetIcon).."|"
+				..tostring(spellId).."|"
+				..tostring(spellName).."|"
+				..tostring(spellDuration).."|"
+				..tostring(spellType))
+		end
+		if (not _t.SingleFrame) then
+			-- Create and position the group for single timers
+			_t.SingleFrame = MakeTimerGroupGui(UIParent)
+			PositionSingleTimerGroup()
+		end
+		-- Add single timer
+		_t.SingleFrame.Title:SetText("Single")
+		timerData = InsertTimer(_t.SingleFrame)
+	else
+		-- Add mob timer
+		local timerGroup = FindMobTimerGroup(targetGuid)
+		if (not timerGroup) then
+			timerGroup = FindFreeMobTimerGroup()
+			if (not timerGroup) then
+				timerGroup = MakeTimerGroupGui(UIParent)
+				table.insert(_t.MobFrames, timerGroup)
+			end
+			timerGroup.Guid = targetGuid
+			timerGroup.Title:SetText(targetName)
+		end
+		timerData = InsertTimer(timerGroup)
+		PositionMobTimerGroups()
 	end
 
 	-- Set payload
 	timerData.CasterGuid = casterGuid
+	timerData.CasterName = casterName
 	timerData.SpellId = spellId
 	timerData.SpellName = spellName
 	timerData.SpellDuration = spellDuration
@@ -362,7 +453,8 @@ function _t:InsertSpellTimer(casterGuid, targetGuid, targetName, targetLevel, sp
 	timerData.TargetGuid = targetGuid
 	timerData.TargetName = targetName
 	timerData.TargetLevel = targetLevel
-	
+	timerData.EndTime = GetTime() + spellDuration
+
 	StartTimer(timerData)
 end
 
@@ -370,37 +462,55 @@ end
 function _t:ResetTimer(casterGuid, targetGuid, spellId, spellDuration)
 	for i,timerData in ipairs(_t.Instances) do
 		if (timerData.CasterGuid == casterGuid and timerData.TargetGuid == targetGuid and timerData.SpellId == spellId) then
-			timerData.bar:SetValue(spellDuration)
+			timerData.ProgressBar:SetValue(spellDuration)
 			return
 		end
+	end
+end
+
+local function SetSoulstoneCooldown(timerData)
+	if (timerData.CasterGuid == Necrosis.CurrentEnv.PlayerGuid) then
+		-- Our own soulstone target died
+		timerData.lblSpellname:SetText("Inactive")
+		local iscd, sscd = ItemHelper:GetSoulstoneCooldownSecs()
+		print("sscd: "..tostring(sscd))
+		if (iscd) then
+			timerData.ProgressBar:SetValue(sscd)
+			EventHelper:SendAddonMessage("Soulstone cooldown: "..sscd)
+		else
+			-- Soulstone is ready, remove the timer
+			RemoveTimer(timerData)
+			EventHelper:SendAddonMessage("Soulstone remove: ")
+		end
+	else
+		-- Soulstone target of a fellow warlock died
+
 	end
 end
 
 -- The target died, remove all timers for it
 function _t:RemoveSpellTimerTarget(targetGuid)
-	-- Maybe it was a mob
-	for index,mob in pairs(_t.MobMatrix) do
-		if (mob.Guid == targetGuid) then
-			print("Remove MobMatrix column "..index)
-			for i,timerData in pairs(mob.Timers) do
-				StopTimer(timerData)
-			end
-			RemoveMobMatrixColumn(index)
-			return
-		end
-	end
 	for i,timerData in ipairs(self.Instances) do
 		if (timerData.TargetGuid == targetGuid) then
-			RemoveTimer(timerData)
+			-- Check if it's a soulstone
+			if (timerData.SpellType == "soulstone") then
+				SetSoulstoneCooldown(timerData)
+			else
+				RemoveTimer(timerData)
+			end
 		end
 	end
 end
 
--- The spell was removed from target
+-- A spell was removed from target
 function _t:RemoveSpellTimerTargetName(targetGuid, spellName)
 	for i,timerData in ipairs(self.Instances) do
 		if (timerData.TargetGuid == targetGuid and timerData.SpellName == spellName) then
-			RemoveTimer(timerData)
+			if (timerData.SpellType == "soulstone") then
+				SetSoulstoneCooldown(timerData)
+			else
+				RemoveTimer(timerData)
+			end
 		end
 	end
 end
@@ -411,372 +521,115 @@ function _t:RemoveAllTimers()
 	end
 end
 
+local function MakeAnchor(anchorFrame, anchorName, anchorText)
+	if (anchorFrame) then
+		anchorFrame:Show()
+	else
+		anchorFrame = GraphicsHelper:CreateMovableDialog(anchorName, BAR_HEIGHT, BAR_WIDTH)
+		local tex = anchorFrame:CreateTexture(nil, "BACKGROUND")
+		tex:SetAllPoints()
+		tex:SetColorTexture(1, 1, 1, 0.5)
+		local fs = anchorFrame:CreateFontString(nil, "OVERLAY", "NecrosisTimerFont")
+		fs:ClearAllPoints()
+		fs:SetAllPoints()
+		fs:SetTextColor(0.5, 1, 0)
+		fs:SetText(anchorText)
+		fs:Show()
+	end
+	if (not GraphicsHelper:LoadPosition(anchorFrame)) then
+		anchorFrame:SetPoint("TOPLEFT", 100, -100)
+	end
+	return anchorFrame
+end
 
+function _t:ShowMobAnchor()
+	self.MobAnchor = MakeAnchor(self.MobAnchor, "NecrosisMobTimerAnchor", "Mob Anchor")
+	-- Capture existing timer groups
+	for i,mobFrame in ipairs(self.MobFrames) do
+		mobFrame.Frame:SetParent(self.MobAnchor)
+	end
+	PositionMobTimerGroups()
+end
 
+function _t:HideMobAnchor()
+	for i,mobFrame in ipairs(self.MobFrames) do
+		mobFrame.Frame:SetParent(UIParent)
+	end
+	self.MobAnchor:Hide()
+	self.MobAnchor = nil
+	PositionMobTimerGroups()
+end
 
--- -- The timers' table is here for that. | La table des timers est là pour ça !
--- function Necrosis:InsertTimerParTable(spellIndex, Target, LevelTarget, Timer, TargetGUID)
--- 	-- insert an entry into the table || Insertion de l'entrée dans le tableau
--- 	-- if (spellIndex == 14) then
--- 		-- Necrosis.Timers:InsertSpellTimer(UnitGUID("player"), spellIndex, TargetGUID, Target, LevelTarget)
--- 	-- end
+function _t:ShowSingleAnchor()
+	self.SingleAnchor = MakeAnchor(self.SingleAnchor, "NecrosisSingleTimerAnchor", "Single Anchor")
+	PositionSingleTimerGroup()
+end
 
--- 	Timer.SpellTimer:insert(
--- 		{
--- 			Name = Necrosis.Spell[spellIndex].Name,
--- 			Time = Necrosis.Spell[spellIndex].Length,
--- 			TimeMax = floor(GetTime() + Necrosis.Spell[spellIndex].Length),
--- 			Type = Necrosis.Spell[spellIndex].Type,
--- 			Target = Target,
--- 			TargetGUID = TargetGUID,
--- 			TargetLevel = LevelTarget,
--- 			Group = 0,
--- 			Gtimer = nil
--- 		}
--- 	)
+function _t:HideSingleAnchor()
+	if (_t.SingleFrame) then
+		_t.SingleFrame.Frame:SetParent(UIParent)
+	end
+	_t.SingleAnchor:Hide()
+	_t.SingleAnchor = nil
+	PositionSingleTimerGroup()
+end
 
--- 	-- attach a graphical timer if enabled || Association d'un timer graphique au timer
--- 	-- associate it to the frame (if present) || Si il y a une frame timer de libérée, on l'associe au timer
--- 	-- if NecrosisConfig.TimerType == 1 then
--- 	if NecrosisConfig.TimerType == "Graphical" then
--- 		local TimerLibre = nil
--- 		for index, valeur in ipairs(Timer.TimerTable) do
--- 			if not valeur then
--- 				TimerLibre = index
--- 				Timer.TimerTable[index] = true
--- 				break
--- 			end
--- 		end
--- 		-- if there is no frame, add one || Si il n'y a pas de frame de libérée, on rajoute une frame
--- 		if not TimerLibre then
--- 			Timer.TimerTable:insert(true)
--- 			TimerLibre = #Timer.TimerTable
--- 		end
--- 		-- update the timer display || Association effective au timer
--- 		Timer.SpellTimer[#Timer.SpellTimer].Gtimer = TimerLibre
--- 		local FontString, StatusBar = self:AddFrame("NecrosisTimerFrame"..TimerLibre)
--- 		FontString:SetText(Timer.SpellTimer[#Timer.SpellTimer].Name)
--- 		StatusBar:SetMinMaxValues(
--- 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax - Timer.SpellTimer[#Timer.SpellTimer].Time,
--- 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax
--- 		)
--- 	end
+function _t:UpdateRaidIcon(unitGuid, iconNumber)
+	for i,mobFrame in ipairs(_t.MobFrames) do
+		if (mobFrame.Guid == unitGuid) then
+			if (mobFrame.RaidIconNumber ~= iconNumber) then
+				mobFrame.RaidIconNumber = iconNumber
+				UpdateRaidIcon(mobFrame.RaidIcon, iconNumber)
+			end
+			break
+		end
+	end
+	-- Check for banish on a target
+	if (_t.SingleFrame) then
+		for i,timerData in ipairs(_t.SingleFrame.Timers) do
+			if (timerData.TargetGuid == unitGuid and timerData.SpellType == "banish") then
+				if (timerData.RaidIconNumber ~= iconNumber) then
+					timerData.RaidIconNumber = iconNumber
+					UpdateRaidIcon(timerData.RaidIcon, iconNumber)
+				end
+				break
+			end
+		end
+	end
+end
 
--- 	-- if NecrosisConfig.TimerType > 0 then
--- 	if NecrosisConfig.TimerType == "Graphical" or NecrosisConfig.TimerType == "Textual" then
--- 		-- sort the timers by type || Tri des entrées par type de sort
--- 		self:Tri(Timer.SpellTimer, "Type")
-
--- 		-- Create timers by mob group || Création des groupes (noms des mobs) des timers
--- 		Timer.SpellGroup, Timer.SpellTimer = self:Parsing(Timer.SpellGroup, Timer.SpellTimer)
-
--- 		-- update the display || On met à jour l'affichage
--- 		NecrosisUpdateTimer(Timer.SpellTimer, Timer.SpellGroup)
--- 	end
-
--- 	-- detection of resists || Détection des resists
--- 	if not (Necrosis.Spell[spellIndex].Type == 0) then
--- 		Timer.LastSpell.Name = Necrosis.Spell[spellIndex].Name
--- 		Timer.LastSpell.Target = Target
--- 		Timer.LastSpell.TargetGUID = TargetGUID
--- 		Timer.LastSpell.TargetLevel = LevelTarget
--- 		Timer.LastSpell.Time = GetTime()
--- 		for i in ipairs(Timer.SpellTimer) do
--- 			if Timer.SpellTimer[i].Name == Timer.LastSpell.Name
--- 				and Timer.SpellTimer[i].TargetGUID == Timer.LastSpell.TargetGUID
--- 			then
--- 				Timer.LastSpell.Index = i
--- 				break
--- 			end
--- 		end
--- 	end
-
--- 	return Timer
--- end
-
--- -- timers for the healthstone & soulstone || Et pour insérer le timer de pierres
--- function Necrosis:InsertTimerStone(Stone, start, duration, Timer)
-
--- 	-- insert an entry into the table || Insertion de l'entrée dans le tableau
--- 	if Stone == "Healthstone" then
--- 		Timer.SpellTimer:insert(
--- 			{
--- 				Name = self.HealthstoneCooldown,
--- 				Time = 120,
--- 				TimeMax = floor(GetTime() + 120),
--- 				Type = 2,
--- 				TargetGUID = "",
--- 				Target = "",
--- 				TargetLevel = "",
--- 				Group = 2,
--- 				Gtimer = nil
--- 			}
--- 		)
--- 	elseif Stone == "Soulstone" then
--- 		Timer.SpellTimer:insert(
--- 			{
--- 				Name = Necrosis.Spell[11].Name,
--- 				Time = floor(duration - GetTime() + start),
--- 				TimeMax = floor(start + duration),
--- 				Type = Necrosis.Spell[11].Type,
--- 				TargetGUID = "???",
--- 				Target = "???",
--- 				TargetLevel = "",
--- 				Group = 1,
--- 				Gtimer = nil,
--- 			}
--- 		)
--- 	end
-
--- 	-- attach a graphical timer if enabled || Association d'un timer graphique au timer
--- 	-- associate it to the frame (if enabled) || Si il y a une frame timer de libérée, on l'associe au timer
--- 	-- if NecrosisConfig.TimerType == 1 then
--- 	if NecrosisConfig.TimerType == "Graphical" then
--- 		local TimerLibre = nil
--- 		for index, valeur in ipairs(Timer.TimerTable) do
--- 			if not valeur then
--- 				TimerLibre = index
--- 				Timer.TimerTable[index] = true
--- 				break
--- 			end
--- 		end
--- 		-- if there is no frame, just add one || Si il n'y a pas de frame de libérée, on rajoute une frame
--- 		if not TimerLibre then
--- 			Timer.TimerTable:insert(true)
--- 			TimerLibre = #Timer.TimerTable
--- 		end
--- 		-- update the timer display || Association effective au timer
--- 		Timer.SpellTimer[#Timer.SpellTimer].Gtimer = TimerLibre
--- 		local FontString, StatusBar = self:AddFrame("NecrosisTimerFrame"..TimerLibre)
--- 		FontString:SetText(Timer.SpellTimer[#Timer.SpellTimer].Name)
--- 		StatusBar:SetMinMaxValues(
--- 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax - Timer.SpellTimer[#Timer.SpellTimer].Time,
--- 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax
--- 		)
--- 	end
-
--- 	-- if NecrosisConfig.TimerType > 0 then
--- 	if NecrosisConfig.TimerType == "Graphical" or NecrosisConfig.TimerType == "Textual" then
--- 		-- sort the timers || Tri des entrées par type de sort
--- 		self:Tri(Timer.SpellTimer, "Type")
-
--- 		-- Create timers by mob group || Création des groupes (noms des mobs) des timers
--- 		Timer.SpellGroup, Timer.SpellTimer = self:Parsing(Timer.SpellGroup, Timer.SpellTimer)
-
--- 		-- update the display || On met à jour l'affichage
--- 		NecrosisUpdateTimer(Timer.SpellTimer, Timer.SpellGroup)
--- 	end
-
--- 	return Timer
--- end
-
-
--- -- Create personal timers || Pour la création de timers personnels
--- function NecrosisTimerX(nom, duree, truc, Target, LevelTarget, Timer,Guid)
-
--- 	Timer.SpellTimer:insert(
--- 		{
--- 			Name = nom,
--- 			Time = duree,
--- 			TimeMax = floor(GetTime() + duree),
--- 			Type = truc,
--- 			TargetGUID = Guid, --TODO ??
--- 			Target = Target,
--- 			TargetLevel = LevelTarget,
--- 			Group = 0,
--- 			Gtimer = nil
--- 		}
--- 	)
-
--- 	-- if NecrosisConfig.TimerType == 1 then
--- 	if NecrosisConfig.TimerType == "Graphical" then
--- 		-- attach a graphical timer (if enabled) || Association d'un timer graphique au timer
--- 		-- associate the timer to the frame || Si il y a une frame timer de libérée, on l'associe au timer
--- 		local TimerLibre = nil
--- 		for index, valeur in ipairs(Timer.TimerTable) do
--- 			if not valeur then
--- 				TimerLibre = index
--- 				Timer.TimerTable[index] = true
--- 				break
--- 			end
--- 		end
--- 		-- if there is no frame, add one || Si il n'y a pas de frame de libérée, on rajoute une frame
--- 		if not TimerLibre then
--- 			Timer.TimerTable:insert(true)
--- 			TimerLibre = #Timer.TimerTable
--- 		end
--- 		-- update the timer display || Association effective au timer
--- 		Timer.SpellTimer[#Timer.SpellTimer].Gtimer = TimerLibre
--- 		local FontString, StatusBar = self:AddFrame("NecrosisTimerFrame"..TimerLibre)
--- 		FontString:SetText(Timer.SpellTimer[#Timer.SpellTimer].Name)
--- 		StatusBar:SetMinMaxValues(
--- 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax - Timer.SpellTimer[#Timer.SpellTimer].Time,
--- 			Timer.SpellTimer[#Timer.SpellTimer].TimeMax
--- 		)
--- 	end
-
--- 	-- if NecrosisConfig.TimerType > 0 then
--- 	if NecrosisConfig.TimerType == "Graphical" or NecrosisConfig.TimerType == "Textual" then
--- 		-- sort the timers || Tri des entrées par type de sort
--- 		self:Tri(Timer.SpellTimer, "Type")
-
--- 		-- Create timers by mob group || Création des groupes (noms des mobs) des timers
--- 		Timer.SpellGroup, Timer.SpellTimer = self:Parsing(Timer.SpellGroup, Timer.SpellTimer)
-
--- 		-- update the display || On met à jour l'affichage
--- 		NecrosisUpdateTimer(Timer.SpellTimer, Timer.SpellGroup)
--- 	end
-
--- 	return Timer
--- end
-
--- ------------------------------------------------------------------------------------------------------
--- -- FUNCTIONS TO REMOVE TIMERS || FONCTIONS DE RETRAIT
--- ------------------------------------------------------------------------------------------------------
-
--- -- delete a timer by its index || Connaissant l'index du Timer dans la liste, on le supprime
--- function Necrosis:RetraitTimerParIndex(index, Timer)
--- 	if NecrosisConfig.TimerType == "Graphical" or NecrosisConfig.TimerType == "Textual" then
--- 		-- remove the graphical timer || Suppression du timer graphique
--- 		if NecrosisConfig.TimerType == "Graphical" and Timer.SpellTimer[index] then
--- 			Timer.TimerTable[Timer.SpellTimer[index].Gtimer] = false
--- 			_G["NecrosisTimerFrame"..Timer.SpellTimer[index].Gtimer]:Hide()
--- 		end
-
--- 		-- remove the mob group timer || Suppression du timer du groupe de mob
--- 		if Timer.SpellTimer[index] and Timer.SpellGroup[Timer.SpellTimer[index].Group] then
--- 			if Timer.SpellGroup[Timer.SpellTimer[index].Group].Visible  then
--- 				Timer.SpellGroup[Timer.SpellTimer[index].Group].Visible = Timer.SpellGroup[Timer.SpellTimer[index].Group].Visible - 1
--- 				-- Hide the frame groups if empty || On cache la Frame des groupes si elle est vide
--- 				if Timer.SpellGroup[Timer.SpellTimer[index].Group].Visible <= 0 then
--- 					local frameGroup = _G["NecrosisSpellTimer"..Timer.SpellTimer[index].Group]
--- 					if frameGroup then frameGroup:Hide() end
--- 				end
--- 			end
--- 		end
--- 	end
-
--- 	-- remove the timer from the list || On enlève le timer de la liste
--- 	Timer.SpellTimer:remove(index)
-
--- 	-- update the display || On met à jour l'affichage
--- 	NecrosisUpdateTimer(Timer.SpellTimer, Timer.SpellGroup)
-
--- 	return Timer
--- end
-
--- -- remove a timer by name || Si on veut supprimer spécifiquement un Timer...
--- function Necrosis:RetraitTimerParNom(name, Timer)
--- 	for index = 1, #Timer.SpellTimer, 1 do
--- 		if Timer.SpellTimer[index].Name == name then
--- 			Timer = self:RetraitTimerParIndex(index, Timer)
--- 			break
--- 		end
--- 	end
--- 	return Timer
--- end
-
--- function Necrosis:RetraitTimerParGuid(guid, Timer)
--- 	for index = 1, #Timer.SpellTimer, 1 do
--- 		if Timer.SpellTimer[index].TargetGUID == sourceGUID then
--- 			Timer = self:RetraitTimerParIndex(index, Timer)
--- 			break
--- 		end
--- 	end
--- 	return Timer
--- end
-
--- -- remove timers during combat || Fonction pour enlever les timers de combat lors de la regen
--- function Necrosis:RetraitTimerCombat(Timer)
--- 	for index = 1, #Timer.SpellTimer, 1 do
--- 		if Timer.SpellTimer[index] then
--- 			-- remove if its a cooldown timer || Si les cooldowns sont nominatifs, on enlève le nom
--- 			if Timer.SpellTimer[index].Type == 3 then
--- 				Timer.SpellTimer[index].Target = ""
--- 				Timer.SpellTimer[index].TargetGUID = ""
--- 				Timer.SpellTimer[index].TargetLevel = ""
--- 			end
--- 			-- other combat timers || Enlevage des timers de combat
--- 			if Timer.SpellTimer[index].Type == 4
--- 				or Timer.SpellTimer[index].Type == 5
--- 				or Timer.SpellTimer[index].Type == 6
--- 				then
--- 					Timer = self:RetraitTimerParIndex(index, Timer)
--- 			end
--- 		end
--- 	end
-
--- 	-- if NecrosisConfig.TimerType > 0 then
--- 	if NecrosisConfig.TimerType == "Graphical" or NecrosisConfig.TimerType == "Textual" then
--- 		local index = 4
--- 		while #Timer.SpellGroup >= 4 do
--- 			if _G["NecrosisSpellTimer"..index] then _G["NecrosisSpellTimer"..index]:Hide() end
--- 			Timer.SpellGroup:remove()
--- 			index = index + 1
--- 		end
--- 	end
-
--- 	return Timer
--- end
-
-
-
--- ------------------------------------------------------------------------------------------------------
--- -- BOOLEAN FUNCTIONS || FONCTIONS BOOLEENNES
--- ------------------------------------------------------------------------------------------------------
--- -- timer exists?
--- function Necrosis:TimerExisteDeja(Nom, SpellTimer)
--- 	for index = 1, #SpellTimer, 1 do
--- 		if SpellTimer[index].Name == Nom then
--- 			return true;
--- 		end
--- 	end
--- 	return false;
--- end
-
-
--- ------------------------------------------------------------------------------------------------------
--- -- SORTING FUNCTIONS || FONCTIONS DE TRI
--- ------------------------------------------------------------------------------------------------------
-
--- -- defined timer groups || On définit les groupes de chaque Timer
--- function Necrosis:Parsing(SpellGroup, SpellTimer)
--- 	for index = 1, #SpellTimer, 1 do
--- 		if SpellTimer[index].Group == 0 then
--- 			local GroupeOK = false
--- 			for i = 1, #SpellGroup, 1 do
--- 				if ((SpellTimer[index].Type == i) and (i <= 3)) or
--- 				   (SpellTimer[index].TargetGUID == SpellGroup[i].TargetGUID)
--- 					then
--- 					GroupeOK = true
--- 					SpellTimer[index].Group = i
--- 					SpellGroup[i].Visible = SpellGroup[i].Visible + 1
--- 					break
--- 				end
--- 			end
--- 			-- Create a new group if it doesnt exist || Si le groupe n'existe pas, on en crée un nouveau
--- 			if not GroupeOK then
--- 				SpellGroup:insert(
--- 					{
--- 						Name = SpellTimer[index].Target,
--- 						SubName = SpellTimer[index].TargetLevel,
--- 						TargetGUID = SpellTimer[index].TargetGUID,
--- 						Visible = 1
--- 					}
--- 				)
--- 				SpellTimer[index].Group = #SpellGroup
--- 			end
--- 		end
--- 	end
-
--- 	self:Tri(SpellTimer, "Group")
--- 	return SpellGroup, SpellTimer
--- end
-
--- -- sort timers according to their group || On trie les timers selon leur groupe
--- function Necrosis:Tri(SpellTimer, clef)
--- 	return SpellTimer:sort(
--- 		function (SubTab1, SubTab2)
--- 			return SubTab1[clef] < SubTab2[clef]
--- 		end)
--- end
+function _t:Initialize()
+	-- Do nothing if timers are disabled
+	if (not NecrosisConfig.EnableTimerBars) then
+		return
+	end
+	-- Start the timer update
+	C_Timer.After(TICK_SECS, UpdateTimer)
+	-- Set the default font for timer bars if none is configured
+	if (not NecrosisConfig.TimerFont) then
+		NecrosisConfig.TimerFont = Necrosis.Config.Fonts[1]
+	end
+	-- Also set default font size
+	if (not NecrosisConfig.TimerFontSize) then
+		NecrosisConfig.TimerFontSize = 12
+	end
+	-- Set the configured font and anchors
+	_t:SetFont(NecrosisConfig.TimerFont.Path, NecrosisConfig.TimerFontSize)
+	if (not NecrosisConfig.FramePosition["NecrosisMobTimerAnchor"]) then
+		NecrosisConfig.FramePosition["NecrosisMobTimerAnchor"] =
+			Config.FramePosition["NecrosisMobTimerAnchor"]
+	end
+	-- Add soulstone timer if it's on cooldown
+	local iscd, secs = ItemHelper:GetSoulstoneCooldownSecs()
+	if (iscd) then
+		local spellId = 20765 -- Major Soulstone Resurrection
+		self:InsertSpellTimer(
+			Necrosis.CurrentEnv.PlayerGuid,
+			Necrosis.CurrentEnv.PlayerName,
+			nil, nil, nil, nil,
+			spellId,
+			GetSpellInfo(spellId),
+			secs,
+			Necrosis.Spell.AuraType[spellId])
+	end
+end

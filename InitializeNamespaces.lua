@@ -3,7 +3,12 @@ Localization = {}
 Necrosis = {
 	Config = {},
 	CurrentEnv = {
+		ChatPrefix = "necrosis-cre",
 		PlayerGuid = UnitGUID("player"),
+		PlayerName = UnitName("player"),
+		PlayerFullName = nil,
+		InParty = false,
+		InRaid = false,
 		SpellCast = {}
 	},
 	Gui = {},

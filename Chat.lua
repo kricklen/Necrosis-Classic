@@ -329,11 +329,10 @@ end
 function _chat:_Msg(msg, channel)
 	-- dispatch the message to the appropriate chat channel depending on the message type
 	if (channel == "WORLD") then
-		local groupMembersCount = GetNumGroupMembers()
-		if (groupMembersCount > 5) then
+		if (Necrosis.CurrentEnv.InRaid) then
 			-- send to all raid members
 			channel = "RAID"
-		elseif (groupMembersCount > 0) then
+		elseif (Necrosis.CurrentEnv.InParty) then
 			-- send to party members
 			channel = "PARTY"
 		else

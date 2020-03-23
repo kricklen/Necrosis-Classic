@@ -77,32 +77,10 @@ function _mw:Show()
 			end
 		end
 
-		self.Frame = CreateFrame("Frame", "NecrosisGeneralFrame", UIParent)
-		-- Defining its attributes
-		self.Frame:SetFrameStrata("DIALOG")
-		self.Frame:SetMovable(true)
-		self.Frame:EnableMouse(true)
-		self.Frame:SetToplevel(true)
-		self.Frame:SetHeight(402)--512
-		self.Frame:SetWidth(428)
-		self.Frame:Show()
-		self.Frame:ClearAllPoints()
-		if NecrosisConfig.FramePosition.NecrosisGeneralFrame then
-			self.Frame:SetPoint(
-				NecrosisConfig.FramePosition["NecrosisGeneralFrame"][1],
-				NecrosisConfig.FramePosition["NecrosisGeneralFrame"][2],
-				NecrosisConfig.FramePosition["NecrosisGeneralFrame"][3],
-				NecrosisConfig.FramePosition["NecrosisGeneralFrame"][4],
-				NecrosisConfig.FramePosition["NecrosisGeneralFrame"][5]
-			)
-		else
+		self.Frame = GraphicsHelper:CreateMovableDialog("NecrosisGeneralFrame", 402, 428)
+		if (not GraphicsHelper:LoadPosition(self.Frame)) then
 			self.Frame:SetPoint("TOPLEFT", 100, -100)
 		end
-
-		self.Frame:RegisterForDrag("LeftButton")
-		self.Frame:SetScript("OnMouseUp", Necrosis.OnDragStop)
-		self.Frame:SetScript("OnDragStart", Necrosis.OnDragStart)
-		self.Frame:SetScript("OnDragStop", Necrosis.OnDragStop)
 
 		self.bgIcon = GraphicsHelper:CreateTexture(
 			self.Frame, "BACKGROUND",
