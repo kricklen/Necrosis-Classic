@@ -242,57 +242,6 @@ local function RemoveTimer(timerData)
 	timerData.Group = nil
 end
 
-local function UpdateTimer(ticker)
-	print("upd: "..tostring(self))
-	local timerData = ticker.TimerData
-	-- for i,timerData in pairs(_t.Instances) do
-		if (not timerData.Finished) then
-			-- local value = timerData.ProgressBar:GetValue() - _t.TICK_SECS
-			-- local fraction = value / timerData.SpellDuration
-			timerData.Value = timerData.Value - _t.TICK_SECS
-			local fraction = timerData.Value / timerData.SpellDuration
-			
-			timerData.ProgressBar:SetValue(timerData.Value)
-			
-			-- timerData.Spark:ClearAllPoints()
-			-- timerData.Spark:SetPoint("CENTER", timerData.ProgressBar, "LEFT", fraction * (BAR_WIDTH - BAR_HEIGHT), 0)
-			
-			if (timerData.Value > 60) then
-				timerData.lblCountdown:SetText(_t:GetFormattedTime(timerData.Value))
-			else
-				local idx = string.find(timerData.Value, ".", 1, true)
-				if (idx) then
-					local str = string.sub(timerData.Value, 1, idx + 1)
-					timerData.lblCountdown:SetText(str)
-				end
-			end
-
-			if (fraction <= 0) then
-				RemoveTimer(timerData)
-			end
-		end
-	-- end
-
-
-	<start>...
-	ends = GetTime() + delay
-	-- do stuff
-	local time = GetTime()
-	-- local delay = timer.delay - (time - timer.ends)
-	local delay = _t.TICK_SECS - (time - timer.ends)
-	-- Ensure the delay doesn't go below the threshold
-	if delay < 0.01 then delay = 0.01 end
-	C_TimerAfter(delay, timer.callback)
-	timer.ends = time + delay
-	<end>...
-
-
-	if (NecrosisConfig.EnableTimerBars) then
-		-- Repeat after 0.1 secs
-		C_Timer.After(TICK_SECS, UpdateTimer)
-	end
-end
-
 local function FindFreeTimer()
 	for i,timerData in ipairs(_t.Instances) do
 		if (timerData.Finished and timerData.Frame) then
@@ -397,8 +346,8 @@ end
 
 local function StartTimer(timerData)
 	-- Timers are split into 3 types: banish, soulstone and the rest
-	-- Banish and soulstone are displayed in the same frame group, banishes on top, soulstones at the bottom
-	-- The rest is displayed in a frame group per mob since it's dots etc.
+	-- Banish and soulstone are displayed in the same timer group, banishes on top, soulstones at the bottom
+	-- The rest is displayed in a timer group per mob since it's dots etc.
 
 	-- Set starting values
 	timerData.ProgressBar:SetMinMaxValues(0, timerData.SpellDuration)
@@ -426,10 +375,48 @@ local function StartTimer(timerData)
 	timerData.Group.Frame:Show()
 	timerData.Frame:Show()
 
-	timerData.UpdateMe = UpdateTimer
-	-- timerData.Ticker = C_Timer.NewTicker(_t.TICK_SECS, UpdateTimer, timerData.SpellDuration / _t.TICK_SECS)
-	-- timerData.Ticker.TimerData = timerData
-	C_Timer.After(_t.TICK_SECS, timerData.UpdateMe)
+	-- Update functionality inspired by AceTimer library
+	timerData.TickEnd = GetTime() + _t.TICK_SECS
+	timerData.UpdateFunc =
+		function()
+			if (not timerData.Finished) then
+				timerData.Value = timerData.Value - _t.TICK_SECS
+				local fraction = timerData.Value / timerData.SpellDuration
+				
+				-- Update progress bar
+				timerData.ProgressBar:SetValue(timerData.Value)
+				
+				-- Move spark along the progress bar
+				timerData.Spark:ClearAllPoints()
+				timerData.Spark:SetPoint("CENTER", timerData.ProgressBar, "LEFT", fraction * (BAR_WIDTH - BAR_HEIGHT), 0)
+				
+				-- Display minutes:seconds or seconds.tenths
+				if (timerData.Value > 60) then
+					timerData.lblCountdown:SetText(_t:GetFormattedTime(timerData.Value))
+				else
+					local idx = string.find(timerData.Value, ".", 1, true)
+					if (idx) then
+						local str = string.sub(timerData.Value, 1, idx + 1)
+						timerData.lblCountdown:SetText(str)
+					end
+				end
+	
+				-- Clear timer or continue ticking
+				if (fraction <= 0) then
+					RemoveTimer(timerData)
+				else
+					local time = GetTime()
+					local delay = _t.TICK_SECS - (time - timerData.TickEnd)
+					-- Ensure the delay doesn't go below the threshold
+					if delay < 0.01 then delay = 0.01 end
+					C_Timer.After(delay, timerData.UpdateFunc)
+					timerData.TickEnd = time + delay
+				end
+			end
+		end
+
+	-- Start ticking
+	C_Timer.After(_t.TICK_SECS, timerData.UpdateFunc)
 end
 
 function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, targetLevel, targetIcon, spellId, spellName, spellDuration, spellType)
@@ -493,25 +480,30 @@ end
 function _t:ResetTimer(casterGuid, targetGuid, spellId, spellDuration)
 	for i,timerData in ipairs(_t.Instances) do
 		if (timerData.CasterGuid == casterGuid and timerData.TargetGuid == targetGuid and timerData.SpellId == spellId) then
-			timerData.ProgressBar:SetValue(spellDuration)
+			timerData.Value = spellDuration
 			return
 		end
 	end
 end
 
-local function SetSoulstoneCooldown(timerData)
+local function RemoveSoulstone(timerData)
+	-- If soulstone is cast, don't use it's timer but the item cooldown.
+	-- -> Is that better?
+	-- Display and communicate duration and target name.
+	-- When target dies or removes ss, check for item cooldown.
+	-- If ss is on cooldown (which it should if the target dies f.e.),
+	-- then update the display and communicate the cooldown.
 	if (timerData.CasterGuid == Necrosis.CurrentEnv.PlayerGuid) then
 		-- Our own soulstone target died
-		timerData.lblSpellname:SetText("Inactive")
 		local iscd, sscd = ItemHelper:GetSoulstoneCooldownSecs()
-		print("sscd: "..tostring(sscd))
 		if (iscd) then
-			timerData.ProgressBar:SetValue(sscd)
-			EventHelper:SendAddonMessage("Soulstone cooldown: "..sscd)
+			timerData.Value = sscd
+			timerData.lblSpellname:SetText("Inactive")
+			EventHelper:SendAddonMessage("SoulstoneCooldown~"..timerData.CasterGuid.."|"..sscd)
 		else
 			-- Soulstone is ready, remove the timer
 			RemoveTimer(timerData)
-			EventHelper:SendAddonMessage("Soulstone remove: ")
+			EventHelper:SendAddonMessage("SoulstoneReady~"..timerData.CasterGuid)
 		end
 	else
 		-- Soulstone target of a fellow warlock died
@@ -523,9 +515,8 @@ end
 function _t:RemoveSpellTimerTarget(targetGuid)
 	for i,timerData in ipairs(self.Instances) do
 		if (timerData.TargetGuid == targetGuid) then
-			-- Check if it's a soulstone
 			if (timerData.SpellType == "soulstone") then
-				SetSoulstoneCooldown(timerData)
+				RemoveSoulstone(timerData)
 			else
 				RemoveTimer(timerData)
 			end
@@ -538,7 +529,7 @@ function _t:RemoveSpellTimerTargetName(targetGuid, spellName)
 	for i,timerData in ipairs(self.Instances) do
 		if (timerData.TargetGuid == targetGuid and timerData.SpellName == spellName) then
 			if (timerData.SpellType == "soulstone") then
-				SetSoulstoneCooldown(timerData)
+				RemoveSoulstone(timerData)
 			else
 				RemoveTimer(timerData)
 			end
@@ -635,8 +626,6 @@ function _t:Initialize()
 	if (not NecrosisConfig.EnableTimerBars) then
 		return
 	end
-	-- Start the timer update
-	-- C_Timer.After(_t.TICK_SECS, UpdateTimer)
 	-- Set the default font for timer bars if none is configured
 	if (not NecrosisConfig.TimerFont) then
 		NecrosisConfig.TimerFont = Necrosis.Config.Fonts[1]
