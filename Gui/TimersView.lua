@@ -297,10 +297,10 @@ function _tv:Show()
 			function(self)
 				local spellId = 20765
 				Necrosis.Timers:InsertSpellTimer(
-					"12345",
-					"Testman",
-					-- Necrosis.CurrentEnv.PlayerGuid,
-					-- Necrosis.CurrentEnv.PlayerName,
+					-- "12345",
+					-- "Testman",
+					Necrosis.CurrentEnv.PlayerGuid,
+					Necrosis.CurrentEnv.PlayerName,
 					UnitGUID("target"), UnitName("target"), 0, 0,
 					spellId,
 					GetSpellInfo(spellId),
@@ -361,7 +361,7 @@ function _tv:Show()
 
 		self.btnKillSoulstoneTimer = GraphicsHelper:CreateButton(
 			self.Frame,
-			"Kill Soulstone",
+			"Kill Target",
 			-90, -278,
 			function(self)
 				Necrosis.Timers:RemoveSpellTimerTarget(UnitGUID("target"))

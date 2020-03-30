@@ -332,12 +332,13 @@ end
 -- NECROSIS FUNCTIONS || FONCTIONS NECROSIS
 ------------------------------------------------------------------------------------------------------
 -- Function started when updating the interface (main) - every 0.1 seconds || Fonction lancée à la mise à jour de l'interface (main) -- Toutes les 0,1 secondes environ
-function Necrosis:OnUpdate(something, elapsed)
+function Necrosis:OnUpdate(elapsed)--something,
 
-	if elapsed then
+	if (elapsed) then
 		Local.LastUpdate[1] = Local.LastUpdate[1] + elapsed
 		Local.LastUpdate[2] = Local.LastUpdate[2] + elapsed
 	end
+
 	-- -- If smooth scroll timers, we update them as soon as possible || Si défilement lisse des timers, on les met à jours le plus vite possible
 	-- NecrosisUpdateTimer(Local.TimerManagement.SpellTimer)
 

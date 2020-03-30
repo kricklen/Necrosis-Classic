@@ -48,12 +48,14 @@ Necrosis.Timers = {
 	SingleAnchor = nil,
 	MobFrames = {},
 	MobAnchor = nil,
-	Font = CreateFont("NecrosisTimerFont")
+	Font = CreateFont("NecrosisTimerFont"),
+	TICK_SECS = 0.05,
+	TimeSinceLastUpdate = 0
 }
 
 local _t = Necrosis.Timers
 
-local TICK_SECS = 0.1
+-- local TICK_SECS = 0.1
 local BAR_HEIGHT = 20
 local BAR_WIDTH = 140
 local BAR_PADDING = 1
@@ -201,11 +203,16 @@ local function SortTimerGroup(timerGroup)
 	end
 end
 
-local function UpdateRaidIcon(iconFrame, iconNumber)
+local function UpdateRaidIcon(data, iconNumber)
+	if (iconNumber == data.RaidIconNumber) then
+		return
+	end
 	if (iconNumber) then
-		iconFrame:SetTexture(GraphicsHelper:GetWoWTexture("TargetingFrame", "UI-RaidTargetingIcon_"..iconNumber))
+		data.RaidIcon:SetTexture(GraphicsHelper:GetWoWTexture("TargetingFrame", "UI-RaidTargetingIcon_"..iconNumber))
+		data.RaidIconNumber = iconNumber
 	else
-		iconFrame:SetTexture(nil)
+		data.RaidIcon:SetTexture(nil)
+		data.RaidIconNumber = nil
 	end
 end
 
@@ -215,10 +222,9 @@ local function RemoveTimer(timerData)
 	end
 	timerData.Finished = true
 	-- Hide the timer, stopping the countdown
-	timerData.Frame:SetScript("OnUpdate", nil)
 	timerData.Frame:Hide()
 	-- Remove the raid icon from the timer (might have been banish)
-	UpdateRaidIcon(timerData.RaidIcon, nil)
+	UpdateRaidIcon(timerData, nil)
 	-- Remove the timer from the group
 	local idx = table.indexOf(timerData.Group.Timers, timerData)
 	table.remove(timerData.Group.Timers, idx)
@@ -226,7 +232,7 @@ local function RemoveTimer(timerData)
 		SortTimerGroup(timerData.Group)
 	else
 		-- Remove the raid icon from the timer group
-		UpdateRaidIcon(timerData.Group.RaidIcon, nil)
+		UpdateRaidIcon(timerData.Group, nil)
 		timerData.Group.Frame:Hide()
 		if (timerData.SpellType ~= "soulstone" and timerData.SpellType ~= "banish") then
 			PositionMobTimerGroups()
@@ -236,23 +242,27 @@ local function RemoveTimer(timerData)
 	timerData.Group = nil
 end
 
-local function UpdateTimer()
-	for i,timerData in pairs(_t.Instances) do
+local function UpdateTimer(ticker)
+	print("upd: "..tostring(self))
+	local timerData = ticker.TimerData
+	-- for i,timerData in pairs(_t.Instances) do
 		if (not timerData.Finished) then
-			local value = timerData.ProgressBar:GetValue() - TICK_SECS
-			local fraction = value / timerData.SpellDuration
+			-- local value = timerData.ProgressBar:GetValue() - _t.TICK_SECS
+			-- local fraction = value / timerData.SpellDuration
+			timerData.Value = timerData.Value - _t.TICK_SECS
+			local fraction = timerData.Value / timerData.SpellDuration
 			
-			timerData.ProgressBar:SetValue(value)
+			timerData.ProgressBar:SetValue(timerData.Value)
 			
-			timerData.Spark:ClearAllPoints()
-			timerData.Spark:SetPoint("CENTER", timerData.ProgressBar, "LEFT", fraction * (BAR_WIDTH - BAR_HEIGHT), 0)
+			-- timerData.Spark:ClearAllPoints()
+			-- timerData.Spark:SetPoint("CENTER", timerData.ProgressBar, "LEFT", fraction * (BAR_WIDTH - BAR_HEIGHT), 0)
 			
-			if (value > 60) then
-				timerData.lblCountdown:SetText(_t:GetFormattedTime(value))
+			if (timerData.Value > 60) then
+				timerData.lblCountdown:SetText(_t:GetFormattedTime(timerData.Value))
 			else
-				local idx = string.find(value, ".", 1, true)
+				local idx = string.find(timerData.Value, ".", 1, true)
 				if (idx) then
-					local str = string.sub(value, 1, idx + 1)
+					local str = string.sub(timerData.Value, 1, idx + 1)
 					timerData.lblCountdown:SetText(str)
 				end
 			end
@@ -261,7 +271,22 @@ local function UpdateTimer()
 				RemoveTimer(timerData)
 			end
 		end
-	end
+	-- end
+
+
+	<start>...
+	ends = GetTime() + delay
+	-- do stuff
+	local time = GetTime()
+	-- local delay = timer.delay - (time - timer.ends)
+	local delay = _t.TICK_SECS - (time - timer.ends)
+	-- Ensure the delay doesn't go below the threshold
+	if delay < 0.01 then delay = 0.01 end
+	C_TimerAfter(delay, timer.callback)
+	timer.ends = time + delay
+	<end>...
+
+
 	if (NecrosisConfig.EnableTimerBars) then
 		-- Repeat after 0.1 secs
 		C_Timer.After(TICK_SECS, UpdateTimer)
@@ -379,6 +404,7 @@ local function StartTimer(timerData)
 	timerData.ProgressBar:SetMinMaxValues(0, timerData.SpellDuration)
 	timerData.ProgressBar:SetValue(timerData.SpellDuration)
 	timerData.lblCountdown:SetText(timerData.SpellDuration)
+	timerData.Value = timerData.SpellDuration
 
 	if (timerData.SpellType == "soulstone") then
 		-- Soulstone Resurrection has no SpellIcon texture
@@ -399,6 +425,11 @@ local function StartTimer(timerData)
 	-- Show the gui elements, starting the timer
 	timerData.Group.Frame:Show()
 	timerData.Frame:Show()
+
+	timerData.UpdateMe = UpdateTimer
+	-- timerData.Ticker = C_Timer.NewTicker(_t.TICK_SECS, UpdateTimer, timerData.SpellDuration / _t.TICK_SECS)
+	-- timerData.Ticker.TimerData = timerData
+	C_Timer.After(_t.TICK_SECS, timerData.UpdateMe)
 end
 
 function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, targetLevel, targetIcon, spellId, spellName, spellDuration, spellType)
@@ -577,9 +608,8 @@ end
 function _t:UpdateRaidIcon(unitGuid, iconNumber)
 	for i,mobFrame in ipairs(_t.MobFrames) do
 		if (mobFrame.Guid == unitGuid) then
-			if (mobFrame.RaidIconNumber ~= iconNumber) then
-				mobFrame.RaidIconNumber = iconNumber
-				UpdateRaidIcon(mobFrame.RaidIcon, iconNumber)
+			if (#mobFrame.Timers > 0) then
+				UpdateRaidIcon(mobFrame, iconNumber)
 			end
 			break
 		end
@@ -587,10 +617,12 @@ function _t:UpdateRaidIcon(unitGuid, iconNumber)
 	-- Check for banish on a target
 	if (_t.SingleFrame) then
 		for i,timerData in ipairs(_t.SingleFrame.Timers) do
-			if (timerData.TargetGuid == unitGuid and timerData.SpellType == "banish") then
-				if (timerData.RaidIconNumber ~= iconNumber) then
-					timerData.RaidIconNumber = iconNumber
-					UpdateRaidIcon(timerData.RaidIcon, iconNumber)
+			if (timerData.TargetGuid == unitGuid
+				and (timerData.SpellType == "soulstone"
+				or timerData.SpellType == "banish"))
+			then
+				if (not timerData.Finished) then
+					UpdateRaidIcon(timerData, iconNumber)
 				end
 				break
 			end
@@ -604,7 +636,7 @@ function _t:Initialize()
 		return
 	end
 	-- Start the timer update
-	C_Timer.After(TICK_SECS, UpdateTimer)
+	-- C_Timer.After(_t.TICK_SECS, UpdateTimer)
 	-- Set the default font for timer bars if none is configured
 	if (not NecrosisConfig.TimerFont) then
 		NecrosisConfig.TimerFont = Necrosis.Config.Fonts[1]
