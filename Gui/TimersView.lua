@@ -75,7 +75,7 @@ function _tv:cbEnableTimerBars_Click()
 	if (NecrosisConfig.EnableTimerBars) then
 		Necrosis.Timers:Initialize()
 	else
-		Necrosis.Timers:RemoveAllTimers()
+		Necrosis.Timers:Disable()
 	end
 end
 
@@ -339,7 +339,7 @@ function _tv:Show()
 				Necrosis.Timers:InsertSpellTimer(
 					Necrosis.CurrentEnv.PlayerGuid,
 					Necrosis.CurrentEnv.PlayerName,
-					UnitGUID("target"), UnitName("target"), 0, 0,
+					UnitGUID("target"), UnitName("target"), 0, nil,
 					spellId,
 					GetSpellInfo(spellId),
 					Necrosis.Spell.AuraDuration[spellId],
@@ -368,6 +368,40 @@ function _tv:Show()
 			end
 		)
 		self.btnKillSoulstoneTimer:SetWidth(100)
+		
+		self.btnTestTimerSSRemote = GraphicsHelper:CreateButton(
+			self.Frame,
+			"Test SS Remote",
+			-90, -306,
+			function(self)
+				local spellId = 20765
+				local spellName = GetSpellInfo(spellId)
+				EventHelper:SendAddonMessage("InsertTimer~"
+					..tostring(12345).."|"
+					..tostring("Testman").."|"
+					..tostring(UnitGUID("target")).."|"
+					..tostring(UnitName("target")).."|"
+					..tostring(0).."|"
+					..tostring(nil).."|"
+					..tostring(spellId).."|"
+					..tostring(spellName).."|"
+					..tostring(Necrosis.Spell.AuraDuration[spellId]).."|"
+					..tostring(Necrosis.Spell.AuraType[spellId])
+				)
+				-- Necrosis.Timers:InsertSpellTimer(
+				-- 	"12345",
+				-- 	"Testman",
+				-- 	-- Necrosis.CurrentEnv.PlayerGuid,
+				-- 	-- Necrosis.CurrentEnv.PlayerName,
+				-- 	UnitGUID("target"), UnitName("target"), 0, 0,
+				-- 	spellId,
+				-- 	GetSpellInfo(spellId),
+				-- 	Necrosis.Spell.AuraDuration[spellId],
+				-- 	Necrosis.Spell.AuraType[spellId]
+				-- )
+			end
+		)
+		self.btnTestTimerSSRemote:SetWidth(100)
 	end
 
 	self.Frame:Show()

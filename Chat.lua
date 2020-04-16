@@ -124,6 +124,11 @@ function _chat:AfterSpellCast()
 	end
 end
 
+function _chat:ClearMessages()
+	_chat.MsgTableBefore = nil
+	_chat.MsgTableAfter = nil
+end
+
 
 --
 -- Start of refactored code

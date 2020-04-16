@@ -33,20 +33,20 @@ EventHelper = {
 }
 
 -- Array with references to text change functions
-local _languageChangedHandlers = {}
+local _onLanguageChangedHandlers = {}
 
 local _eh = EventHelper
 
 -- Localization event and handler
 function _eh:RegisterLanguageChangedHandler(handler)
-    table.insert(_languageChangedHandlers, handler)
+    table.insert(_onLanguageChangedHandlers, handler)
 end
 
 -- Notify language change
-function _eh:FireLanguageChangedEvent(code)
+function _eh:OnLanguageChangedEvent(code)
     NecrosisConfig.Language = code
     Necrosis:SpellLocalize("tooltip")
-    for i,handler in ipairs(_languageChangedHandlers) do
+    for i,handler in ipairs(_onLanguageChangedHandlers) do
         handler()
     end    
 end
@@ -83,19 +83,81 @@ end
 function _eh:ProcessAddonMessage(text)
     local split_cmd = split(text, "~")
     print("command: "..tostring(split_cmd[1])..", "..tostring(split_cmd[2]))
+
     if (split_cmd[1] == "InsertTimer") then
         local split_timer = split(split_cmd[2], "|")
         Necrosis.Timers:InsertSpellTimer(
-            split_timer[1],
-            split_timer[2],
-            split_timer[3],
-            split_timer[4],
-            split_timer[5],
-            split_timer[6],
-            split_timer[7],
-            split_timer[8],
-            split_timer[9],
-            split_timer[10]
+            split_timer[1], -- casterGuid
+            split_timer[2], -- casterName
+            split_timer[3], -- targetGuid
+            split_timer[4], -- targetName
+            split_timer[5], -- targetLevel
+            split_timer[6], -- targetIcon
+            split_timer[7], -- spellId
+            split_timer[8], -- spellName
+            split_timer[9], -- spellDuration
+            split_timer[10] -- spellType
         )
+
+    elseif (split_cmd[1] == "RemoveSpellTimerTargetName") then
+        local split_timer = split(split_cmd[2], "|")
+        print("Msg RemoveSpellTimerTargetName: "
+            ..split_timer[1]..", "
+            ..split_timer[2]..", "
+            ..split_timer[3])
+        Necrosis.Timers:RemoveSpellTimerTargetName(
+            split_timer[1], -- casterGuid
+            split_timer[2], -- targetGuid
+            split_timer[3]  -- spellName
+        )
+
+    elseif (split_cmd[1] == "UpdateTimer") then
+        local split_timer = split(split_cmd[2], "|")
+        print("Msg UpdateTimer: "
+            ..split_timer[1]..", "
+            ..split_timer[2]..", "
+            ..split_timer[3]..", "
+            ..split_timer[4])
+        Necrosis.Timers:UpdateTimer(
+            split_timer[1], -- casterGuid
+            split_timer[2], -- targetGuid
+            split_timer[3], -- spellId
+            split_timer[4]  -- spellDuration
+        )
+    end
+end
+
+-- Combat start event
+local _onCombatStartHandlers = {}
+
+function _eh:RegisterOnCombatStartHandler(handler)
+    table.insert(_onCombatStartHandlers, handler)
+end
+
+function _eh:OnCombatStart()
+    print("Combat starts...")
+    for i,handler in ipairs(_onCombatStartHandlers) do
+        handler()
+    end
+end
+
+-- Combat finished event
+local _onCombatStopHandlers = {}
+
+function _eh:RegisterOnCombatStopHandler(handler)
+    table.insert(_onCombatStopHandlers, handler)
+end
+
+function _eh:UnregisterOnCombatStopHandler(handler)
+    local idx = table.indexOf(_onCombatStopHandlers, handler)
+    if (idx > 0) then
+        table.remove(_onCombatStopHandlers, idx)
+    end
+end
+
+function _eh:OnCombatStop()
+    print("Combat stops...")
+    for i,handler in ipairs(_onCombatStopHandlers) do
+        handler()
     end
 end

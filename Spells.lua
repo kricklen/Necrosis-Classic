@@ -256,32 +256,32 @@ function Necrosis:SpellLocalize(tooltip)
 		-- Add durations for each debuff that might be tracked by timers
 		-- Inspired by LibClassicDurations to hard-code it since UnitDebuff(..) API always returns 0
 		-- Affliction
-		AddAuraDuration({172}, 12) -- Corruption 1
-		AddAuraDuration({6222}, 15) -- Corruption 2
-		AddAuraDuration({6223, 7648, 11671, 11672}, 18) -- Corruption 3-6
-		AddAuraDuration({980, 1014, 6217, 11711, 11712, 11713}, 24) -- Curse of Agony 1-6
-		AddAuraDuration({603}, 60) -- Curse of Doom
-		AddAuraDuration({704, 7658, 7659, 11717}, 120) -- Curse of Recklessness 1-4
-		AddAuraDuration({17862, 17937}, 300) -- Curse of Shadow 1-2
-		AddAuraDuration({1714, 11719}, 30) -- Curse of Tongues 1-2
-		AddAuraDuration({702, 1108, 6205, 7646, 11707, 11708}, 120) -- Curse of Weakness 1-6
-		AddAuraDuration({1490, 11721, 11722}, 300) -- Curse of Elements 1-3
-		AddAuraDuration({6789, 17925, 17926}, 3) -- Death Coil 1-3
-		AddAuraDuration({5782}, 10) -- Fear 1
-		AddAuraDuration({6213}, 15) -- Fear 2
-		AddAuraDuration({6215}, 20) -- Fear 3
-		AddAuraDuration({5484}, 10) -- Howl of Terror 1
-		AddAuraDuration({17928}, 15) -- Howl of Terror 2
+		AddAuraDuration({172}, 12, "debuff") -- Corruption 1
+		AddAuraDuration({6222}, 15, "debuff") -- Corruption 2
+		AddAuraDuration({6223, 7648, 11671, 11672}, 18, "debuff") -- Corruption 3-6
+		AddAuraDuration({980, 1014, 6217, 11711, 11712, 11713}, 24, "debuff") -- Curse of Agony 1-6
+		AddAuraDuration({603}, 60, "debuff") -- Curse of Doom
+		AddAuraDuration({704, 7658, 7659, 11717}, 120, "debuff") -- Curse of Recklessness 1-4
+		AddAuraDuration({17862, 17937}, 300, "debuff") -- Curse of Shadow 1-2
+		AddAuraDuration({1714, 11719}, 30, "debuff") -- Curse of Tongues 1-2
+		AddAuraDuration({702, 1108, 6205, 7646, 11707, 11708}, 120, "debuff") -- Curse of Weakness 1-6
+		AddAuraDuration({1490, 11721, 11722}, 300, "debuff") -- Curse of Elements 1-3
+		AddAuraDuration({6789, 17925, 17926}, 3, "debuff") -- Death Coil 1-3
+		AddAuraDuration({5782}, 10, "debuff") -- Fear 1
+		AddAuraDuration({6213}, 15, "debuff") -- Fear 2
+		AddAuraDuration({6215}, 20, "debuff") -- Fear 3
+		AddAuraDuration({5484}, 10, "debuff") -- Howl of Terror 1
+		AddAuraDuration({17928}, 15, "debuff") -- Howl of Terror 2
 		-- Demonology
 		AddAuraDuration({710}, 20, "banish") -- Banish 1
 		AddAuraDuration({18647}, 30, "banish") -- Banish 2
-		AddAuraDuration({1098, 11725, 11726}, 300) -- Enslave Demon 1-3
-		AddAuraDuration({1122}, 300) -- Inferno
+		AddAuraDuration({1098, 11725, 11726}, 300, "debuff") -- Enslave Demon 1-3
+		AddAuraDuration({1122}, 300, "debuff") -- Inferno
 		AddAuraDuration({20707, 20762, 20763, 20764, 20765}, 1800, "soulstone") -- Soulstone Resurrection 1-5
 		-- Destruction
-		AddAuraDuration({348, 707, 1094, 2941, 11665, 11667, 11668}, 15) -- Immolate 1-7
-		AddAuraDuration({17877, 18867, 18868, 18869, 18870, 18871}, 5) -- Shadowburn 1-6
-		AddAuraDuration({17794, 17797, 17798, 17799, 17800}, 12) -- Shadow Vulnerability
+		AddAuraDuration({348, 707, 1094, 2941, 11665, 11667, 11668}, 15, "debuff") -- Immolate 1-7
+		AddAuraDuration({17877, 18867, 18868, 18869, 18870, 18871}, 5, "debuff") -- Shadowburn 1-6
+		AddAuraDuration({17794, 17797, 17798, 17799, 17800}, 12, "debuff") -- Shadow Vulnerability
 
 
 		-- Type 0 = Pas de Timer || no timer

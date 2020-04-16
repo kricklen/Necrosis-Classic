@@ -49,21 +49,20 @@ Necrosis.Timers = {
 	MobFrames = {},
 	MobAnchor = nil,
 	Font = CreateFont("NecrosisTimerFont"),
-	TICK_SECS = 0.05,
 	TimeSinceLastUpdate = 0
 }
 
 local _t = Necrosis.Timers
 
--- local TICK_SECS = 0.1
+local TICK_SECS = 0.05
 local BAR_HEIGHT = 20
-local BAR_WIDTH = 140
+local BAR_WIDTH = 160
 local BAR_PADDING = 1
 local BAR_COLOR = {r = 1, g = 0.5, b = 0}
 local TEXT_COLOR = {r = 1, g = 1, b = 1}
 local SS_BAN_ANCHOR = {x = 0, y = 0}
 local MOB_ANCHOR = {x = -60, y = 0}
-local BACKGROUND_COLOR = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
+local BACKGROUND_COLOR = {r = 0.2, g = 0.2, b = 0.2, a = 0.7}
 
 function _t:GetFormattedTime(secs)
 	local mins = math.modf(secs / 60)
@@ -151,8 +150,8 @@ end
 
 local function MakeTimerGroupGui(parentFrame)
 	local mf = CreateFrame("Frame", nil, parentFrame)
+	-- local mf = CreateFrame("BUTTON", nil, parentFrame, "SecureActionButtonTemplate")
 	mf:SetMovable(false)
-	-- mf:SetAllPoints(parentFrame)
 	mf:ClearAllPoints()
 	mf:SetSize(BAR_WIDTH, BAR_HEIGHT)
 
@@ -294,18 +293,17 @@ local function MakeTimerGui(parentFrame)
 	bg:SetAllPoints()
 	bg:SetColorTexture(BACKGROUND_COLOR.r, BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a)
 
-	local spark = bar:CreateTexture(nil, "OVERLAY")
-	spark:SetSize(BAR_HEIGHT, BAR_HEIGHT)
-	spark:SetTexture(GraphicsHelper:GetWoWTexture("CastingBar", "UI-CastingBar-Spark"))
-	spark:SetBlendMode("ADD")
-	spark:ClearAllPoints()
-	spark:SetPoint("CENTER", bar, "LEFT", 0, 0)
-
 	local spellIcon = bar:CreateTexture(nil, "OVERLAY")
 	spellIcon:SetSize(BAR_HEIGHT, BAR_HEIGHT)
 	spellIcon:SetBlendMode("ADD")
 	spellIcon:ClearAllPoints()
 	spellIcon:SetPoint("RIGHT", frame, "RIGHT", BAR_PADDING, 0)
+
+	local bgSpell = bar:CreateTexture(nil, "BACKGROUND")
+	bgSpell:SetSize(BAR_HEIGHT, BAR_HEIGHT)
+	bgSpell:ClearAllPoints()
+	bgSpell:SetPoint("RIGHT", frame, "RIGHT", BAR_PADDING, 0)
+	bgSpell:SetColorTexture(BACKGROUND_COLOR.r, BACKGROUND_COLOR.g, BACKGROUND_COLOR.b, BACKGROUND_COLOR.a)
 
 	local raidIcon = bar:CreateTexture(nil, "OVERLAY")
 	raidIcon:SetSize(BAR_HEIGHT, BAR_HEIGHT)
@@ -320,7 +318,6 @@ local function MakeTimerGui(parentFrame)
 			lblCountdown = lblCountdown,
 			lblSpellname = lblSpellname,
 			ProgressBar = bar,
-			Spark = spark,
 			SpellIcon = spellIcon,
 			RaidIcon = raidIcon
 		}
@@ -354,13 +351,7 @@ local function StartTimer(timerData)
 	timerData.ProgressBar:SetValue(timerData.SpellDuration)
 	timerData.lblCountdown:SetText(timerData.SpellDuration)
 	timerData.Value = timerData.SpellDuration
-
-	if (timerData.SpellType == "soulstone") then
-		-- Soulstone Resurrection has no SpellIcon texture
-		timerData.SpellIcon:SetTexture(GetSpellTexture("Create Soulstone"))
-	else
-		timerData.SpellIcon:SetTexture(GetSpellTexture(timerData.SpellName))
-	end
+	timerData.SpellIcon:SetTexture(GetSpellTexture(timerData.SpellId))
 
 	-- Assign the spell name or target
 	if (timerData.SpellType == "soulstone" or timerData.SpellType == "banish") then
@@ -376,19 +367,15 @@ local function StartTimer(timerData)
 	timerData.Frame:Show()
 
 	-- Update functionality inspired by AceTimer library
-	timerData.TickEnd = GetTime() + _t.TICK_SECS
+	timerData.TickEnd = GetTime() + TICK_SECS
 	timerData.UpdateFunc =
 		function()
 			if (not timerData.Finished) then
-				timerData.Value = timerData.Value - _t.TICK_SECS
+				timerData.Value = timerData.Value - TICK_SECS
 				local fraction = timerData.Value / timerData.SpellDuration
 				
 				-- Update progress bar
 				timerData.ProgressBar:SetValue(timerData.Value)
-				
-				-- Move spark along the progress bar
-				timerData.Spark:ClearAllPoints()
-				timerData.Spark:SetPoint("CENTER", timerData.ProgressBar, "LEFT", fraction * (BAR_WIDTH - BAR_HEIGHT), 0)
 				
 				-- Display minutes:seconds or seconds.tenths
 				if (timerData.Value > 60) then
@@ -406,7 +393,7 @@ local function StartTimer(timerData)
 					RemoveTimer(timerData)
 				else
 					local time = GetTime()
-					local delay = _t.TICK_SECS - (time - timerData.TickEnd)
+					local delay = TICK_SECS - (time - timerData.TickEnd)
 					-- Ensure the delay doesn't go below the threshold
 					if delay < 0.01 then delay = 0.01 end
 					C_Timer.After(delay, timerData.UpdateFunc)
@@ -416,26 +403,49 @@ local function StartTimer(timerData)
 		end
 
 	-- Start ticking
-	C_Timer.After(_t.TICK_SECS, timerData.UpdateFunc)
+	C_Timer.After(TICK_SECS, timerData.UpdateFunc)
 end
 
 function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, targetLevel, targetIcon, spellId, spellName, spellDuration, spellType)
+	assert(casterGuid ~= nil, 	 "casterGuid is nil")
+	assert(casterName ~= nil, 	 "casterName is nil")
+	assert(targetGuid ~= nil, 	 "targetGuid is nil")
+	assert(targetName ~= nil, 	 "targetName is nil")
+	assert(targetLevel ~= nil, 	 "targetLevel is nil")
+	if (targetIcon == 0) then targetIcon = nil end
+	assert(spellId ~= nil, 		 "spellId is nil")
+	assert(spellName ~= nil, 	 "spellName is nil")
+	assert(spellDuration ~= nil, "spellDuration is nil")
+	assert(spellType ~= nil, 	 "spellType is nil")
+
 	local timerData
+print("InsertSpellTimer: "..spellName)	
 	if (spellType == "soulstone" or spellType == "banish") then
 		-- If we cast soulstone or banish, tell our fellow warlocks
 		if (casterGuid == Necrosis.CurrentEnv.PlayerGuid) then
-			-- Broadcast to raid/party if applicable
-			EventHelper:SendAddonMessage("InsertTimer~"
-				..tostring(casterGuid).."|"
-				..tostring(casterName).."|"
-				..tostring(targetGuid).."|"
-				..tostring(targetName).."|"
-				..tostring(targetLevel).."|"
-				..tostring(targetIcon).."|"
-				..tostring(spellId).."|"
-				..tostring(spellName).."|"
-				..tostring(spellDuration).."|"
-				..tostring(spellType))
+			if (spellType == "soulstone") then
+
+				-- local bandwidthIn, bandwidthOut, latencyHomeMS, latencyWorldMS = GetNetStats()
+				-- print("Net Stats: "
+				-- 	.."bandwidthIn: "..bandwidthIn
+				-- 	..", bandwidthOut: "..bandwidthOut
+				-- 	..", latencyHome: "..latencyHomeMS
+				-- 	..", latencyWorld: "..latencyWorldMS)
+
+				-- Broadcast to raid/party if applicable
+				EventHelper:SendAddonMessage("InsertTimer~"
+					..casterGuid.."|"
+					..casterName.."|"
+					..targetGuid.."|"
+					..targetName.."|"
+					..targetLevel.."|"
+					..tonumber(targetIcon).."|"
+					..spellId.."|"
+					..spellName.."|"
+					..spellDuration.."|"
+					..spellType
+				)
+			end
 		end
 		if (not _t.SingleFrame) then
 			-- Create and position the group for single timers
@@ -474,10 +484,12 @@ function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, tar
 	timerData.EndTime = GetTime() + spellDuration
 
 	StartTimer(timerData)
+
+	return timerData
 end
 
--- Reset an existing timer, a debuff has been casted on a tareget while it was still active
-function _t:ResetTimer(casterGuid, targetGuid, spellId, spellDuration)
+-- Update an existing timer, a debuff has been casted on a tareget while it was still active
+function _t:UpdateTimer(casterGuid, targetGuid, spellId, spellDuration)
 	for i,timerData in ipairs(_t.Instances) do
 		if (timerData.CasterGuid == casterGuid and timerData.TargetGuid == targetGuid and timerData.SpellId == spellId) then
 			timerData.Value = spellDuration
@@ -493,21 +505,37 @@ local function RemoveSoulstone(timerData)
 	-- When target dies or removes ss, check for item cooldown.
 	-- If ss is on cooldown (which it should if the target dies f.e.),
 	-- then update the display and communicate the cooldown.
+
+	-- Remove the target guid to avoid removing the timer by accident
+	timerData.TargetGuid = "-"
+	UpdateRaidIcon(timerData, 8)
 	if (timerData.CasterGuid == Necrosis.CurrentEnv.PlayerGuid) then
 		-- Our own soulstone target died
-		local iscd, sscd = ItemHelper:GetSoulstoneCooldownSecs()
-		if (iscd) then
-			timerData.Value = sscd
-			timerData.lblSpellname:SetText("Inactive")
-			EventHelper:SendAddonMessage("SoulstoneCooldown~"..timerData.CasterGuid.."|"..sscd)
+		local isCd, cdSecs = ItemHelper:GetSoulstoneCooldownSecs()
+		if (isCd) then
+			timerData.Value = cdSecs
+			timerData.lblSpellname:SetText("On Cooldown")
+			EventHelper:SendAddonMessage(
+				"UpdateTimer~"
+				..timerData.CasterGuid.."|"
+				..timerData.TargetGuid.."|"
+				..timerData.SpellId.."|"
+				..cdSecs
+			)
 		else
 			-- Soulstone is ready, remove the timer
 			RemoveTimer(timerData)
-			EventHelper:SendAddonMessage("SoulstoneReady~"..timerData.CasterGuid)
+			EventHelper:SendAddonMessage(
+				"RemoveSpellTimerTargetName~"
+				..timerData.CasterGuid.."|"
+				..timerData.TargetGuid.."|"
+				..timerData.SpellName
+			)
 		end
 	else
 		-- Soulstone target of a fellow warlock died
-
+		print("Soulstone of another warlock died: "..timerData.CasterName)
+		timerData.lblSpellname:SetText("C/D - "..timerData.CasterName)
 	end
 end
 
@@ -525,7 +553,7 @@ function _t:RemoveSpellTimerTarget(targetGuid)
 end
 
 -- A spell was removed from target
-function _t:RemoveSpellTimerTargetName(targetGuid, spellName)
+function _t:RemoveSpellTimerTargetName(casterGuid, targetGuid, spellName)
 	for i,timerData in ipairs(self.Instances) do
 		if (timerData.TargetGuid == targetGuid and timerData.SpellName == spellName) then
 			if (timerData.SpellType == "soulstone") then
@@ -621,6 +649,14 @@ function _t:UpdateRaidIcon(unitGuid, iconNumber)
 	end
 end
 
+local function RemoveCombatTimers()
+	for i,timerData in ipairs(_t.Instances) do
+		if (timerData.SpellType ~= "soulstone") then
+			RemoveTimer(timerData)
+		end
+	end
+end
+
 function _t:Initialize()
 	-- Do nothing if timers are disabled
 	if (not NecrosisConfig.EnableTimerBars) then
@@ -644,13 +680,27 @@ function _t:Initialize()
 	local iscd, secs = ItemHelper:GetSoulstoneCooldownSecs()
 	if (iscd) then
 		local spellId = 20765 -- Major Soulstone Resurrection
-		self:InsertSpellTimer(
-			Necrosis.CurrentEnv.PlayerGuid,
-			Necrosis.CurrentEnv.PlayerName,
-			nil, nil, nil, nil,
-			spellId,
-			GetSpellInfo(spellId),
-			secs,
-			Necrosis.Spell.AuraType[spellId])
+		-- Add the timer
+		local ssTimer =
+			_t:InsertSpellTimer(
+				Necrosis.CurrentEnv.PlayerGuid,
+				Necrosis.CurrentEnv.PlayerName,
+				"-", "Cooldown", "0", nil,
+				spellId,
+				GetSpellInfo(spellId),
+				Necrosis.Spell.AuraDuration[spellId],
+				Necrosis.Spell.AuraType[spellId]
+			)
+		-- Set the remaining duration
+		ssTimer.Value = secs
 	end
+
+	-- Remove all dots and banishes when combat stops
+	-- This is required f.e. for the core hound packs in MC which don't die but smolder
+	EventHelper:RegisterOnCombatStopHandler(RemoveCombatTimers)
+end
+
+function _t:Disable()
+	_t:RemoveAllTimers()
+	EventHelper:UnregisterOnCombatStopHandler(RemoveCombatTimers)
 end

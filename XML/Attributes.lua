@@ -288,6 +288,7 @@ end
 -- Associating the frames to buttons, and creating stones on right-click.
 -- Association de la monture au bouton, et de la création des pierres sur un clic droit
 function Necrosis:StoneAttribute(Steed)
+	print("Necrosis:StoneAttribute")
 	if InCombatLockdown() then
 		return
 	end
@@ -352,9 +353,9 @@ function Necrosis:MainButtonAttribute()
 	-- Le clic droit ouvre le Menu des options
 	NecrosisButton:SetAttribute("type2", "Open")
 	NecrosisButton.Open = function()
-		if not InCombatLockdown() then
+		-- if not InCombatLockdown() then
 			Necrosis.Gui.MainWindow:Show()
-		end
+		-- end
 	end
 	if Necrosis.Spell[NecrosisConfig.MainSpell].ID then
 		NecrosisButton:SetAttribute("type1", "spell")
@@ -504,7 +505,8 @@ end
 
 function Necrosis:SoulstoneUpdateAttribute(nostone)
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if (InCombatLockdown() or not _G["NecrosisSoulstoneButton"]) then
+	-- if (InCombatLockdown() or not _G["NecrosisSoulstoneButton"]) then
+	if (not _G["NecrosisSoulstoneButton"]) then
 		return
 	end
 
@@ -525,7 +527,8 @@ end
 
 function Necrosis:HealthstoneUpdateAttribute(nostone)
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if (InCombatLockdown() or not _G["NecrosisHealthstoneButton"]) then
+	-- if (InCombatLockdown() or not _G["NecrosisHealthstoneButton"]) then
+	if (not _G["NecrosisHealthstoneButton"]) then
 		return
 	end
 

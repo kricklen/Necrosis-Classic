@@ -88,7 +88,7 @@ end
 function _mv._LanuageDropDownItemClick(item, dd, initFunc)
     UIDropDownMenu_SetSelectedValue(dd, item.value)
     initFunc()
-    EventHelper:FireLanguageChangedEvent(item.value)
+    EventHelper:OnLanguageChangedEvent(item.value)
 end
 
 function _mv:cbShowTooltip_Click()

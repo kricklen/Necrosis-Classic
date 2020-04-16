@@ -486,6 +486,7 @@ function Necrosis.OnEvent(self, event, ...)
 	-- ..tostring(arg1)..", "
 	-- ..tostring(arg2)..", "
 	-- ..tostring(arg3)..", ")
+		Necrosis.Chat:AfterSpellCast()
 
 	-- When the warlock begins to cast a spell, we intercept the spell's name || Quand le démoniste commence à incanter un sort, on intercepte le nom de celui-ci
 	-- We also save the name of the target of the spell as well as its level || On sauve également le nom de la cible du sort ainsi que son niveau
@@ -540,6 +541,8 @@ print("Failed or interrupted: "..tostring(arg2))
 		Local.SpellCasted = {}
 		Necrosis.CurrentEnv.SpellCast[arg2] = nil
 
+		Necrosis.Chat:ClearMessages()
+
 		-- Flag if a Trade window is open, so you can automatically trade the healing stones || Flag si une fenetre de Trade est ouverte, afin de pouvoir trader automatiquement les pierres de soin
 	elseif event == "TRADE_REQUEST" or event == "TRADE_SHOW" then
 		Local.Trade.Request = true
@@ -587,6 +590,9 @@ print("LEARNED_SPELL_IN_TAB")
 	-- At the end of the fight, we stop reporting Twilight || A la fin du combat, on arrête de signaler le Crépuscule
 	-- We remove the spell timers and the names of mobs || On enlève les timers de sorts ainsi que les noms des mobs
 	elseif (event == "PLAYER_REGEN_ENABLED") then
+
+		EventHelper.OnCombatStop()
+		
 		Local.PlayerInCombat = false
 		-- Local.TimerManagement = Necrosis:RetraitTimerCombat(Local.TimerManagement)
 
@@ -615,6 +621,9 @@ print("LEARNED_SPELL_IN_TAB")
 
 	-- If we come back into combat || Si on rentre en combat
 	elseif event == "PLAYER_REGEN_DISABLED" then
+		
+		EventHelper.OnCombatStart()
+
 		Local.PlayerInCombat = true
 		-- Close the options menu || On ferme le menu des options
 		if _G["NecrosisGeneralFrame"] and NecrosisGeneralFrame:IsVisible() then
@@ -649,7 +658,7 @@ print("LEARNED_SPELL_IN_TAB")
 				.."\n, name: "..tostring(arg8)
 				.."\n, instanceID: "..tostring(arg9)
 			)
-
+			-- Don't talk to ourself
 			if (arg4 ~= Necrosis.CurrentEnv.PlayerFullName) then
 				EventHelper:ProcessAddonMessage(arg2)
 			end
@@ -692,9 +701,8 @@ function Necrosis:OnCombatLogEvent(event, ...)
 					destGUID = Necrosis.CurrentEnv.PlayerGuid
 					destName = Necrosis.CurrentEnv.PlayerName
 				end
-				-- Capture the icon of the spell target also
+				-- Capture the icon of the spell target
 				local destIconNumber = GetRaidTargetIndex("target")
-
 				local spellData = Necrosis.CurrentEnv.SpellCast[spellName]
 				if (spellData) then
 					Necrosis.Timers:InsertSpellTimer(
@@ -719,7 +727,7 @@ function Necrosis:OnCombatLogEvent(event, ...)
 			-- Reset a timer if a duration is available
 			local spellData = Necrosis.CurrentEnv.SpellCast[spellName]
 			if (spellData) then
-				Necrosis.Timers:ResetTimer(
+				Necrosis.Timers:UpdateTimer(
 					Necrosis.CurrentEnv.PlayerGuid,
 					destGUID,
 					spellData.id,
@@ -738,7 +746,7 @@ function Necrosis:OnCombatLogEvent(event, ...)
 
 		if (NecrosisConfig.EnableTimerBars) then
 			if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid) then
-				Necrosis.Timers:RemoveSpellTimerTargetName(destGUID, spellName)
+				Necrosis.Timers:RemoveSpellTimerTargetName(Necrosis.CurrentEnv.PlayerGuid, destGUID, spellName)
 			end
 		end
 
@@ -763,7 +771,7 @@ function Necrosis:OnCombatLogEvent(event, ...)
 			and sourceGUID == Necrosis.CurrentEnv.PlayerGuid
 			and destGUID == UnitGUID("target"))
 	then
-print("Spell resisted")
+print("Spell resisted: "..tostring(spellName))
 
 		Necrosis.CurrentEnv.SpellCast[spellName] = nil
 	
@@ -955,7 +963,7 @@ function Necrosis:SpellManagement()
 	if (Local.SpellCasted.Name) then
 		-- print ('casting on target '..Local.SpellCasted.TargetName)
 		-- Messages Posts Cast (Démons et TP)
-		Necrosis.Chat:AfterSpellCast()
+		-- Necrosis.Chat:AfterSpellCast()
 
 		-- Create a timer when a soulstone has been used || Si le sort lancé à été une Résurrection de Pierre d'âme, on place un timer
 		if (Local.SpellCasted.Name == self.Spell[11].Name) then
