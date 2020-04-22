@@ -431,6 +431,8 @@ print("InsertSpellTimer: "..spellName)
 				-- 	..", bandwidthOut: "..bandwidthOut
 				-- 	..", latencyHome: "..latencyHomeMS
 				-- 	..", latencyWorld: "..latencyWorldMS)
+				local ti = targetIcon
+				if (ti == nil) then ti = 0 end
 
 				-- Broadcast to raid/party if applicable
 				EventHelper:SendAddonMessage("InsertTimer~"
@@ -439,7 +441,7 @@ print("InsertSpellTimer: "..spellName)
 					..targetGuid.."|"
 					..targetName.."|"
 					..targetLevel.."|"
-					..tonumber(targetIcon).."|"
+					..ti.."|"
 					..spellId.."|"
 					..spellName.."|"
 					..spellDuration.."|"
