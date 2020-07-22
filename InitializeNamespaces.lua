@@ -3,7 +3,7 @@ Localization = {}
 Necrosis = {
 	Config = {},
 	CurrentEnv = {
-		ChatPrefix = "necrosis-cre",
+		ChatPrefix = "necrosis-classic",
 		PlayerGuid = UnitGUID("player"),
 		PlayerName = UnitName("player"),
 		PlayerFullName = nil,
@@ -19,7 +19,7 @@ Necrosis = {
 
 Necrosis.Data = {
 	Version = GetAddOnMetadata("Necrosis-Classic", "Version"),
-	AppName = "Necrosis LdC",
+	AppName = "Necrosis Classic",
 	LastConfig = 20191125
 }
 Necrosis.Data.Label = Necrosis.Data.AppName.." "..Necrosis.Data.Version

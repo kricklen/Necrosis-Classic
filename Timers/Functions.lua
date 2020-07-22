@@ -419,7 +419,7 @@ function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, tar
 	assert(spellType ~= nil, 	 "spellType is nil")
 
 	local timerData
-print("InsertSpellTimer: "..spellName)	
+-- print("InsertSpellTimer: "..spellName)	
 	if (spellType == "soulstone" or spellType == "banish") then
 		-- If we cast soulstone or banish, tell our fellow warlocks
 		if (casterGuid == Necrosis.CurrentEnv.PlayerGuid) then

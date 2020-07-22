@@ -76,13 +76,13 @@ function _eh:SendAddonMessage(message)
         channel = "PARTY"
     end
     local success = C_ChatInfo.SendAddonMessage(Necrosis.CurrentEnv.ChatPrefix, message, channel)
-    print("_eh:SendAddonMessage: "..tostring(success))
+    -- print("_eh:SendAddonMessage: "..tostring(success))
 end
 
 -- Process messages from other warlocks in the raid or party
 function _eh:ProcessAddonMessage(text)
     local split_cmd = split(text, "~")
-    print("command: "..tostring(split_cmd[1])..", "..tostring(split_cmd[2]))
+    -- print("command: "..tostring(split_cmd[1])..", "..tostring(split_cmd[2]))
 
     if (split_cmd[1] == "InsertTimer") then
         local split_timer = split(split_cmd[2], "|")
@@ -101,10 +101,10 @@ function _eh:ProcessAddonMessage(text)
 
     elseif (split_cmd[1] == "RemoveSpellTimerTargetName") then
         local split_timer = split(split_cmd[2], "|")
-        print("Msg RemoveSpellTimerTargetName: "
-            ..split_timer[1]..", "
-            ..split_timer[2]..", "
-            ..split_timer[3])
+        -- print("Msg RemoveSpellTimerTargetName: "
+        --     ..split_timer[1]..", "
+        --     ..split_timer[2]..", "
+        --     ..split_timer[3])
         Necrosis.Timers:RemoveSpellTimerTargetName(
             split_timer[1], -- casterGuid
             split_timer[2], -- targetGuid
@@ -113,11 +113,11 @@ function _eh:ProcessAddonMessage(text)
 
     elseif (split_cmd[1] == "UpdateTimer") then
         local split_timer = split(split_cmd[2], "|")
-        print("Msg UpdateTimer: "
-            ..split_timer[1]..", "
-            ..split_timer[2]..", "
-            ..split_timer[3]..", "
-            ..split_timer[4])
+        -- print("Msg UpdateTimer: "
+        --     ..split_timer[1]..", "
+        --     ..split_timer[2]..", "
+        --     ..split_timer[3]..", "
+        --     ..split_timer[4])
         Necrosis.Timers:UpdateTimer(
             split_timer[1], -- casterGuid
             split_timer[2], -- targetGuid
@@ -135,7 +135,7 @@ function _eh:RegisterOnCombatStartHandler(handler)
 end
 
 function _eh:OnCombatStart()
-    print("Combat starts...")
+    -- print("Combat starts...")
     for i,handler in ipairs(_onCombatStartHandlers) do
         handler()
     end
@@ -156,7 +156,7 @@ function _eh:UnregisterOnCombatStopHandler(handler)
 end
 
 function _eh:OnCombatStop()
-    print("Combat stops...")
+    -- print("Combat stops...")
     for i,handler in ipairs(_onCombatStopHandlers) do
         handler()
     end

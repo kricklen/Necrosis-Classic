@@ -458,7 +458,7 @@ function Necrosis.OnEvent(self, event, ...)
 		end
 
 	-- If the player resurrects || Si le joueur ressucite
-	elseif 	(event == "PLAYER_ALIVE" or event == "PLAYER_UNGHOST") then
+	elseif (event == "PLAYER_ALIVE" or event == "PLAYER_UNGHOST") then
 		-- We are sobering all the spell buttons || On dégrise tous les boutons de sort
 		if _G["NecrosisMountButton"] then
 			NecrosisMountButton:GetNormalTexture():SetDesaturated(nil)
@@ -477,10 +477,21 @@ function Necrosis.OnEvent(self, event, ...)
 		-- We reset the gray button list || On réinitialise la liste des boutons grisés
 		Local.Desatured = {}
 		Local.Dead = false
-			
+
 	-- Successful spell casting management || Gestion de l'incantation des sorts réussie
-	elseif (event == "UNIT_SPELLCAST_SUCCEEDED" and arg1 == "player")
+	elseif (event == "UNIT_SPELLCAST_SUCCEEDED")-- and arg1 == "player")
 	then
+-- print("UNIT_SPELLCAST_SUCCEEDED "..tostring(arg1)..", "..arg3..", "..tostring(Necrosis.CurrentEnv.SpellCast[arg2].target))
+		if (Necrosis.CurrentEnv.SpellCast[arg2] ~= nil) then
+			-- print("Target: "..tostring(Necrosis.CurrentEnv.SpellCast[arg2].target))
+			-- if (Necrosis.Spell.AuraDuration[arg3] ~= nil) then
+			-- 	print("Duration: "..Necrosis.Spell.AuraDuration[arg3])
+			-- end
+			Necrosis.CurrentEnv.SpellCast[arg2] = nil
+		end
+
+		Necrosis.CurrentEnv.SpellCast[arg3] = nil
+
 		Local.SpellCasted.Name = GetSpellInfo(arg3)
 		Necrosis:SpellManagement()
 	-- ..tostring(arg1)..", "
@@ -490,8 +501,15 @@ function Necrosis.OnEvent(self, event, ...)
 
 	-- When the warlock begins to cast a spell, we intercept the spell's name || Quand le démoniste commence à incanter un sort, on intercepte le nom de celui-ci
 	-- We also save the name of the target of the spell as well as its level || On sauve également le nom de la cible du sort ainsi que son niveau
-	elseif (event == "UNIT_SPELLCAST_SENT" and arg1 == "player")
+	elseif (event == "UNIT_SPELLCAST_SENT")-- and arg1 == "player")
 	then
+		-- arg1 = unit
+		-- arg2 = target
+		-- arg3 = castGUID
+		-- arg4 = spellID
+		Necrosis.CurrentEnv.SpellCast[arg3] = { target = arg2, spellId = arg4 }
+-- print("UNIT_SPELLCAST_SENT "..tostring(arg2)..", "..arg4..", "..arg3)
+
 		-- Check if timers are enabled
 		if (NecrosisConfig.EnableTimerBars) then
 			if (Necrosis.Spell.AuraDuration[arg4]) then
@@ -535,12 +553,12 @@ function Necrosis.OnEvent(self, event, ...)
 		Necrosis.Chat:BeforeSpellCast(Local.SpellCasted)
 
 	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
-	elseif ((event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == player)
+	elseif ((event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED"))-- and arg1 == player)
 	then
-print("Failed or interrupted: "..tostring(arg2))
+-- print("UNIT_SPELLCAST_FAILED/INTERRUPTED "..arg3..", "..arg2)
+		--print("Failed or interrupted: "..tostring(arg2)..", "..arg3)
 		Local.SpellCasted = {}
 		Necrosis.CurrentEnv.SpellCast[arg2] = nil
-
 		Necrosis.Chat:ClearMessages()
 
 		-- Flag if a Trade window is open, so you can automatically trade the healing stones || Flag si une fenetre de Trade est ouverte, afin de pouvoir trader automatiquement les pierres de soin
@@ -582,7 +600,7 @@ print("Failed or interrupted: "..tostring(arg2))
 	-- If the Warlock learns a new spell / spell, we get the new spells list || Si le Démoniste apprend un nouveau sort / rang de sort, on récupère la nouvelle liste des sorts
 	-- If the Warlock learns a new buff or summon spell, the buttons are recreated || Si le Démoniste apprend un nouveau sort de buff ou d'invocation, on recrée les boutons
 	elseif (event == "LEARNED_SPELL_IN_TAB") then
-print("LEARNED_SPELL_IN_TAB")
+-- print("LEARNED_SPELL_IN_TAB")
 		Necrosis:SpellSetup()
 		Necrosis:CreateMenu()
 		Necrosis:ButtonSetup()
@@ -647,17 +665,17 @@ print("LEARNED_SPELL_IN_TAB")
 	elseif (event == "CHAT_MSG_ADDON") then
 		-- "prefix", "text", "channel", "sender", "target", zoneChannelID, localID, "name", instanceID
 		if (arg1 == Necrosis.CurrentEnv.ChatPrefix) then
-			print("CHAT_MSG_ADDON: "
-				.."\nprefix: "..tostring(arg1)
-				.."\n, text: "..tostring(arg2)
-				.."\n, channel: "..tostring(arg3)
-				.."\n, sender: "..tostring(arg4)
-				.."\n, target: "..tostring(arg5)
-				.."\n, zoneChannelID: "..tostring(arg6)
-				.."\n, localID: "..tostring(arg7)
-				.."\n, name: "..tostring(arg8)
-				.."\n, instanceID: "..tostring(arg9)
-			)
+			-- print("CHAT_MSG_ADDON: "
+			-- 	.."\nprefix: "..tostring(arg1)
+			-- 	.."\n, text: "..tostring(arg2)
+			-- 	.."\n, channel: "..tostring(arg3)
+			-- 	.."\n, sender: "..tostring(arg4)
+			-- 	.."\n, target: "..tostring(arg5)
+			-- 	.."\n, zoneChannelID: "..tostring(arg6)
+			-- 	.."\n, localID: "..tostring(arg7)
+			-- 	.."\n, name: "..tostring(arg8)
+			-- 	.."\n, instanceID: "..tostring(arg9)
+			-- )
 			-- Don't talk to ourself
 			if (arg4 ~= Necrosis.CurrentEnv.PlayerFullName) then
 				EventHelper:ProcessAddonMessage(arg2)
@@ -771,7 +789,7 @@ function Necrosis:OnCombatLogEvent(event, ...)
 			and sourceGUID == Necrosis.CurrentEnv.PlayerGuid
 			and destGUID == UnitGUID("target"))
 	then
-print("Spell resisted: "..tostring(spellName))
+print("Necrosis - Spell resisted: "..tostring(spellName))
 
 		Necrosis.CurrentEnv.SpellCast[spellName] = nil
 	
@@ -793,7 +811,7 @@ print("Spell resisted: "..tostring(spellName))
 		and ((BagHelper.Spellstone_Name and arg9 == BagHelper.Spellstone_Name)
 			or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
 	then
-	print("ENCHANT_APPLIED: "..arg9)
+	-- print("ENCHANT_APPLIED: "..arg9)
 			Local.SomethingOnHand = arg9
 			Necrosis:UpdateIcons()
 	-- End of enchantment detection || Détection fin d'enchant
@@ -827,11 +845,11 @@ function CheckUnitDebuff()
 		nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
 		 = UnitDebuff("target", 1, "PLAYER")
 
-	print("UnitDebuff: "..tostring(name)..", "..tostring(icon)..", "..tostring(count)..", "
-		..tostring(debuffType)..", "..tostring(duration)..", "..tostring(expirationTime)..", "
-		..tostring(source)..", "..tostring(isStealable)..", "..tostring(nameplateShowPersonal)..", "
-		..tostring(spellId)..", "..tostring(canApplyAura)..", "..tostring(isBossDebuff)
-	)
+	-- print("UnitDebuff: "..tostring(name)..", "..tostring(icon)..", "..tostring(count)..", "
+	-- 	..tostring(debuffType)..", "..tostring(duration)..", "..tostring(expirationTime)..", "
+	-- 	..tostring(source)..", "..tostring(isStealable)..", "..tostring(nameplateShowPersonal)..", "
+	-- 	..tostring(spellId)..", "..tostring(canApplyAura)..", "..tostring(isBossDebuff)
+	-- )
 end
 
 ------------------------------------------------------------------------------------------------------
@@ -958,126 +976,126 @@ end
 -- Event : UNIT_SPELLCAST_SUCCEEDED
 -- Manages everything related to successful spell casts || Permet de gérer tout ce qui touche aux sorts une fois leur incantation réussie
 function Necrosis:SpellManagement()
-	-- print (Local.SpellCasted.Name)
-	local SortActif = false
-	if (Local.SpellCasted.Name) then
-		-- print ('casting on target '..Local.SpellCasted.TargetName)
-		-- Messages Posts Cast (Démons et TP)
-		-- Necrosis.Chat:AfterSpellCast()
+	-- -- print (Local.SpellCasted.Name)
+	-- local SortActif = false
+	-- if (Local.SpellCasted.Name) then
+	-- 	-- print ('casting on target '..Local.SpellCasted.TargetName)
+	-- 	-- Messages Posts Cast (Démons et TP)
+	-- 	-- Necrosis.Chat:AfterSpellCast()
 
-		-- Create a timer when a soulstone has been used || Si le sort lancé à été une Résurrection de Pierre d'âme, on place un timer
-		if (Local.SpellCasted.Name == self.Spell[11].Name) then
-			if Local.SpellCasted.TargetName == UnitName("player") then
-				Local.SpellCasted.TargetName = ""
-				Local.SpellCasted.TargetGUID = ""
-			end
-		-- Create a timer if a healthstone was used || Si le sort était une pierre de soin
-		elseif Local.SpellCasted.Name:find(self.Translation.Item.Healthstone) and not Local.SpellCasted.Name:find(self.Translation.Misc.Create) then
-			-- Local.TimerManagement = self:InsertTimerStone("Healthstone", nil, nil, Local.TimerManagement)
-		-- Create a timer for any other spell cast (if valid) || Pour les autres sorts castés, tentative de timer si valable
-		else
-			for spell=1, #self.Spell, 1 do
-				if Local.SpellCasted.Name == self.Spell[spell].Name and not (spell == 10) then
-					-- Update the timer if it already exists || Si le timer existe déjà sur la cible, on le met à jour
-					if Local.TimerManagement.SpellTimer[1] then
-						for thisspell=1, #Local.TimerManagement.SpellTimer, 1 do
-							if Local.TimerManagement.SpellTimer[thisspell].Name == Local.SpellCasted.Name
-								and Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID
-								and not (self.Spell[spell].Type == 4)	-- not a curse
-								and not (self.Spell[spell].Type == 5) -- not corruption
-								and not (spell == 16)
-								and not (spell == 41)
-								then
-								-- If it is spell launched already present on a mob, we put the timer back to the bottom ||Si c'est sort lancé déjà présent sur un mob, on remet le timer à fond
-								if not (spell == 9) or (spell == 9 and not self:UnitHasEffect("focus", Local.SpellCasted.Name)) then
-									Local.TimerManagement.SpellTimer[thisspell].Time = self.Spell[spell].Length
-									Local.TimerManagement.SpellTimer[thisspell].TimeMax = floor(GetTime() + self.Spell[spell].Length)
-									if (spell == 9) and (Local.SpellCasted.Rank:find("1")) then
-										Local.TimerManagement.SpellTimer[thisspell].Time = 20
-										Local.TimerManagement.SpellTimer[thisspell].TimeMax = floor(GetTime() + 20)
-									end
-								end
-								SortActif = true
-								break
-							end
+	-- 	-- Create a timer when a soulstone has been used || Si le sort lancé à été une Résurrection de Pierre d'âme, on place un timer
+	-- 	if (Local.SpellCasted.Name == self.Spell[11].Name) then
+	-- 		if Local.SpellCasted.TargetName == UnitName("player") then
+	-- 			Local.SpellCasted.TargetName = ""
+	-- 			Local.SpellCasted.TargetGUID = ""
+	-- 		end
+	-- 	-- Create a timer if a healthstone was used || Si le sort était une pierre de soin
+	-- 	elseif Local.SpellCasted.Name:find(self.Translation.Item.Healthstone) and not Local.SpellCasted.Name:find(self.Translation.Misc.Create) then
+	-- 		-- Local.TimerManagement = self:InsertTimerStone("Healthstone", nil, nil, Local.TimerManagement)
+	-- 	-- Create a timer for any other spell cast (if valid) || Pour les autres sorts castés, tentative de timer si valable
+	-- 	else
+	-- 		for spell=1, #self.Spell, 1 do
+	-- 			if Local.SpellCasted.Name == self.Spell[spell].Name and not (spell == 10) then
+	-- 				-- Update the timer if it already exists || Si le timer existe déjà sur la cible, on le met à jour
+	-- 				if Local.TimerManagement.SpellTimer[1] then
+	-- 					for thisspell=1, #Local.TimerManagement.SpellTimer, 1 do
+	-- 						if Local.TimerManagement.SpellTimer[thisspell].Name == Local.SpellCasted.Name
+	-- 							and Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID
+	-- 							and not (self.Spell[spell].Type == 4)	-- not a curse
+	-- 							and not (self.Spell[spell].Type == 5) -- not corruption
+	-- 							and not (spell == 16)
+	-- 							and not (spell == 41)
+	-- 							then
+	-- 							-- If it is spell launched already present on a mob, we put the timer back to the bottom ||Si c'est sort lancé déjà présent sur un mob, on remet le timer à fond
+	-- 							if not (spell == 9) or (spell == 9 and not self:UnitHasEffect("focus", Local.SpellCasted.Name)) then
+	-- 								Local.TimerManagement.SpellTimer[thisspell].Time = self.Spell[spell].Length
+	-- 								Local.TimerManagement.SpellTimer[thisspell].TimeMax = floor(GetTime() + self.Spell[spell].Length)
+	-- 								if (spell == 9) and (Local.SpellCasted.Rank:find("1")) then
+	-- 									Local.TimerManagement.SpellTimer[thisspell].Time = 20
+	-- 									Local.TimerManagement.SpellTimer[thisspell].TimeMax = floor(GetTime() + 20)
+	-- 								end
+	-- 							end
+	-- 							SortActif = true
+	-- 							break
+	-- 						end
 
 
-							-- If we have banished a new target, then remove the previous timer. || Si c'est un banish sur une nouvelle cible, on supprime le timer précédent
-							if Local.TimerManagement.SpellTimer[thisspell].Name == Local.SpellCasted.Name and spell == 9
-								and not
-									(Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID)
-								then
-								-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
-								SortActif = false
-								break
-							end
+	-- 						-- If we have banished a new target, then remove the previous timer. || Si c'est un banish sur une nouvelle cible, on supprime le timer précédent
+	-- 						if Local.TimerManagement.SpellTimer[thisspell].Name == Local.SpellCasted.Name and spell == 9
+	-- 							and not
+	-- 								(Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID)
+	-- 							then
+	-- 							-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
+	-- 							SortActif = false
+	-- 							break
+	-- 						end
 
-							-- If we have cast fear, then remove the previous timer || Si c'est un fear, on supprime le timer du fear précédent
-							if Local.TimerManagement.SpellTimer[thisspell].Name == Local.SpellCasted.Name and spell == 13 then
-								-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
-								SortActif = false
-								break
-							end
+	-- 						-- If we have cast fear, then remove the previous timer || Si c'est un fear, on supprime le timer du fear précédent
+	-- 						if Local.TimerManagement.SpellTimer[thisspell].Name == Local.SpellCasted.Name and spell == 13 then
+	-- 							-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
+	-- 							SortActif = false
+	-- 							break
+	-- 						end
 
-							if SortActif then
-								break
-							end
-						end
-						-- If the timer is a curse, one removes the preceding curse on the target || Si le timer est une malédiction, on enlève la précédente malédiction sur la cible
-						if (self.Spell[spell].Type == 4) or (spell == 16) then
-							for thisspell=1, #Local.TimerManagement.SpellTimer, 1 do
-								-- But we keep the cooldown of the evil curse || Mais on garde le cooldown de la malédiction funeste
-								if Local.TimerManagement.SpellTimer[thisspell].Name == self.Spell[16].Name then
-									Local.TimerManagement.SpellTimer[thisspell].TargetGUID = Local.SpellCasted.TargetGUID
-									Local.TimerManagement.SpellTimer[thisspell].TargetLevel = Local.SpellCasted.TargetLevel
-								end
-								if Local.TimerManagement.SpellTimer[thisspell].Type == 4
-									and Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID
-									then
-									-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
-									break
-								end
-							end
-							SortActif = false
-						-- If its a corruption timer, remove the previous one || Si le timer est une corruption, on enlève la précédente corruption sur la cible
-						elseif (self.Spell[spell].Type == 5) then
-							for thisspell=1, #Local.TimerManagement.SpellTimer, 1 do
-								if Local.TimerManagement.SpellTimer[thisspell].Type == 5
-									and Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID
-									then
-									-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
-									break
-								end
-							end
-							SortActif = false
-						end
-					end
-					if not SortActif
-						and not (self.Spell[spell].Type == 0)
-						and not (spell == 10)
-						and not (spell == 1)
-						and not (spell == 2)
-						then
+	-- 						if SortActif then
+	-- 							break
+	-- 						end
+	-- 					end
+	-- 					-- If the timer is a curse, one removes the preceding curse on the target || Si le timer est une malédiction, on enlève la précédente malédiction sur la cible
+	-- 					if (self.Spell[spell].Type == 4) or (spell == 16) then
+	-- 						for thisspell=1, #Local.TimerManagement.SpellTimer, 1 do
+	-- 							-- But we keep the cooldown of the evil curse || Mais on garde le cooldown de la malédiction funeste
+	-- 							if Local.TimerManagement.SpellTimer[thisspell].Name == self.Spell[16].Name then
+	-- 								Local.TimerManagement.SpellTimer[thisspell].TargetGUID = Local.SpellCasted.TargetGUID
+	-- 								Local.TimerManagement.SpellTimer[thisspell].TargetLevel = Local.SpellCasted.TargetLevel
+	-- 							end
+	-- 							if Local.TimerManagement.SpellTimer[thisspell].Type == 4
+	-- 								and Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID
+	-- 								then
+	-- 								-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
+	-- 								break
+	-- 							end
+	-- 						end
+	-- 						SortActif = false
+	-- 					-- If its a corruption timer, remove the previous one || Si le timer est une corruption, on enlève la précédente corruption sur la cible
+	-- 					elseif (self.Spell[spell].Type == 5) then
+	-- 						for thisspell=1, #Local.TimerManagement.SpellTimer, 1 do
+	-- 							if Local.TimerManagement.SpellTimer[thisspell].Type == 5
+	-- 								and Local.TimerManagement.SpellTimer[thisspell].TargetGUID == Local.SpellCasted.TargetGUID
+	-- 								then
+	-- 								-- Local.TimerManagement = self:RetraitTimerParIndex(thisspell, Local.TimerManagement)
+	-- 								break
+	-- 							end
+	-- 						end
+	-- 						SortActif = false
+	-- 					end
+	-- 				end
+	-- 				if not SortActif
+	-- 					and not (self.Spell[spell].Type == 0)
+	-- 					and not (spell == 10)
+	-- 					and not (spell == 1)
+	-- 					and not (spell == 2)
+	-- 					then
 
-						if (spell == 9) then
+	-- 					if (spell == 9) then
 
-							if Necrosis.Spell[9].Rank then
-								self.Spell[spell].Length = 20
-							else
-								self.Spell[spell].Length = 30
-							end
-							Local.TimerManagement.Banish = true
-						end
-						-- now insert a timer for the spell that has been casted
-						-- Local.TimerManagement = Necrosis:InsertTimerParTable(spell, Local.SpellCasted.TargetName, Local.SpellCasted.TargetLevel, Local.TimerManagement,Local.SpellCasted.TargetGUID)
-						break
-					end
-				end
-			end
-		end
-	end
-	Local.SpellCasted = {}
-	return
+	-- 						if Necrosis.Spell[9].Rank then
+	-- 							self.Spell[spell].Length = 20
+	-- 						else
+	-- 							self.Spell[spell].Length = 30
+	-- 						end
+	-- 						Local.TimerManagement.Banish = true
+	-- 					end
+	-- 					-- now insert a timer for the spell that has been casted
+	-- 					-- Local.TimerManagement = Necrosis:InsertTimerParTable(spell, Local.SpellCasted.TargetName, Local.SpellCasted.TargetLevel, Local.TimerManagement,Local.SpellCasted.TargetGUID)
+	-- 					break
+	-- 				end
+	-- 			end
+	-- 		end
+	-- 	end
+	-- end
+	-- Local.SpellCasted = {}
+	-- return
 end
 
 ------------------------------------------------------------------------------------------------------
@@ -2077,7 +2095,7 @@ end
 
 -- Display or Hide buttons depending on spell availability || Affiche ou masque les boutons de sort à chaque nouveau sort appris
 function Necrosis:ButtonSetup()
-print("Necrosis:ButtonSetup")
+-- print("Necrosis:ButtonSetup")
 	local NBRScale = (100 + (NecrosisConfig.NecrosisButtonScale - 85)) / 100
 	if NecrosisConfig.NecrosisButtonScale <= 95 then
 		NBRScale = 1.1
@@ -2678,7 +2696,7 @@ function Necrosis:SymetrieTimer(bool)
 			)
 			_G["NecrosisTimerFrame"..num.."OutText"]:SetJustifyH("LEFT")
 			num = num + 1
-print("Necrosis:SymetrieTimer: "..tostring(_G["NecrosisTimerFrame"..num.."OutText"]:GetTop()))
+-- print("Necrosis:SymetrieTimer: "..tostring(_G["NecrosisTimerFrame"..num.."OutText"]:GetTop()))
 		end
 	end
 	if _G["NecrosisTimerFrame0"] then

@@ -46,7 +46,7 @@ function Necrosis:BindName()
 	-------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	-- Le Titre
-	_G["BINDING_HEADER_Necrosis"] = "Necrosis LdC"
+	_G["BINDING_HEADER_Necrosis"] = "Necrosis Classic"
 
 	-- La Sphere
 	_G["BINDING_NAME_CLICK NecrosisButton:LeftButton"] = self.Spell[NecrosisConfig.MainSpell].Name

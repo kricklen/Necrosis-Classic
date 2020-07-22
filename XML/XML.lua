@@ -131,7 +131,7 @@ function Necrosis:CreateWarlockUI()
 		frame = CreateFrame("Button", "NecrosisButton", UIParent, "SecureActionButtonTemplate")
 		frame:SetNormalTexture(GraphicsHelper:GetTexture("Shard"))
 	end
-print("Create NecrosisButton")
+-- print("Create NecrosisButton")
 	-- Define its attributes || Définition de ses attributs
 	frame:SetFrameLevel(1)
 	frame:SetMovable(true)
@@ -181,7 +181,7 @@ end
 local function CreateStoneButton(stone)
 	-- Create the stone button || Création du bouton de la pierre
 	local frame = CreateFrame("Button", "Necrosis"..stone.."Button", UIParent, "SecureActionButtonTemplate")
-print("CreateStoneButton: "..stone)
+-- print("CreateStoneButton: "..stone)
 	-- Define its attributes || Définition de ses attributs
 	frame:SetMovable(true)
 	frame:EnableMouse(true)

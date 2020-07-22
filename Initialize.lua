@@ -112,7 +112,7 @@ function Necrosis:Initialize(Config)
 	self:ButtonSetup()
 
 	local successfulRequest = C_ChatInfo.RegisterAddonMessagePrefix(Necrosis.CurrentEnv.ChatPrefix)
-	print("request chat: "..tostring(successfulRequest))
+	-- print("request chat: "..tostring(successfulRequest))
 
     -- Enregistrement de la commande console
 	SlashCmdList["NecrosisCommand"] = Necrosis.SlashHandler
