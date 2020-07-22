@@ -84,7 +84,7 @@ function _mw:Show()
 
 		self.bgIcon = GraphicsHelper:CreateTexture(
 			self.Frame, "BACKGROUND",
-			60, 60,
+			62, 62,
 			GraphicsHelper:GetWoWTexture("Spellbook", "Spellbook-Icon"),
 			"TOPLEFT",
 			10, -8
@@ -135,7 +135,7 @@ function _mw:Show()
 		-- Credits
 		self.fsCredits = GraphicsHelper:CreateFontString(
 			self.Frame,
-			"Developed by Lomig & Tarcalion",
+			"Developed by Lomig & Tarcalion, adopted by kricklen",
 			"TOP",
 			0, -44
 		)
