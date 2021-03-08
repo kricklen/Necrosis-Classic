@@ -273,9 +273,9 @@ function Necrosis:SpellLocalize(tooltip)
 		AddAuraDuration({5484}, 10, "debuff") -- Howl of Terror 1
 		AddAuraDuration({17928}, 15, "debuff") -- Howl of Terror 2
 		-- Demonology
-		AddAuraDuration({710}, 20, "banish") -- Banish 1
-		AddAuraDuration({18647}, 30, "banish") -- Banish 2
-		AddAuraDuration({1098, 11725, 11726}, 300, "debuff") -- Enslave Demon 1-3
+		AddAuraDuration({710}, 20, "single") -- Banish 1
+		AddAuraDuration({18647}, 30, "single") -- Banish 2
+		AddAuraDuration({1098, 11725, 11726}, 300, "single") -- Enslave Demon 1-3
 		AddAuraDuration({1122}, 300, "debuff") -- Inferno
 		AddAuraDuration({20707, 20762, 20763, 20764, 20765}, 1800, "soulstone") -- Soulstone Resurrection 1-5
 		-- Destruction

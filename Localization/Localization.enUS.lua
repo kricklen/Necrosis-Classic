@@ -371,7 +371,7 @@ function Localization.enUS()
 			"Hey, I'm late! Let's find a horse that roxes!",
 		},
 		[2] = {
-			"<emote> is giggling gloomily...",
+			"<emote>is giggling gloomily...",
 			"<yell>I am summoning a steed from nightmare!",
 		},
 		[3] = {
@@ -384,12 +384,19 @@ function Localization.enUS()
 		Soulstone = {
 			{"<after>{X} --> <target> is soulstoned! <-- {X}"},
 			{"<after>{skull} --> <target> is soulstoned! <-- {skull}"}
-			-- {"{X} --> <target> test 123! <-- {X}", "abc"},
-			-- {"{S} --> <target> test 456! <-- {S}"}
 		},
 		-- Ritual of Summoning
 		RitualOfSummoning = {
-			{"<after>{X} --> Summoning <target> - please click on the portal <-- {X}"}
+			{
+				"Hold tight, <target>, summon incoming!",
+				"<emote>is concentrating...",
+				"<after>{X} --> Summoning <target> - please click on the portal <-- {X}"
+			},
+			{
+				"When you're done reading this <target>, you're already being summoned.",
+				"<emote>is concentrating...",
+				"<after>{X} --> Summoning <target> - please click the portal <-- {X}"
+			}
 		},
 		-- Ritual of Souls
 		RitualOfSouls = {

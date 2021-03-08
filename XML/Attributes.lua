@@ -45,9 +45,9 @@ local _G = getfenv(0)
 
 -- On crée les menus sécurisés pour les différents sorts Buff / Démon / Malédictions
 function Necrosis:MenuAttribute(menu)
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	local menuButton = _G[menu]
 	
@@ -144,9 +144,9 @@ end
 
 -- On associe les buffs au clic sur le bouton concerné
 function Necrosis:BuffSpellAttribute()
-	if InCombatLockdown() then
-		return
-	end
+	--if InCombatLockdown() then
+	--	return
+	--end
 
 	-- Association de l'armure demoniaque si le sort est disponible
 	if _G["NecrosisBuffMenu1"] then
@@ -226,9 +226,9 @@ end
 
 -- On associe les démons au clic sur le bouton concerné
 function Necrosis:PetSpellAttribute()
-	if InCombatLockdown() then
-		return
-	end
+	--if InCombatLockdown() then
+	--	return
+	--end
 
 	-- Démons maitrisés
 	for i = 2, 6, 1 do
@@ -265,9 +265,9 @@ end
 
 -- On associe les malédictions au clic sur le bouton concerné
 function Necrosis:CurseSpellAttribute()
-	if InCombatLockdown() then
-		return
-	end
+	--if InCombatLockdown() then
+	--	return
+	--end
 
 	local buffID = {23, 22, 25, 40, 26, 16, 14}
 	for i = 1, #buffID, 1 do
@@ -289,9 +289,9 @@ end
 -- Association de la monture au bouton, et de la création des pierres sur un clic droit
 function Necrosis:StoneAttribute(Steed)
 	-- print("Necrosis:StoneAttribute")
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	-- stones || Pour les pierres
 	local itemName = {"Soulstone", "Healthstone", "Spellstone", "Firestone" }
@@ -549,7 +549,8 @@ end
 
 function Necrosis:SpellstoneUpdateAttribute(nostone)
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if (InCombatLockdown() or not _G["NecrosisSpellstoneButton"]) then
+	--if (InCombatLockdown() or not _G["NecrosisSpellstoneButton"]) then
+	if (not _G["NecrosisSpellstoneButton"]) then
 		return
 	end
 
@@ -567,7 +568,8 @@ end
 
 function Necrosis:FirestoneUpdateAttribute(nostone)
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if (InCombatLockdown() or not _G["NecrosisFirestoneButton"]) then
+	--if (InCombatLockdown() or not _G["NecrosisFirestoneButton"]) then
+	if (not _G["NecrosisFirestoneButton"]) then
 		return
 	end
 

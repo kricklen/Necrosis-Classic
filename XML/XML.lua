@@ -214,14 +214,15 @@ local function CreateStoneButton(stone)
 	-- if there are no restrictions while in combat, then allow the stone to be cast || Ils permettent de caster la pierre sur soi si pas de cible et hors combat
 	if stone == "Soulstone" then
 		frame:SetScript("PreClick", function(self)
-			if not (InCombatLockdown() or UnitIsFriend("player","target")) then
+			--if not (InCombatLockdown() or UnitIsFriend("player","target")) then
+			if not (UnitIsFriend("player","target")) then
 				self:SetAttribute("unit", "player")
 			end
 		end)
 		frame:SetScript("PostClick", function(self)
-			if not InCombatLockdown() then
+			--if not InCombatLockdown() then
 				self:SetAttribute("unit", "target")
-			end
+			--end
 		end)
 	end
 
