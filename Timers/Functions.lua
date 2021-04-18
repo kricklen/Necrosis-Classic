@@ -267,7 +267,12 @@ local function MakeTimerGui(parentFrame)
 	lblCountdown:SetJustifyH("LEFT")
 	lblCountdown:SetTextColor(TEXT_COLOR.r, TEXT_COLOR.g, TEXT_COLOR.b)
 	lblCountdown:ClearAllPoints()
-	lblCountdown:SetPoint("LEFT", frame, "LEFT", 1, 0)
+	-- lblCountdown:SetPoint("LEFT", frame, "LEFT", 1, 0)
+	if (NecrosisConfig.SpellTimerPos == -1) then
+		lblCountdown:SetPoint("LEFT", frame, "LEFT", 1, 0)
+	else
+		lblCountdown:SetPoint("LEFT", frame, "RIGHT", 5, 0)
+	end
 
 	local bar = CreateFrame("StatusBar", nil, frame)
 	bar:SetSize(BAR_WIDTH - BAR_HEIGHT, BAR_HEIGHT)
