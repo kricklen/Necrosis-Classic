@@ -40,13 +40,9 @@
 
 Necrosis.Gui.TimersView = {
 	Frame = false,
-	ddTimers = false,
-	lblTimers = false,
 	cbEnableTimers = false,
 	cbTimersGrowUpwards = false,
-	cbTimersOnLeftSide = false,
-	--        0           1            2
-	_Types = {"Disabled", "Graphical", "Textual"}
+	cbTimersOnLeftSide = false
 }
 
 local _tv = Necrosis.Gui.TimersView
@@ -88,47 +84,6 @@ function _tv:cbTimersGrowUpwards_Click()
 		NecrosisConfig.SensListe = -1
 	else
 		NecrosisConfig.SensListe = 1
-	end
-end
-
-function _tv.ddTimers_Init(dd)
-	for i,data in ipairs(_tv._Types) do
-		UIDropDownMenu_AddButton({
-			text = Necrosis.Config.Timers.Type[data],
-			value = data,
-			checked = false,
-			func = _tv.ddTimers_Click,
-			arg1 = dd
-		})
-		if (data == NecrosisConfig.TimerType) then
-			UIDropDownMenu_SetSelectedValue(dd, data)
-			UIDropDownMenu_SetText(dd, Necrosis.Config.Timers.Type[NecrosisConfig.TimerType])
-		end
-	end
-	if (NecrosisConfig.TimerType == "Disabled") then
-		_tv.DisableTimers()
-	else
-		Necrosis:CreateTimerAnchor()
-		if (NecrosisConfig.TimerType == "Textual") then
-			_tv.EnableTextualTimers()
-		else
-			_tv.EnableGraphicalTimers()
-		end
-	end
-end
-
-function _tv.ddTimers_Click(item, dd)
-	UIDropDownMenu_SetSelectedValue(dd, item.value)
-	NecrosisConfig.TimerType = item.value
-	if item.value == "Disabled" then
-		_tv.DisableTimers()
-	else
-		Necrosis:CreateTimerAnchor()
-		if item.value == "Textual" then
-			_tv.EnableTextualTimers()
-		else
-			_tv.EnableGraphicalTimers()
-		end
 	end
 end
 
@@ -204,9 +159,6 @@ function _tv.EnableGraphicalTimers()
 end
 
 function _tv.UpdateTexts()
-	UIDropDownMenu_Initialize(_tv.ddTimers, _tv.ddTimers_Init)
-	UIDropDownMenu_SetText(_tv.ddTimers, Necrosis.Config.Timers.Type[NecrosisConfig.TimerType])
-	_tv.lblTimers:SetText(Necrosis.Config.Timers["Type de timers"])
 	_tv.cbEnableTimers:SetText(Necrosis.Config.Timers["Afficher le bouton des timers"])
 	_tv.cbTimersGrowUpwards:SetText(Necrosis.Config.Timers["Afficher les timers de bas en haut"])
 	_tv.cbTimersOnLeftSide:SetText(Necrosis.Config.Timers["Afficher les timers sur la gauche du bouton"])
@@ -230,7 +182,7 @@ function _tv:Show()
 		self.cbEnableTimers = GraphicsHelper:CreateCheckButton(
 			self.Frame,
 			Necrosis.Config.Timers["Afficher le bouton des timers"],
-			0, -66,
+			0, -40,
 			self.cbEnableTimers_Click
 		)
 		self.cbEnableTimers:SetChecked(NecrosisConfig.ShowSpellTimers)
@@ -239,7 +191,7 @@ function _tv:Show()
 		self.cbEnableTimerBars = GraphicsHelper:CreateCheckButton(
 			self.Frame,
 			"Enable timer bars",
-			0, -88,
+			0, -66,
 			self.cbEnableTimerBars_Click
 		)
 		self.cbEnableTimerBars:SetChecked(NecrosisConfig.EnableTimerBars)
@@ -248,7 +200,7 @@ function _tv:Show()
 		self.cbTimersOnLeftSide = GraphicsHelper:CreateCheckButton(
 			self.Frame,
 			Necrosis.Config.Timers["Afficher les timers sur la gauche du bouton"],
-			0, -110,
+			0, -88,
 			self.cbTimersOnLeftSide_Click
 		)
 		self.cbTimersOnLeftSide:SetChecked(NecrosisConfig.SpellTimerPos == -1)
@@ -257,7 +209,7 @@ function _tv:Show()
 		self.cbTimersGrowUpwards = GraphicsHelper:CreateCheckButton(
 			self.Frame,
 			Necrosis.Config.Timers["Afficher les timers de bas en haut"],
-			0, -132,
+			0, -110,
 			self.cbTimersGrowUpwards_Click
 		)
 		self.cbTimersGrowUpwards:SetChecked(NecrosisConfig.SensListe == -1)
@@ -265,20 +217,11 @@ function _tv:Show()
 		-- Handler to update texts when language changes
 		EventHelper:RegisterLanguageChangedHandler(self.UpdateTexts)
 
-		-- Choix du timer graphique
-		-- Initialize dropdown here so the checkboxes can be disabled/enabled
-		self.ddTimers, self.lblTimers = GraphicsHelper:CreateDropDown(
-			self.Frame,
-			Necrosis.Config.Timers["Type de timers"],
-			0, -40,
-			self.ddTimers_Init
-		)
-
 		-- Timer font
 		self.ddTimerFont, self.lblTimerFont = GraphicsHelper:CreateDropDown(
 			self.Frame,
 			"Font",
-			0, -154,
+			0, -132,
 			self.ddTimerFont_Init
 		)
 	
@@ -286,14 +229,14 @@ function _tv:Show()
 		self.ddTimerFontSize, self.lblTimerFontSize = GraphicsHelper:CreateDropDown(
 			self.Frame,
 			"Font Size",
-			0, -176,
+			0, -154,
 			self.ddTimerFontSize_Init
 		)
 	
 		self.btnTestTimer = GraphicsHelper:CreateButton(
 			self.Frame,
 			"Test Soulstone",
-			-200, -250,
+			-200, -230,
 			function(self)
 				local spellId = 20765
 				Necrosis.Timers:InsertSpellTimer(
@@ -314,7 +257,7 @@ function _tv:Show()
 		self.btnTestTimerBanish = GraphicsHelper:CreateButton(
 			self.Frame,
 			"Test Banish",
-			-200, -278,
+			-200, -258,
 			function(self)
 				local spellId = 18647
 				Necrosis.Timers:InsertSpellTimer(
@@ -333,7 +276,7 @@ function _tv:Show()
 		self.btnTestCorruptionBanish = GraphicsHelper:CreateButton(
 			self.Frame,
 			"Test Corruption",
-			-200, -306,
+			-200, -286,
 			function(self)
 				local spellId = 11672
 				Necrosis.Timers:InsertSpellTimer(
@@ -352,7 +295,7 @@ function _tv:Show()
 		self.btnClearTimer = GraphicsHelper:CreateButton(
 			self.Frame,
 			"Clear timer",
-			-90, -250,
+			-90, -230,
 			function(self)
 				Necrosis.Timers:RemoveAllTimers()
 			end
@@ -362,7 +305,7 @@ function _tv:Show()
 		self.btnKillSoulstoneTimer = GraphicsHelper:CreateButton(
 			self.Frame,
 			"Kill Target",
-			-90, -278,
+			-90, -258,
 			function(self)
 				Necrosis.Timers:RemoveSpellTimerTarget(UnitGUID("target"))
 			end
@@ -372,7 +315,7 @@ function _tv:Show()
 		self.btnTestTimerSSRemote = GraphicsHelper:CreateButton(
 			self.Frame,
 			"Test SS Remote",
-			-90, -306,
+			-90, -286,
 			function(self)
 				local spellId = 20765
 				local spellName = GetSpellInfo(spellId)

@@ -267,6 +267,8 @@ local function MakeTimerGui(parentFrame)
 	lblCountdown:SetJustifyH("LEFT")
 	lblCountdown:SetTextColor(TEXT_COLOR.r, TEXT_COLOR.g, TEXT_COLOR.b)
 	lblCountdown:ClearAllPoints()
+	-- lblCountdown:SetPoint("LEFT", frame, "LEFT", 1, 0)
+	print("NecrosisConfig.SpellTimerPos "..NecrosisConfig.SpellTimerPos)
 	if (NecrosisConfig.SpellTimerPos == -1) then
 		lblCountdown:SetPoint("LEFT", frame, "LEFT", 1, 0)
 	else
@@ -661,10 +663,6 @@ local function RemoveCombatTimers()
 end
 
 function _t:Initialize()
-	-- Do nothing if timers are disabled
-	if (not NecrosisConfig.EnableTimerBars) then
-		return
-	end
 	-- Set the default font for timer bars if none is configured
 	if (not NecrosisConfig.TimerFont) then
 		NecrosisConfig.TimerFont = Necrosis.Config.Fonts[1]
@@ -678,6 +676,10 @@ function _t:Initialize()
 	if (not NecrosisConfig.FramePosition["NecrosisMobTimerAnchor"]) then
 		NecrosisConfig.FramePosition["NecrosisMobTimerAnchor"] =
 			Config.FramePosition["NecrosisMobTimerAnchor"]
+	end
+	-- Do nothing else if timers are disabled
+	if (not NecrosisConfig.EnableTimerBars) then
+		return
 	end
 	-- Add soulstone timer if it's on cooldown
 	local iscd, secs = ItemHelper:GetSoulstoneCooldownSecs()
