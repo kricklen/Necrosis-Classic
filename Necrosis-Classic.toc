@@ -55,8 +55,6 @@ Initialize.lua
 Spells.lua
 
 Timers\Functions.lua
-Timers\GraphicalTimers.lua
-Timers\OtherTimers.lua
 
 Bindings.lua
 

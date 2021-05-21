@@ -222,7 +222,7 @@ local function RemoveTimer(timerData)
 	timerData.Finished = true
 	-- Hide the timer, stopping the countdown
 	timerData.Frame:Hide()
-	-- Remove the raid icon from the timer (might have been banish)
+	-- Remove the raid icon from the timer (might have been banish or ss)
 	UpdateRaidIcon(timerData, nil)
 	-- Remove the timer from the group
 	local idx = table.indexOf(timerData.Group.Timers, timerData)
@@ -267,13 +267,7 @@ local function MakeTimerGui(parentFrame)
 	lblCountdown:SetJustifyH("LEFT")
 	lblCountdown:SetTextColor(TEXT_COLOR.r, TEXT_COLOR.g, TEXT_COLOR.b)
 	lblCountdown:ClearAllPoints()
-	-- lblCountdown:SetPoint("LEFT", frame, "LEFT", 1, 0)
-	print("NecrosisConfig.SpellTimerPos "..NecrosisConfig.SpellTimerPos)
-	if (NecrosisConfig.SpellTimerPos == -1) then
-		lblCountdown:SetPoint("LEFT", frame, "LEFT", 1, 0)
-	else
-		lblCountdown:SetPoint("LEFT", frame, "RIGHT", 5, 0)
-	end
+	lblCountdown:SetPoint("LEFT", frame, "LEFT", 1, 0)
 
 	local bar = CreateFrame("StatusBar", nil, frame)
 	bar:SetSize(BAR_WIDTH - BAR_HEIGHT, BAR_HEIGHT)

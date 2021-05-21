@@ -258,7 +258,7 @@ function Necrosis:SpellLocalize(tooltip)
 		-- Affliction
 		AddAuraDuration({172}, 12, "debuff") -- Corruption 1
 		AddAuraDuration({6222}, 15, "debuff") -- Corruption 2
-		AddAuraDuration({6223, 7648, 11671, 11672}, 18, "debuff") -- Corruption 3-6
+		AddAuraDuration({6223, 7648, 11671, 11672, 25311}, 18, "debuff") -- Corruption 3-6
 		AddAuraDuration({980, 1014, 6217, 11711, 11712, 11713}, 24, "debuff") -- Curse of Agony 1-6
 		AddAuraDuration({603}, 60, "debuff") -- Curse of Doom
 		AddAuraDuration({704, 7658, 7659, 11717}, 120, "debuff") -- Curse of Recklessness 1-4
@@ -279,7 +279,7 @@ function Necrosis:SpellLocalize(tooltip)
 		AddAuraDuration({1122}, 300, "debuff") -- Inferno
 		AddAuraDuration({20707, 20762, 20763, 20764, 20765}, 1800, "soulstone") -- Soulstone Resurrection 1-5
 		-- Destruction
-		AddAuraDuration({348, 707, 1094, 2941, 11665, 11667, 11668}, 15, "debuff") -- Immolate 1-7
+		AddAuraDuration({348, 707, 1094, 2941, 11665, 11667, 11668, 25309}, 15, "debuff") -- Immolate 1-7
 		AddAuraDuration({17877, 18867, 18868, 18869, 18870, 18871}, 5, "debuff") -- Shadowburn 1-6
 		AddAuraDuration({17794, 17797, 17798, 17799, 17800}, 12, "debuff") -- Shadow Vulnerability
 
