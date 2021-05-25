@@ -1,4 +1,4 @@
-## Interface: 11305
+## Interface: 11307
 ## Title: Necrosis-Classic
 ## Title-ruRU: Necrosis-Classic (Русский)
 ## Title-frFR: Necrosis-Classic (Français)
