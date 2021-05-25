@@ -407,7 +407,10 @@ function Localization.enUS()
 			{"Come forth my steed!"}
 		},
 		Demon = {
-			{"Summoning <pet>"}
+			{
+				"Summoning <pet>",
+				"<after>Summoned <pet>"
+			}
 		},
 		DemonicSacrifice = {
 			{"<say>Sorry <pet>, i need your essence..."}
