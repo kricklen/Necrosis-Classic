@@ -251,12 +251,6 @@ local function FindFreeTimer()
 	return nil
 end
 
-local function SetTimerParent(timerData, parentFrame)
-	timerData.Frame:ClearAllPoints()
-	timerData.Frame:SetAllPoints(parentFrame)
-	timerData.Frame:SetParent(parentFrame)
-end
-
 local function MakeTimerGui(parentFrame)
 	-- Frame will be positioned later
 	local frame = CreateFrame("Frame", nil, parentFrame)
@@ -324,9 +318,32 @@ local function MakeTimerGui(parentFrame)
 		}
 end
 
+local function SetTimerParent(timerData, parentFrame)
+	timerData.Frame:ClearAllPoints()
+	timerData.Frame:SetAllPoints(parentFrame)
+	timerData.Frame:SetParent(parentFrame)
+end
+
+local function LinkTimerGroup(timerData, timerGroup)
+	-- print("Finding timer in timerGroup 1 "..tostring(timerData.Group))
+	-- if (timerData.Group) then
+	-- 	print("Finding timer in timerGroup 2")
+	-- 	for i = #timerData.Group.Timers, 1, -1 do
+	-- 		print("Finding timer in timerGroup 3 "..tostring(i))
+	-- 		if timerData.Group.Timers[i] == timerData then
+	-- 			print("Finding timer in timerGroup 4 "..tostring(i))
+	-- 			table.remove(timerData.Group, i)
+	-- 		end
+	-- 	end
+	-- end
+	timerData.Group = timerGroup
+	table.insert(timerGroup.Timers, timerData)
+end
+
 local function InsertTimer(timerGroup)
 	-- Find a finished timer
 	local timerData = FindFreeTimer()
+	--print("Free timer: "..tostring(timerData))
 	if (not timerData) then
 		-- Create a new timer with gui elements
 		timerData = MakeTimerGui(timerGroup.Frame)
@@ -335,10 +352,8 @@ local function InsertTimer(timerGroup)
 	end
 	-- Change references to the current timer group
 	SetTimerParent(timerData, timerGroup.Frame)
-
 	-- Link and reverse link timer to group
-	timerData.Group = timerGroup
-	table.insert(timerGroup.Timers, timerData)
+	LinkTimerGroup(timerData, timerGroup)
 	return timerData
 end
 
@@ -367,7 +382,11 @@ local function StartTimer(timerData)
 	-- Show the gui elements, starting the timer
 	timerData.Group.Frame:Show()
 	timerData.Frame:Show()
-
+	-- print("timerData.Frame.isShown() "..tostring(timerData.Frame.isShown()))
+	-- print("timerData.Frame.isVisible() "..tostring(timerData.Frame.isVisible()))
+	-- print("timerData.Frame "..tostring(timerData.Frame)..", parent "..tostring(timerData.Group.Frame)..", "..timerData.SpellName)
+	-- print("timerData.SpellName "..tostring(timerData.SpellName))
+	
 	-- Update functionality inspired by AceTimer library
 	timerData.TickEnd = GetTime() + TICK_SECS
 	timerData.UpdateFunc =
@@ -462,6 +481,7 @@ function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, tar
 	else
 		-- Add mob timer
 		local timerGroup = FindMobTimerGroup(targetGuid)
+--print("targetGuid "..tostring(targetGuid)..", "..tostring(timerGroup))
 		if (not timerGroup) then
 			timerGroup = FindFreeMobTimerGroup()
 			if (not timerGroup) then
