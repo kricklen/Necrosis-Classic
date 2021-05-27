@@ -311,7 +311,7 @@ function Necrosis:OnLoad(event)
 			-- print("Logged in")
 		end
 
-	elseif (event == "SKILL_LINES_CHANGED") -- and Local.LoggedIn and not weCanStart) then
+	elseif (event == "SKILL_LINES_CHANGED") and Local.LoggedIn and not weCanStart --) then
 	then
 		-- Skill changed is fired more than once, seems like a more stable
 		-- indicator that tells when the spellbook is ready.
