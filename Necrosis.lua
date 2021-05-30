@@ -728,7 +728,7 @@ function Necrosis:OnCombatLogEvent(event, ...)
 				end
 
 				-- print("Debuff applied: "..spellName)
-				Necrosis:CheckUnitDebuff(destGUID, spellName)
+				-- Necrosis:CheckUnitDebuff(destGUID, spellName)
 	
 				-- Capture the icon of the spell target
 				local destIconNumber = GetRaidTargetIndex("target")
@@ -2516,6 +2516,7 @@ function Necrosis:CreateMenu()
 					Local.Menu.Buff:insert(menuVariable)
 			else
 				for spell = 2, #NecrosisConfig.BuffSpellPosition, 1 do
+print("Nc CreateMenuBuff "..tostring(spell))
 					if math.abs(NecrosisConfig.BuffSpellPosition[index]) == spell
 						and NecrosisConfig.BuffSpellPosition[spell] > 0
 						and self.Spell[ MenuID[spell] ].ID then
