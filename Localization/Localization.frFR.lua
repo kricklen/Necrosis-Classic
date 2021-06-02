@@ -47,99 +47,99 @@ function Localization.frFR()
 		["Echange"] = "Echange",
 	}
 
-	Necrosis.TooltipData = {
-		["Main"] = {
-			Label = "|c00FFFFFFNecrosis|r",
-			Stone = {
-				[true] = "Oui";
-				[false] = "Non";
-			},
-			Hellspawn = {
-				[true] = "On";
-				[false] = "Off";
-			},
-			["Soulshard"] = "Fragment(s) d'\195\162me : ",
-			["InfernalStone"] = "Pierre(s) infernale(s) : ",
-			["DemoniacStone"] = "Pierre(s) d\195\169moniaque(s) : ",
-			["Soulstone"] = "\nPierre d'\195\162me : ",
-			["Healthstone"] = "Pierre de soins : ",
-			["Spellstone"] = "Pierre de sort : ",
-			["Firestone"] = "Pierre de feu : ",
-			["CurrentDemon"] = "D\195\169mon : ",
-			["EnslavedDemon"] = "D\195\169mon : Asservi",
-			["NoCurrentDemon"] = "D\195\169mon : Aucun",
-		},
-		["Soulstone"] = {
-			Text = {"Clic droit pour cr\195\169er","Clic gauche pour utiliser","Utilis\195\169e\nClic droit pour recr\195\169er","En attente"},
-			Ritual = "|c00FFFFFFShift+Clic pour le rituel d'invocation|r"
-		},
-		["Healthstone"] = {
-			Text = {"Clic droit pour cr\195\169er","Clic gauche pour utiliser"},
-			Text2 = "Clic du milieu ou Ctrl+clic gauche pour \195\169changer",
-			Ritual = "|c00FFFFFFShift+Clic pour le rituel des \195\162mes|r"
-		},
-		["Spellstone"] = {
-			Text = {"Clic droit pour cr\195\169er","En inventaire\nClic gauche pour utiliser","Utilis\195\169e", "Utilis\195\169e\nClic pour cr\195\169er"}
-		},
-		["Firestone"] = {
-			Text = {"Clic droit pour cr\195\169er","En inventaire\nClic gauche pour utiliser","Utilis\195\169e", "Utilis\195\169e\nClic pour cr\195\169er"}
-		},
-		["SpellTimer"] = {
-			Label = "|c00FFFFFFDur\195\169e des sorts|r",
-			Text = "Sorts actifs sur la cible",
-			Right = "Clic droit pour pierre de foyer vers "
-		},
-		["ShadowTrance"] = {
-			Label = "|c00FFFFFFTranse de l'ombre|r"
-		},
-		["Backlash"] = {
-			Label = "|c00FFFFFFContrecoup|r"
-		},
-		["Banish"] = {
-			Text = "Clic droit pour Rang 1"
-		},
-		["Imp"] = {
-			Label = "|c00FFFFFFDiablotin|r"
-		},
-		["Voidwalker"] = {
-			Label = "|c00FFFFFFMarcheur \195\169th\195\169r\195\169|r"
-		},
-		["Succubus"] = {
-			Label = "|c00FFFFFFSuccube|r"
-		},
-		["Felhunter"] = {
-			Label = "|c00FFFFFFChasseur corrompu|r"
-		},
-		["Felguard"] = {
-			Label = "|c00FFFFFFGangregarde|r"
-		},
-		["Infernal"] = {
-			Label = "|c00FFFFFFInfernal|r"
-		},
-		["Doomguard"] = {
-			Label = "|c00FFFFFFGarde funeste|r"
-		},
-		["Mount"] = {
-			Label = "|c00FFFFFFMonture|r",
-			Text = "Clic droit pour Rang 1"
-		},
-		["BuffMenu"] = {
-			Label = "|c00FFFFFFMenu des sorts|r",
-			Text = "Clic droit pour laisser ouvert",
-			Text2 = "Mode automatique : Fermeture \195\160 la fin du combat",
-		},
-		["PetMenu"] = {
-			Label = "|c00FFFFFFMenu des d\195\169mons|r",
-			Text = "Clic droit pour laisser ouvert",
-			Text2 = "Mode automatique : Fermeture \195\160 la fin du combat",
-		},
-		["CurseMenu"] = {
-			Label = "|c00FFFFFFMenu des mal\195\169dictions|r",
-			Text = "Clic droit pour laisser ouvert",
-			Text2 = "Mode automatique : Fermeture \195\160 la fin du combat",
-		},
-		["DominationCooldown"] = "Clic droit pour invocation rapide",
-	}
+	-- Necrosis.TooltipData = {
+	-- 	["Main"] = {
+	-- 		Label = "|c00FFFFFFNecrosis|r",
+	-- 		Stone = {
+	-- 			[true] = "Oui";
+	-- 			[false] = "Non";
+	-- 		},
+	-- 		Hellspawn = {
+	-- 			[true] = "On";
+	-- 			[false] = "Off";
+	-- 		},
+	-- 		["Soulshard"] = "Fragment(s) d'\195\162me : ",
+	-- 		["InfernalStone"] = "Pierre(s) infernale(s) : ",
+	-- 		["DemoniacStone"] = "Pierre(s) d\195\169moniaque(s) : ",
+	-- 		["Soulstone"] = "\nPierre d'\195\162me : ",
+	-- 		["Healthstone"] = "Pierre de soins : ",
+	-- 		["Spellstone"] = "Pierre de sort : ",
+	-- 		["Firestone"] = "Pierre de feu : ",
+	-- 		["CurrentDemon"] = "D\195\169mon : ",
+	-- 		["EnslavedDemon"] = "D\195\169mon : Asservi",
+	-- 		["NoCurrentDemon"] = "D\195\169mon : Aucun",
+	-- 	},
+	-- 	["Soulstone"] = {
+	-- 		Text = {"Clic droit pour cr\195\169er","Clic gauche pour utiliser","Utilis\195\169e\nClic droit pour recr\195\169er","En attente"},
+	-- 		Ritual = "|c00FFFFFFShift+Clic pour le rituel d'invocation|r"
+	-- 	},
+	-- 	["Healthstone"] = {
+	-- 		Text = {"Clic droit pour cr\195\169er","Clic gauche pour utiliser"},
+	-- 		Text2 = "Clic du milieu ou Ctrl+clic gauche pour \195\169changer",
+	-- 		Ritual = "|c00FFFFFFShift+Clic pour le rituel des \195\162mes|r"
+	-- 	},
+	-- 	["Spellstone"] = {
+	-- 		Text = {"Clic droit pour cr\195\169er","En inventaire\nClic gauche pour utiliser","Utilis\195\169e", "Utilis\195\169e\nClic pour cr\195\169er"}
+	-- 	},
+	-- 	["Firestone"] = {
+	-- 		Text = {"Clic droit pour cr\195\169er","En inventaire\nClic gauche pour utiliser","Utilis\195\169e", "Utilis\195\169e\nClic pour cr\195\169er"}
+	-- 	},
+	-- 	["SpellTimer"] = {
+	-- 		Label = "|c00FFFFFFDur\195\169e des sorts|r",
+	-- 		Text = "Sorts actifs sur la cible",
+	-- 		Right = "Clic droit pour pierre de foyer vers "
+	-- 	},
+	-- 	["ShadowTrance"] = {
+	-- 		Label = "|c00FFFFFFTranse de l'ombre|r"
+	-- 	},
+	-- 	["Backlash"] = {
+	-- 		Label = "|c00FFFFFFContrecoup|r"
+	-- 	},
+	-- 	["Banish"] = {
+	-- 		Text = "Clic droit pour Rang 1"
+	-- 	},
+	-- 	["Imp"] = {
+	-- 		Label = "|c00FFFFFFDiablotin|r"
+	-- 	},
+	-- 	["Voidwalker"] = {
+	-- 		Label = "|c00FFFFFFMarcheur \195\169th\195\169r\195\169|r"
+	-- 	},
+	-- 	["Succubus"] = {
+	-- 		Label = "|c00FFFFFFSuccube|r"
+	-- 	},
+	-- 	["Felhunter"] = {
+	-- 		Label = "|c00FFFFFFChasseur corrompu|r"
+	-- 	},
+	-- 	["Felguard"] = {
+	-- 		Label = "|c00FFFFFFGangregarde|r"
+	-- 	},
+	-- 	["Infernal"] = {
+	-- 		Label = "|c00FFFFFFInfernal|r"
+	-- 	},
+	-- 	["Doomguard"] = {
+	-- 		Label = "|c00FFFFFFGarde funeste|r"
+	-- 	},
+	-- 	["Mount"] = {
+	-- 		Label = "|c00FFFFFFMonture|r",
+	-- 		Text = "Clic droit pour Rang 1"
+	-- 	},
+	-- 	["BuffMenu"] = {
+	-- 		Label = "|c00FFFFFFMenu des sorts|r",
+	-- 		Text = "Clic droit pour laisser ouvert",
+	-- 		Text2 = "Mode automatique : Fermeture \195\160 la fin du combat",
+	-- 	},
+	-- 	["PetMenu"] = {
+	-- 		Label = "|c00FFFFFFMenu des d\195\169mons|r",
+	-- 		Text = "Clic droit pour laisser ouvert",
+	-- 		Text2 = "Mode automatique : Fermeture \195\160 la fin du combat",
+	-- 	},
+	-- 	["CurseMenu"] = {
+	-- 		Label = "|c00FFFFFFMenu des mal\195\169dictions|r",
+	-- 		Text = "Clic droit pour laisser ouvert",
+	-- 		Text2 = "Mode automatique : Fermeture \195\160 la fin du combat",
+	-- 	},
+	-- 	["DominationCooldown"] = "Clic droit pour invocation rapide",
+	-- }
 
 	Necrosis.Sound = {
 		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-Fr.mp3",

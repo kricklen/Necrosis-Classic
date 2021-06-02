@@ -98,6 +98,28 @@ function Necrosis:Initialize(Config)
 	end
 
 	self:CreateWarlockUI()
+
+	local f = Necrosis.Warlock_Buttons.main.f
+	if Necrosis.Debug.init_path then
+		_G["DEFAULT_CHAT_FRAME"]:AddMessage("Necrosis- Initialize"
+		.." f:'"..(tostring(f) or "nyl").."'"
+		)
+	end
+
+	f = _G[f]
+	-- Now ready to activate Necrosis
+	-- f:SetScript("OnUpdate", 	function(self, arg1) Necrosis:OnUpdate(self, arg1) end)
+	f:SetScript("OnEnter", 		function(self) Necrosis:BuildButtonTooltip(self) end)
+	f:SetScript("OnLeave", 		function() GameTooltip:Hide() end)
+	f:SetScript("OnMouseUp", 	function(self) Necrosis:OnDragStop(self) end)
+	f:SetScript("OnDragStart", 	function(self) Necrosis:OnDragStart(self) end)
+	f:SetScript("OnDragStop", 	function(self) Necrosis:OnDragStop(self) end)
+
+	-- Register the events used || Enregistrement des events utilisés
+	-- for i in ipairs(Events) do
+	-- 	f:RegisterEvent(Events[i])
+	-- end
+
 	self:CreateWarlockPopup()
 	-----------------------------------------------------------
 	-- Exécution des fonctions de démarrage

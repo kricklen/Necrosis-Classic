@@ -48,99 +48,99 @@ function Localization.zhTW()
 		["Echange"] = "交易",
 	}
 
-	Necrosis.TooltipData = {
-		["Main"] = {
-			Label = "|c00FFFFFFNecrosis|r",
-			Stone = {
-				[true] = "是";
-				[false] = "否";
-			},
-			Hellspawn = {
-				[true] = "開";
-				[false] = "關";
-			},
-			["Soulshard"] = "靈魂碎片：",
-			["InfernalStone"] = "地獄火石：",
-			["DemoniacStone"] = "惡魔雕像：",
-			["Soulstone"] = "\n靈魂石：",
-			["Healthstone"] = "治療石：",
-			["Spellstone"] = "法術石：",
-			["Firestone"] = "火焰石：",
-			["CurrentDemon"] = "惡魔：",
-			["EnslavedDemon"] = "惡魔：奴役",
-			["NoCurrentDemon"] = "惡魔：無",
-		},
-		["Soulstone"] = {
-			Text = {"製造","使用","已使用","等待中"},
-			Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
-		},
-		["Healthstone"] = {
-			Text = {"製造","使用"},
-			Text2 = "按中鍵或是Ctrl-左鍵交易",
-			Ritual = "|c00FFFFFFShift+左鍵施放靈魂儀式|r"
-		},
-		["Spellstone"] = {
-			Text = {"按右鍵製造","按左鍵使用","已使用", "已使用\點擊製造"}
-		},
-		["Firestone"] = {
-			Text = {"按右鍵製造","按左鍵使用","已使用", "已使用\點擊製造"}
-		},
-		["SpellTimer"] = {
-			Label = "|c00FFFFFF法術持續時間|r",
-			Text = "啟用對目標的法術計時",
-			Right = "右鍵使用爐石到"
-		},
-		["ShadowTrance"] = {
-			Label = "|c00FFFFFF暗影冥思|r"
-		},
-		["Backlash"] = {
-			Label = "|c00FFFFFF反衝|r"
-		},
-		["Banish"] = {
-			Text = "按右鍵施放等級1"
-		},
-		["Imp"] = {
-			Label = "|c00FFFFFF小鬼|r"
-		},
-		["Voidwalker"] = {
-			Label = "|c00FFFFFF虛空行者|r"
-		},
-		["Succubus"] = {
-			Label = "|c00FFFFFF魅魔|r"
-		},
-		["Felhunter"] = {
-			Label = "|c00FFFFFF地獄獵犬|r"
-		},
-		["Felguard"] = {
-			Label = "|c00FFFFFF地獄守衛|r"
-		},
-		["Infernal"] = {
-			Label = "|c00FFFFFF地獄火|r"
-		},
-		["Doomguard"] = {
-			Label = "|c00FFFFFF末日守衛|r"
-		},
-		["Mount"] = {
-			Label = "|c00FFFFFF坐騎|r",
-			Text = "右鍵施放等級1"
-		},
-		["BuffMenu"] = {
-			Label = "|c00FFFFFF法術選單|r",
-			Text = "右鍵保持選單開啟",
-			Text2 = "自動模式：脫離戰鬥後自動關閉",
-		},
-		["PetMenu"] = {
-			Label = "|c00FFFFFF惡魔選單|r",
-			Text = "右鍵保持選單開啟",
-			Text2 = "自動模式：脫離戰鬥後自動關閉",
-		},
-		["CurseMenu"] = {
-			Label = "|c00FFFFFF詛咒選單|r",
-			Text = "右鍵保持選單開啟",
-			Text2 = "自動模式：脫離戰鬥後自動關閉",
-		},
-		["DominationCooldown"] = "右鍵快速召喚",
-	}
+	-- Necrosis.TooltipData = {
+	-- 	["Main"] = {
+	-- 		Label = "|c00FFFFFFNecrosis|r",
+	-- 		Stone = {
+	-- 			[true] = "是";
+	-- 			[false] = "否";
+	-- 		},
+	-- 		Hellspawn = {
+	-- 			[true] = "開";
+	-- 			[false] = "關";
+	-- 		},
+	-- 		["Soulshard"] = "靈魂碎片：",
+	-- 		["InfernalStone"] = "地獄火石：",
+	-- 		["DemoniacStone"] = "惡魔雕像：",
+	-- 		["Soulstone"] = "\n靈魂石：",
+	-- 		["Healthstone"] = "治療石：",
+	-- 		["Spellstone"] = "法術石：",
+	-- 		["Firestone"] = "火焰石：",
+	-- 		["CurrentDemon"] = "惡魔：",
+	-- 		["EnslavedDemon"] = "惡魔：奴役",
+	-- 		["NoCurrentDemon"] = "惡魔：無",
+	-- 	},
+	-- 	["Soulstone"] = {
+	-- 		Text = {"製造","使用","已使用","等待中"},
+	-- 		Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
+	-- 	},
+	-- 	["Healthstone"] = {
+	-- 		Text = {"製造","使用"},
+	-- 		Text2 = "按中鍵或是Ctrl-左鍵交易",
+	-- 		Ritual = "|c00FFFFFFShift+左鍵施放靈魂儀式|r"
+	-- 	},
+	-- 	["Spellstone"] = {
+	-- 		Text = {"按右鍵製造","按左鍵使用","已使用", "已使用\點擊製造"}
+	-- 	},
+	-- 	["Firestone"] = {
+	-- 		Text = {"按右鍵製造","按左鍵使用","已使用", "已使用\點擊製造"}
+	-- 	},
+	-- 	["SpellTimer"] = {
+	-- 		Label = "|c00FFFFFF法術持續時間|r",
+	-- 		Text = "啟用對目標的法術計時",
+	-- 		Right = "右鍵使用爐石到"
+	-- 	},
+	-- 	["ShadowTrance"] = {
+	-- 		Label = "|c00FFFFFF暗影冥思|r"
+	-- 	},
+	-- 	["Backlash"] = {
+	-- 		Label = "|c00FFFFFF反衝|r"
+	-- 	},
+	-- 	["Banish"] = {
+	-- 		Text = "按右鍵施放等級1"
+	-- 	},
+	-- 	["Imp"] = {
+	-- 		Label = "|c00FFFFFF小鬼|r"
+	-- 	},
+	-- 	["Voidwalker"] = {
+	-- 		Label = "|c00FFFFFF虛空行者|r"
+	-- 	},
+	-- 	["Succubus"] = {
+	-- 		Label = "|c00FFFFFF魅魔|r"
+	-- 	},
+	-- 	["Felhunter"] = {
+	-- 		Label = "|c00FFFFFF地獄獵犬|r"
+	-- 	},
+	-- 	["Felguard"] = {
+	-- 		Label = "|c00FFFFFF地獄守衛|r"
+	-- 	},
+	-- 	["Infernal"] = {
+	-- 		Label = "|c00FFFFFF地獄火|r"
+	-- 	},
+	-- 	["Doomguard"] = {
+	-- 		Label = "|c00FFFFFF末日守衛|r"
+	-- 	},
+	-- 	["Mount"] = {
+	-- 		Label = "|c00FFFFFF坐騎|r",
+	-- 		Text = "右鍵施放等級1"
+	-- 	},
+	-- 	["BuffMenu"] = {
+	-- 		Label = "|c00FFFFFF法術選單|r",
+	-- 		Text = "右鍵保持選單開啟",
+	-- 		Text2 = "自動模式：脫離戰鬥後自動關閉",
+	-- 	},
+	-- 	["PetMenu"] = {
+	-- 		Label = "|c00FFFFFF惡魔選單|r",
+	-- 		Text = "右鍵保持選單開啟",
+	-- 		Text2 = "自動模式：脫離戰鬥後自動關閉",
+	-- 	},
+	-- 	["CurseMenu"] = {
+	-- 		Label = "|c00FFFFFF詛咒選單|r",
+	-- 		Text = "右鍵保持選單開啟",
+	-- 		Text2 = "自動模式：脫離戰鬥後自動關閉",
+	-- 	},
+	-- 	["DominationCooldown"] = "右鍵快速召喚",
+	-- }
 
 	Necrosis.Sound = {
 		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-En.mp3",

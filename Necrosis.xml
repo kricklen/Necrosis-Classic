@@ -14,6 +14,5 @@
 			</OnEvent>
 		</Scripts>
 	</Frame>
-
 	<GameTooltip name="NecrosisTooltip" inherits="GameTooltipTemplate" parent="UIParent" toplevel="true" movable="true" frameStrata="LOW" />
 </Ui>

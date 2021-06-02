@@ -74,7 +74,7 @@ function _chat:BeforeSpellCast(Spell)
 			_chat:CastRitualOfSouls()
 		end
 	-- messages to be posted while casting 'Soulstone' on a friendly target
-	elseif Spell.Name == Necrosis.Spell[11].Name and not (Spell.TargetName == UnitName("player")) then
+	elseif Spell.Name == Necrosis.Spell[51].Name and not (Spell.TargetName == UnitName("player")) then
 		_chat:CastSoulstone(Spell.TargetName)
 	-- messages to be posted while casting 'Ritual of Summoning'
 	elseif Spell.Name == Necrosis.Spell[37].Name then

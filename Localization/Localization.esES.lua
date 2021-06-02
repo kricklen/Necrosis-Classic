@@ -48,99 +48,99 @@ function Localization.esES()
 		["Echange"] = "Trade",
 	}
 
-	Necrosis.TooltipData = {
-		["Main"] = {
-			Label = "|c00FFFFFFNecrosis|r",
-			Stone = {
-				[true] = "S\195\173",
-				[false] = "No",
-			},
-			Hellspawn = {
-				[true] = "Activar",
-				[false] = "Desactivar",
-			},
-			["Soulshard"] = "Fragmento(s) de Alma: ",
-			["InfernalStone"] = "Piedra(s) Infernal(es): ",
-			["DemoniacStone"] = "Figura(s) Demon\195\173aca(s): ",
-			["Soulstone"] = "\nPiedra de Alma: ",
-			["Healthstone"] = "Piedra de Salud: ",
-			["Spellstone"] = "Piedra de Hechizo: ",
-			["Firestone"] = "Piedra de Fuego: ",
-			["CurrentDemon"] = "Demonio: ",
-			["EnslavedDemon"] = "Demonio: Esclavizado ",
-			["NoCurrentDemon"] = "Demonio: Ninguno",
-		},
-		["Soulstone"] = {
-			Text = {"Click derecho para crear","Click izquierdo para usar","Usada\nClick derecho para recrear","Esperando"},
-			Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
-		},
-		["Healthstone"] = {
-			Text = {"Click derecho para crear","Click izquierdo para usar"},
-			Text2 = "Click central o Ctrl+Click izquierdo para comerciar",
-			Ritual = "|c00FFFFFFShift+Click para empezar el Ritual de Almas|r"
-		},
-		["Spellstone"] = {
-			Text = {"Click derecho para crear","En el inventario\nClick izquierdo para usar","Usada", "Usada\nClick derecho para crear"}
-		},
-		["Firestone"] = {
-			Text = {"Click derecho para crear","En el inventario\nClick izquierdo para usar","Usada", "Usada\nClick derecho para crear"}
-		},
-		["SpellTimer"] = {
-			Label = "|c00FFFFFFDuraci\195\179n de Hechizos|r",
-			Text = "Hechizos activos en el objetivo",
-			Right = "Click derecho para usar Piedra de Hogar a "
-		},
-		["ShadowTrance"] = {
-			Label = "|c00FFFFFFTrance de las Sombras|r"
-		},
-		["Backlash"] = {
-			Label = "|c00FFFFFFBacklash|r"
-		},
-		["Banish"] = {
-			Text = "Click derecho para invocar Rango 1"
-		},
-		["Imp"] = {
-			Label = "|c00FFFFFFDiablillo|r"
-		},
-		["Voidwalker"] = {
-			Label = "|c00FFFFFFAbisario|r"
-		},
-		["Succubus"] = {
-			Label = "|c00FFFFFFS\195\186cubo|r"
-		},
-		["Felhunter"] = {
-			Label = "|c00FFFFFFMan\195\161fago|r"
-		},
-		["Felguard"] = {
-			Label = "|c00FFFFFFGuardia maldito|r"
-		},
-		["Infernal"] = {
-			Label = "|c00FFFFFFInferno|r"
-		},
-		["Doomguard"] = {
-			Label = "|c00FFFFFFGuardia Apocal\195\173ptico|r"
-		},
-		["Mount"] = {
-			Label = "|c00FFFFFFCorcel|r",
-			Text = "Click derecho para lanzar Rango 1"
-		},
-		["BuffMenu"] = {
-			Label = "|c00FFFFFFMen\195\186 de Hechizos|r",
-			Text = "Click Derecho para mantener el men\195\186 abierto",
-			Text2 = "Modo autom\195\161tico: Se cierra cuando sales de combate",
-		},
-		["PetMenu"] = {
-			Label = "|c00FFFFFFMen\195\186 de Demonio|r",
-			Text = "Click Derecho para mantener el men\195\186 abierto",
-			Text2 = "Modo autom\195\161tico: Se cierra cuando sales de combate",
-		},
-		["CurseMenu"] = {
-			Label = "|c00FFFFFFMen\195\186 de Maldici\195\179n|r",
-			Text = "Click Derecho para mantener el men\195\186 abierto",
-			Text2 = "Modo autom\195\161tico: Se cierra cuando sales de combate",
-		},
-		["DominationCooldown"] = "Click Derecho para invocaci\195\179n r\195\161pida",
-	}
+	-- Necrosis.TooltipData = {
+	-- 	["Main"] = {
+	-- 		Label = "|c00FFFFFFNecrosis|r",
+	-- 		Stone = {
+	-- 			[true] = "S\195\173",
+	-- 			[false] = "No",
+	-- 		},
+	-- 		Hellspawn = {
+	-- 			[true] = "Activar",
+	-- 			[false] = "Desactivar",
+	-- 		},
+	-- 		["Soulshard"] = "Fragmento(s) de Alma: ",
+	-- 		["InfernalStone"] = "Piedra(s) Infernal(es): ",
+	-- 		["DemoniacStone"] = "Figura(s) Demon\195\173aca(s): ",
+	-- 		["Soulstone"] = "\nPiedra de Alma: ",
+	-- 		["Healthstone"] = "Piedra de Salud: ",
+	-- 		["Spellstone"] = "Piedra de Hechizo: ",
+	-- 		["Firestone"] = "Piedra de Fuego: ",
+	-- 		["CurrentDemon"] = "Demonio: ",
+	-- 		["EnslavedDemon"] = "Demonio: Esclavizado ",
+	-- 		["NoCurrentDemon"] = "Demonio: Ninguno",
+	-- 	},
+	-- 	["Soulstone"] = {
+	-- 		Text = {"Click derecho para crear","Click izquierdo para usar","Usada\nClick derecho para recrear","Esperando"},
+	-- 		Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
+	-- 	},
+	-- 	["Healthstone"] = {
+	-- 		Text = {"Click derecho para crear","Click izquierdo para usar"},
+	-- 		Text2 = "Click central o Ctrl+Click izquierdo para comerciar",
+	-- 		Ritual = "|c00FFFFFFShift+Click para empezar el Ritual de Almas|r"
+	-- 	},
+	-- 	["Spellstone"] = {
+	-- 		Text = {"Click derecho para crear","En el inventario\nClick izquierdo para usar","Usada", "Usada\nClick derecho para crear"}
+	-- 	},
+	-- 	["Firestone"] = {
+	-- 		Text = {"Click derecho para crear","En el inventario\nClick izquierdo para usar","Usada", "Usada\nClick derecho para crear"}
+	-- 	},
+	-- 	["SpellTimer"] = {
+	-- 		Label = "|c00FFFFFFDuraci\195\179n de Hechizos|r",
+	-- 		Text = "Hechizos activos en el objetivo",
+	-- 		Right = "Click derecho para usar Piedra de Hogar a "
+	-- 	},
+	-- 	["ShadowTrance"] = {
+	-- 		Label = "|c00FFFFFFTrance de las Sombras|r"
+	-- 	},
+	-- 	["Backlash"] = {
+	-- 		Label = "|c00FFFFFFBacklash|r"
+	-- 	},
+	-- 	["Banish"] = {
+	-- 		Text = "Click derecho para invocar Rango 1"
+	-- 	},
+	-- 	["Imp"] = {
+	-- 		Label = "|c00FFFFFFDiablillo|r"
+	-- 	},
+	-- 	["Voidwalker"] = {
+	-- 		Label = "|c00FFFFFFAbisario|r"
+	-- 	},
+	-- 	["Succubus"] = {
+	-- 		Label = "|c00FFFFFFS\195\186cubo|r"
+	-- 	},
+	-- 	["Felhunter"] = {
+	-- 		Label = "|c00FFFFFFMan\195\161fago|r"
+	-- 	},
+	-- 	["Felguard"] = {
+	-- 		Label = "|c00FFFFFFGuardia maldito|r"
+	-- 	},
+	-- 	["Infernal"] = {
+	-- 		Label = "|c00FFFFFFInferno|r"
+	-- 	},
+	-- 	["Doomguard"] = {
+	-- 		Label = "|c00FFFFFFGuardia Apocal\195\173ptico|r"
+	-- 	},
+	-- 	["Mount"] = {
+	-- 		Label = "|c00FFFFFFCorcel|r",
+	-- 		Text = "Click derecho para lanzar Rango 1"
+	-- 	},
+	-- 	["BuffMenu"] = {
+	-- 		Label = "|c00FFFFFFMen\195\186 de Hechizos|r",
+	-- 		Text = "Click Derecho para mantener el men\195\186 abierto",
+	-- 		Text2 = "Modo autom\195\161tico: Se cierra cuando sales de combate",
+	-- 	},
+	-- 	["PetMenu"] = {
+	-- 		Label = "|c00FFFFFFMen\195\186 de Demonio|r",
+	-- 		Text = "Click Derecho para mantener el men\195\186 abierto",
+	-- 		Text2 = "Modo autom\195\161tico: Se cierra cuando sales de combate",
+	-- 	},
+	-- 	["CurseMenu"] = {
+	-- 		Label = "|c00FFFFFFMen\195\186 de Maldici\195\179n|r",
+	-- 		Text = "Click Derecho para mantener el men\195\186 abierto",
+	-- 		Text2 = "Modo autom\195\161tico: Se cierra cuando sales de combate",
+	-- 	},
+	-- 	["DominationCooldown"] = "Click Derecho para invocaci\195\179n r\195\161pida",
+	-- }
 
 	Necrosis.Sound = {
 		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-En.mp3",

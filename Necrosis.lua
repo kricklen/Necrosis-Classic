@@ -34,9 +34,10 @@
 ------------------------------------------------------------------------------------------------------
 
 -- Local variables || Variables locales
+local L = LibStub("AceLocale-3.0"):GetLocale(NECROSIS_ID, true)
+
 local Local = {}
 local _G = getfenv(0)
-
 ------------------------------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS || FONCTIONS LOCALES
 ------------------------------------------------------------------------------------------------------
@@ -236,6 +237,7 @@ Local.TimerManagement = {
 -- Variables used for managing summoning and stone buttons || Variables utilisées pour la gestion des boutons d'invocation et d'utilisation des pierres
 Local.Stone = {
 	Soul = {Mode = 1, Location = {}},
+	Health = {Mode = 1, Location = {}},
 	Spell = {Mode = 1, Location = {}},
 	Hearth = {Location = {}},
 	Fire = {Mode = 1},
@@ -332,6 +334,515 @@ function Necrosis:OnLoad(event)
 	end
 end
 
+
+
+-- Function to check the presence of a buff on the unit.
+-- Strictly identical to UnitHasEffect, but as WoW distinguishes Buff and DeBuff, so we have to.
+local function UnitHasBuff(unit, effect)
+	--		print(("%d=%s, %s, %.2f minutes left."):format(i,name,icon,(etime-GetTime())/60))
+	local res = false
+	for i=1,40 do
+		local name, icon, count, debuffType, duration, 
+		expirationTime, source, isStealable, nameplateShowPersonal, spellId, 
+		canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod 
+		= UnitBuff(unit,i)
+		if name then
+			if name == effect then
+				res = true
+				break
+			else
+				-- continue
+			end
+		else
+			break -- no more
+		end
+	end
+	
+	return res
+end
+
+-- Function to check the presence of a debuff on the unit || Fonction pour savoir si une unité subit un effet
+-- F(string, string)->bool
+local function UnitHasEffect(unit, effect)
+	local res = false
+	for i=1,40 do
+		local name, icon, count, debuffType, duration, 
+			expirationTime, source, isStealable, nameplateShowPersonal, spellId, 
+			canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod 
+			= UnitDebuff(unit,i)
+		if name then
+			if name == effect then
+				res = true
+				break
+			else
+				-- continue
+			end
+		else
+			break -- no more
+		end
+	end
+	
+	return res
+end
+
+-- Display the antifear button / warning || Affiche ou cache le bouton de détection de la peur suivant la cible.
+local function ShowAntiFearWarning()
+	local Actif = false -- Must be False, or a number from 1 to Local.Warning.Antifear.Icon[] max element.
+
+	-- Checking if we have a target. Any fear need a target to be casted on
+	if UnitExists("target") and UnitCanAttack("player", "target") and not UnitIsDead("target") then
+		-- Checking if the target has natural immunity (only NPC target)
+		if not UnitIsPlayer("target") and ( UnitCreatureType("target") == Necrosis.Unit.Undead or UnitCreatureType("target") == "Mechanical" ) then
+			Actif = 2 -- Immun
+		end
+		-- We'll start to parse the target buffs, as his class doesn't give him natural permanent immunity
+		if not Actif then
+			for index=1, #Necrosis.AntiFear.Buff, 1 do
+				if UnitHasBuff("target",Necrosis.AntiFear.Buff[index]) then
+					Actif = 3 -- Prot
+					break
+				end
+			end
+
+			-- No buff found, let's try the debuffs
+			for index=1, #Necrosis.AntiFear.Debuff, 1 do
+				if UnitHasEffect("target",Necrosis.AntiFear.Debuff[index]) then
+					Actif = 3 -- Prot
+					break
+				end
+			end
+		end
+
+		-- An immunity has been detected before, but we still don't know why => show the button anyway
+		if Local.Warning.Antifear.Immune and not Actif then
+			Actif = 1
+		end
+	end
+
+	if Actif then
+		-- Antifear button is currently not visible, we have to change that
+		if not Local.Warning.Antifear.Actif then
+			Local.Warning.Antifear.Actif = true
+			Necrosis:Msg(Necrosis.ChatMessage.Information.FearProtect, "USER")
+			NecrosisAntiFearButton:SetNormalTexture("Interface\\Addons\\Necrosis\\UI\\AntiFear"..Local.Warning.Antifear.Icon[Actif].."-02")
+			if NecrosisConfig.Sound then PlaySoundFile(Necrosis.Sound.Fear) end
+--			ShowUIPanel(NecrosisAntiFearButton)
+			NecrosisAntiFearButton:Show()
+			Local.Warning.Antifear.Blink = GetTime() + 0.6
+			Local.Warning.Antifear.Toggle = 2
+
+		-- Timer to make the button blink
+		elseif GetTime() >= Local.Warning.Antifear.Blink then
+			if Local.Warning.Antifear.Toggle == 1 then
+				Local.Warning.Antifear.Toggle = 2
+			else
+				Local.Warning.Antifear.Toggle = 1
+			end
+			Local.Warning.Antifear.Blink = GetTime() + 0.4
+			NecrosisAntiFearButton:SetNormalTexture("Interface\\Addons\\Necrosis\\UI\\AntiFear"..Local.Warning.Antifear.Icon[Actif].."-0"..Local.Warning.Antifear.Toggle)
+		end
+
+	elseif Local.Warning.Antifear.Actif then	-- No antifear on target, but the button is still visible => gonna hide it
+		Local.Warning.Antifear.Actif = false
+--		HideUIPanel(NecrosisAntiFearButton)
+		NecrosisAntiFearButton:Hide()
+	end
+end
+
+-- Function updating the buttons Necrosis and giving the state of the button of the soul stone || Fonction mettant à jour les boutons Necrosis et donnant l'état du bouton de la pierre d'âme
+local function UpdateIcons()
+	
+	-- If the function was called to detect an enchantment, it is detected! || Si la fonction a été appelée pour détecter un enchantement, on le détecte !
+	if (Local.SomethingOnHand == "Truc") then
+		-- self:MoneyToggle()
+		NecrosisTooltip:SetInventoryItem("player", 16)
+		local itemName = tostring(NecrosisTooltipTextLeft8:GetText())
+		if (itemName and BagHelper.Spellstone_Name) then
+			if (itemName:find(BagHelper.Spellstone_Name)) then
+				Local.SomethingOnHand = BagHelper.Spellstone_Name
+			end
+		end
+		if (itemName and BagHelper.Firestone_Name) then
+			if (itemName:find(BagHelper.Firestone_Name)) then
+				Local.SomethingOnHand = BagHelper.Firestone_Name
+			end
+		end
+	end
+
+	-- Soul Stone || Pierre d'âme
+	-----------------------------------------------
+
+	-- We inquire to know if a stone of soul was used -> verification in the timers || On se renseigne pour savoir si une pierre d'âme a été utilisée --> vérification dans les timers
+	-- local SoulstoneInUse = false
+	-- if Local.TimerManagement.SpellTimer then
+	-- 	for index = 1, #Local.TimerManagement.SpellTimer, 1 do
+	-- 		if (Local.TimerManagement.SpellTimer[index].Name == self.Spell[11].Name)  and Local.TimerManagement.SpellTimer[index].TimeMax > 0 then
+	-- 			SoulstoneInUse = true
+	-- 			break
+	-- 		end
+	-- 	end
+	-- end
+	local soulstoneInUse = ItemHelper:IsSoulstoneOnCooldown()
+
+	if BagHelper.Soulstone_IsAvailable then
+		if soulstoneInUse then
+			Local.Stone.Soul.Mode = 4
+		else
+			Local.Stone.Soul.Mode = 2
+		end
+	else
+		if soulstoneInUse then
+			Local.Stone.Soul.Mode = 3
+		else
+			-- If the stone was not used, and there is no stone in inventory -> Mode 1 || Si la Pierre n'a pas été utilisée, et qu'il n'y a pas de pierre en inventaire -> Mode 1
+			Local.Stone.Soul.Mode = 1
+		end
+	end
+
+-- 	-- If the stone was not used, and there is no stone in inventory -> Mode 1 || Si la Pierre n'a pas été utilisée, et qu'il n'y a pas de pierre en inventaire -> Mode 1
+-- 	-- if not (Local.Stone.Soul.OnHand or SoulstoneInUse) then
+-- 	if not (BagHelper.Soulstone_IsAvailable or SoulstoneInUse) then
+-- print("Local.Stone.Soul.Mode = 1")
+-- 		Local.Stone.Soul.Mode = 1
+-- 	end
+
+-- 	-- If the stone was not used, but there is a stone in inventory || Si la Pierre n'a pas été utilisée, mais qu'il y a une pierre en inventaire
+-- 	-- if Local.Stone.Soul.OnHand and (not SoulstoneInUse) then
+-- 	if BagHelper.Soulstone_IsAvailable and (not SoulstoneInUse) then
+-- 		-- If the stone in inventory contains a timer, and we leave a RL -> Mode 4 || Si la pierre en inventaire contient un timer, et qu'on sort d'un RL --> Mode 4
+-- 		-- local start, duration = GetContainerItemCooldown(Local.Stone.Soul.Location[1],Local.Stone.Soul.Location[2])
+-- 		local start, duration = GetContainerItemCooldown(BagHelper.Soulstone_BagId, BagHelper.Soulstone_SlotId)
+-- 		if Local.LoggedIn and start > 0 and duration > 0 then
+-- 			Local.TimerManagement = self:InsertTimerStone("Soulstone", start, duration, Local.TimerManagement)
+-- 			Local.Stone.Soul.Mode = 4
+-- 			Local.LoggedIn = false
+-- 		-- If the stone does not contain a timer, or you do not leave an RL -> Mode 2 || Si la pierre ne contient pas de timer, ou qu'on ne sort pas d'un RL --> Mode 2
+-- 		else
+-- 			Local.Stone.Soul.Mode = 2
+-- 			Local.LoggedIn = false
+-- 		end
+-- 	end
+
+-- 	-- If the stone was used but there is no stone in inventory -> Mode 3 || Si la Pierre a été utilisée mais qu'il n'y a pas de pierre en inventaire --> Mode 3
+-- 	-- if (not Local.Stone.Soul.OnHand) and SoulstoneInUse then
+-- 	if (not BagHelper.Soulstone_IsAvailable) and SoulstoneInUse then
+-- 		Local.Stone.Soul.Mode = 3
+-- 	end
+
+-- 	-- If the stone was used and there is a stone in inventory || Si la Pierre a été utilisée et qu'il y a une pierre en inventaire
+-- 	-- if Local.Stone.Soul.OnHand and SoulstoneInUse then
+-- 	if BagHelper.Soulstone_IsAvailable and SoulstoneInUse then
+-- 		Local.Stone.Soul.Mode = 4
+-- 	end
+
+	-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
+	if (Necrosis.Spell[51].ID
+		and BagHelper.Soulstone_Name
+		and (Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 3))
+	then
+		self:SoulstoneUpdateAttribute("NoStone")
+	end
+
+	-- Display of the mode icon || Affichage de l'icone liée au mode
+	local f = _G[Necrosis.Warlock_Buttons.soul_stone.f]
+	if f then
+		f:SetNormalTexture(GraphicsHelper:GetTexture("SoulstoneButton-0")..Local.Stone.Soul.Mode)
+	end
+	-- -- Display of the mode icon || Affichage de l'icone liée au mode
+	-- if (_G["NecrosisSoulstoneButton"]) then
+	-- 	NecrosisSoulstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("SoulstoneButton-0")..Local.Stone.Soul.Mode)
+	-- end
+
+	-- Stone of life || Pierre de vie
+	-----------------------------------------------
+
+	-- Mode "I have one" (2) / "I have none" (1) || Mode "j'en ai une" (2) / "j'en ai pas" (1)
+	if (not BagHelper.Healthstone_IsAvailable) then
+		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
+		if (Necrosis.Spell[52].ID and BagHelper.Healthstone_Name) then
+			self:HealthstoneUpdateAttribute("NoStone")
+		end
+	end
+
+	--Display of the mode icon || Affichage de l'icone liée au mode
+	local f = _G[Necrosis.Warlock_Buttons.health_stone.f]
+	if f then
+		if (BagHelper.Healthstone_IsAvailable) then
+			f:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-02"))
+		else
+			f:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-01"))
+		end
+	end
+	-- --Display of the mode icon || Affichage de l'icone liée au mode
+	-- if (_G["NecrosisHealthstoneButton"]) then
+	-- 	if (BagHelper.Healthstone_IsAvailable) then
+	-- 		NecrosisHealthstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-02"))
+	-- 	else
+	-- 		NecrosisHealthstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-01"))
+	-- 	end
+	-- end
+
+	-- Stone of spell || Pierre de sort
+	-----------------------------------------------
+
+	-- Stone in the inventory ... || Pierre dans l'inventaire...
+	-- if Local.Stone.Spell.OnHand then
+	if (BagHelper.Spellstone_IsAvailable) then
+		-- ... and on the weapon = mode 3, otherwise = mode 2 || ... et sur l'arme = mode 3, sinon = mode 2
+		if (Local.SomethingOnHand == BagHelper.Spellstone_Name) then
+			Local.Stone.Spell.Mode = 3
+		else
+			Local.Stone.Spell.Mode = 2
+		end
+	-- Stone nonexistent ... || Pierre inexistante...
+	else
+		-- ... but on the weapon = mode 4, otherwise = mode 1 || ... mais sur l'arme = mode 4, sinon = mode 1
+		if (Local.SomethingOnHand == BagHelper.Spellstone_Name) then
+			Local.Stone.Spell.Mode = 4
+		else
+			Local.Stone.Spell.Mode = 1
+		end
+		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
+		if (Necrosis.Spell[53].ID and BagHelper.Spellstone_Name) then
+			self:SpellstoneUpdateAttribute("NoStone")
+		end
+	end
+
+	-- Display of the mode icon || Affichage de l'icone liée au mode
+	local f = _G[Necrosis.Warlock_Buttons.spell_stone.f]
+	if f then
+		f:SetNormalTexture(GraphicsHelper:GetTexture("SpellstoneButton-0"..Local.Stone.Spell.Mode))
+	end
+	-- -- Display of the mode icon || Affichage de l'icone liée au mode
+	-- if _G["NecrosisSpellstoneButton"] then
+	-- 	NecrosisSpellstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("SpellstoneButton-0"..Local.Stone.Spell.Mode))
+	-- end
+
+	-- Fire stone || Pierre de feu
+	-----------------------------------------------
+
+	-- Stone in the inventory ... || Pierre dans l'inventaire...
+	-- if Local.Stone.Fire.OnHand then
+	if (BagHelper.Firestone_IsAvailable) then
+		-- ... and on the weapon = mode 3, otherwise = mode 2 || ... et sur l'arme = mode 3, sinon = mode 2
+		if (Local.SomethingOnHand == BagHelper.Firestone_Name) then
+			Local.Stone.Fire.Mode = 3
+		else
+			Local.Stone.Fire.Mode = 2
+		end
+	-- Stone nonexistent ... || Pierre inexistante...
+	else
+		-- ... but on the weapon = mode 4, otherwise = mode 1 || ... mais sur l'arme = mode 4, sinon = mode 1
+		if (Local.SomethingOnHand == BagHelper.Firestone_Name) then
+			Local.Stone.Fire.Mode = 4
+		else
+			Local.Stone.Fire.Mode = 1
+		end
+		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
+		if (Necrosis.Spell[54].ID and BagHelper.Firestone_Name) then
+			self:FirestoneUpdateAttribute("NoStone")
+		end
+	end
+
+	-- Display of the mode icon || Affichage de l'icone liée au mode
+	local f = _G[Necrosis.Warlock_Buttons.fire_stone.f]
+	if f then
+		f:SetNormalTexture(GraphicsHelper:GetTexture("FirestoneButton-0"..Local.Stone.Fire.Mode))
+	end
+	-- -- Display of the mode icon || Affichage de l'icone liée au mode
+	-- if _G["NecrosisFirestoneButton"] then
+	-- 	NecrosisFirestoneButton:SetNormalTexture(GraphicsHelper:GetTexture("FirestoneButton-0"..Local.Stone.Fire.Mode))
+	-- end
+	
+
+	local hsCooldown = ItemHelper:GetHearthstoneCooldown()
+	if hsCooldown then
+		NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(1)
+	else
+		NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(nil)
+	end
+end
+	
+
+-- Events : CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS, CHAT_MSG_SPELL_AURA_GONE_SELF et CHAT_MSG_SPELL_BREAK_AURA
+-- Manage the appearing and disappearing effects on the warlock || Permet de gérer les effets apparaissants et disparaissants sur le démoniste
+-- Based on CombatLog || Basé sur le CombatLog
+local function SelfEffect(action, nom)
+	if NecrosisConfig.LeftMount then
+		local NomCheval1 = GetSpellInfo(NecrosisConfig.LeftMount)
+	else
+		local NomCheval1 = Necrosis.Warlock_Spells[23161].Name
+	end
+	if NecrosisConfig.RightMount then
+		local NomCheval2 = GetSpellInfo(NecrosisConfig.RightMount)
+	else
+		local NomCheval2 = Necrosis.Warlock_Spells[5784].Name
+	end
+
+	local f = _G[Necrosis.Warlock_Buttons.mounts.f]
+	if action == "BUFF" then
+		local fs = _G[Necrosis.Warlock_Buttons.trance.f]
+		local fb = _G[Necrosis.Warlock_Buttons.backlash.f]
+		-- Changing the mount button when the Warlock is disassembled || Changement du bouton de monture quand le Démoniste est démonté
+		if nom == Necrosis.Warlock_Spells[5784].Name or  nom == Necrosis.Warlock_Spells[23161].Name or nom == "NomCheval1" or nom == "NomCheval2" then
+			Local.BuffActif.Mount = true
+			if f then
+				f:SetNormalTexture(Necrosis.Warlock_Buttons.mounts.high)
+				f:GetNormalTexture():SetDesaturated(nil)
+			end
+		-- Change Dominated Domination Button if Enabled + Cooldown Timer || Changement du bouton de la domination corrompue si celle-ci est activée + Timer de cooldown
+		elseif Necrosis.IsSpellKnown("domination") 
+			and (nom == Necrosis.GetSpellName("domination")) 
+			then -- 15
+			Local.BuffActif.Domination = true
+			local f = _G[Necrosis.Warlock_Buttons.domination.f]
+			if f then
+				f:SetNormalTexture(Necrosis.Warlock_Buttons.domination.high)
+				f:GetNormalTexture():SetDesaturated(nil)
+			end
+		-- Change the spiritual link button if it is enabled || Changement du bouton du lien spirituel si celui-ci est activé
+		elseif Necrosis.IsSpellKnown("link") 
+			and (nom == Necrosis.GetSpellName("link")) 
+			then -- 38
+			Local.BuffActif.SoulLink = true
+			local f = _G[Necrosis.Warlock_Buttons.link.f]
+			if f then
+				f:SetNormalTexture(Necrosis.Warlock_Buttons.link.high)
+				f:GetNormalTexture():SetDesaturated(nil)
+			end
+		-- If Backlash, to display the icon and we proc the sound || si Contrecoup, pouf on affiche l'icone et on proc le son
+		-- If By-effect, one-on-one icon and one proc the sound || if By-effect, pouf one posts the icon and one proc the sound
+		elseif nom == Necrosis.Translation.Proc.Backlash and NecrosisConfig.ShadowTranceAlert then
+			Necrosis:Msg(Necrosis.ProcText.Backlash, "USER")
+			if NecrosisConfig.Sound then PlaySoundFile(Necrosis.Sound.Backlash) end
+			fb:Show()
+		-- If Twilight, to display the icon and sound || si Crépuscule, pouf on affiche l'icone et on proc le son
+		-- If Twilight / Nightfall, puff one posts the icon and one proc the sound || if Twilight/Nightfall, pouf one posts the icon and one proc the sound
+		elseif nom == Necrosis.Translation.Proc.ShadowTrance and NecrosisConfig.ShadowTranceAlert then
+			Necrosis:Msg(Necrosis.ProcText.ShadowTrance, "USER")
+			if NecrosisConfig.Sound then PlaySoundFile(Necrosis.Sound.ShadowTrance) end
+			fs:Show()
+		end
+	else
+		-- Changing the mount button when the Warlock is disassembled || Changement du bouton de monture quand le Démoniste est démonté
+		if nom == Necrosis.Warlock_Spells[5784].Name or  nom == Necrosis.Warlock_Spells[23161].Name or nom == "NomCheval1" or nom == "NomCheval2" then
+			Local.BuffActif.Mount = false
+			if f then
+				f:SetNormalTexture(Necrosis.Warlock_Buttons.mounts.norm)
+			end
+		-- Domination button change when Warlock is no longer under control || Changement du bouton de Domination quand le Démoniste n'est plus sous son emprise
+		elseif Necrosis.IsSpellKnown("domination") -- known
+			and (nom == Necrosis.GetSpellName("domination")) 
+			then -- 15
+			Local.BuffActif.Domination = false
+			local f = _G[Necrosis.Warlock_Buttons.domination.f]
+			if f then
+				f:SetNormalTexture(Necrosis.Warlock_Buttons.mounts.norm)
+			end
+		-- Changing the Spiritual Link button when the Warlock is no longer under control || Changement du bouton du Lien Spirituel quand le Démoniste n'est plus sous son emprise
+		elseif Necrosis.IsSpellKnown("link") -- known
+			and (nom == Necrosis.GetSpellName("link")) 
+			then -- 38
+			Local.BuffActif.SoulLink = false
+			local f = _G[Necrosis.Warlock_Buttons.link.f]
+			if f then
+				f:SetNormalTexture(Necrosis.Warlock_Buttons.link.norm)
+			end
+		-- Hide the shadowtrance (nightfall) or backlash buttons when the state is ended
+		elseif nom == Necrosis.Translation.Proc.ShadowTrance or nom == Necrosis.Translation.Proc.Backlash then
+			local fs = _G[Necrosis.Warlock_Buttons.trance.f]
+			local fb = _G[Necrosis.Warlock_Buttons.backlash.f]
+			fs:Hide()
+			fb:Hide()
+		end
+	end
+	Necrosis:UpdateMana()
+	return
+end
+
+local function SatList(list, val)
+	for i, v in pairs(list) do
+		menuVariable = _G[Necrosis.Warlock_Buttons[v.f_ptr].f]
+		if menuVariable then
+			menuVariable:GetNormalTexture():SetDesaturated(val)
+		end
+	end
+end
+
+-- Event : UNIT_PET
+-- Allows the servo to be timed, as well as to prevent for servo breaks || Permet de timer les asservissements, ainsi que de prévenir pour les ruptures d'asservissement
+-- Also change the name of the pet to the replacement of it || Change également le nom du pet au remplacement de celui-ci
+local function ChangeDemon()
+	-- If the new demon is a slave demon, we put a 5 minute timer || Si le nouveau démon est un démon asservi, on place un timer de 5 minutes
+	if (UnitHasEffect("pet", self.Spell[10].Name)) then
+		if (not Necrosis.CurrentEnv.DemonEnslaved) then
+			Necrosis.CurrentEnv.DemonEnslaved = true
+		end
+	else
+		-- When the enslaved demon is lost, remove the timer and warn the warlock || Quand le démon asservi est perdu, on retire le Timer et on prévient le Démoniste
+		if (Necrosis.CurrentEnv.DemonEnslaved) then
+			Necrosis.CurrentEnv.DemonEnslaved = false
+			
+			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.EnslaveEnd) end
+			self.Chat:_Msg(self.ChatMessage.Information.EnslaveBreak, "USER")
+		end
+	end
+
+	-- If the demon is not enslaved we define its title, and we update its name in Necrosis || Si le démon n'est pas asservi on définit son titre, et on met à jour son nom dans Necrosis
+	Necrosis.CurrentEnv.LastDemonType = Necrosis.CurrentEnv.DemonType
+	Necrosis.CurrentEnv.DemonType = UnitCreatureFamily("pet")
+
+	if Necrosis.CurrentEnv.DemonType then
+		NecrosisConfig.PetName[Necrosis.CurrentEnv.DemonType] = UnitName("pet")
+	end
+
+	for i = 1, #self.Translation.DemonName, 1 do
+		if Necrosis.CurrentEnv.DemonType == self.Translation.DemonName[i] and not (NecrosisConfig.PetName[i] or (UnitName("pet") == UNKNOWNOBJECT)) then
+			NecrosisConfig.PetName[i] = UnitName("pet")
+			--self:Localization()
+			break
+		end
+	end
+	self:UpdateMana()
+
+	return
+end
+
+
+-- local function SetupSpells(reason)
+-- 	Necrosis:SpellSetup(reason)
+
+-- 	-- associate the mounts to the sphere button || Association du sort de monture correct au bouton
+-- 	if (Necrosis.Warlock_Spells[5784].InSpellBook) or (Necrosis.Warlock_Spells[23161].InSpellBook) then
+-- 		Local.Summon.SteedAvailable = true
+-- 	else
+-- 		Local.Summon.SteedAvailable = false
+-- 	end
+
+-- 	if not InCombatLockdown() then
+-- 		Necrosis:MainButtonAttribute()
+-- 		Necrosis:BuffSpellAttribute()
+-- 		Necrosis:PetSpellAttribute()
+-- 		Necrosis:CurseSpellAttribute()
+-- 		Necrosis:StoneAttribute(Local.Summon.SteedAvailable)
+-- 	end
+
+-- 	-- (re)create the icons around the main sphere
+-- 	Necrosis:CreateMenu()
+-- 	Necrosis:ButtonSetup()
+
+-- 	-- Check for stones - the buttons can be updated as needed
+-- 	Necrosis:BagExplore()
+
+-- 	--[[ Determine the pet out, if any, and mark its button.
+-- 		Really to clear the buttons in case we 'lose' the pet
+-- 		on a reload / crash / other reason.
+-- 		The event UNIT_PET is triggered at init / reload IF a pet is out
+-- 	--]]
+-- 	ChangeDemon() 
+-- end
+
+
 ------------------------------------------------------------------------------------------------------
 -- NECROSIS FUNCTIONS || FONCTIONS NECROSIS
 ------------------------------------------------------------------------------------------------------
@@ -367,7 +878,7 @@ function Necrosis:OnUpdate(elapsed)--something,
 					if TimeLocal >= (Local.TimerManagement.SpellTimer[index].TimeMax - 0.5) then
 						local StoneFade = false
 						-- If the timer was that of Soul Stone, warn the Warlock || Si le timer était celui de la Pierre d'âme, on prévient le Démoniste
-						if Local.TimerManagement.SpellTimer[index].Name == self.Spell[11].Name then
+						if Local.TimerManagement.SpellTimer[index].Name == self.Spell[51].Name then
 							self.Chat:_Msg(self.ChatMessage.Information.SoulstoneEnd)
 							if NecrosisConfig.Sound then PlaySoundFile(self.Sound.SoulstoneEnd) end
 							StoneFade = true
@@ -380,7 +891,7 @@ function Necrosis:OnUpdate(elapsed)--something,
 							index = 0
 							if StoneFade then
 								-- We update the appearance of the button of the soul stone || On met à jour l'apparence du bouton de la pierre d'âme
-								self:UpdateIcons()
+								UpdateIcons()
 							end
 							break
 						end
@@ -485,7 +996,7 @@ function Necrosis.OnEvent(self, event, ...)
 	-- Successful spell casting management || Gestion de l'incantation des sorts réussie
 	elseif (event == "UNIT_SPELLCAST_SUCCEEDED" and arg1 == "player")
 	then
--- print("UNIT_SPELLCAST_SUCCEEDED "..tostring(arg1)..", "..arg3..", "..tostring(Necrosis.CurrentEnv.SpellCast[arg2].target))
+	-- print("UNIT_SPELLCAST_SUCCEEDED "..tostring(arg1)..", "..arg3..", "..tostring(Necrosis.CurrentEnv.SpellCast[arg2].target))
 		if (Necrosis.CurrentEnv.SpellCast[arg2] ~= nil) then
 			-- print("Target: "..tostring(Necrosis.CurrentEnv.SpellCast[arg2].target))
 			-- if (Necrosis.Spell.AuraDuration[arg3] ~= nil) then
@@ -514,7 +1025,7 @@ function Necrosis.OnEvent(self, event, ...)
 		-- arg3 = castGUID
 		-- arg4 = spellID
 		Necrosis.CurrentEnv.SpellCast[arg3] = { target = arg2, spellId = arg4 }
--- print("UNIT_SPELLCAST_SENT "..tostring(arg2)..", "..arg4..", "..arg3)
+	-- print("UNIT_SPELLCAST_SENT "..tostring(arg2)..", "..arg4..", "..arg3)
 
 		-- Check if timers are enabled
 		if (NecrosisConfig.EnableTimerBars) then
@@ -561,7 +1072,7 @@ function Necrosis.OnEvent(self, event, ...)
 	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
 	elseif ((event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED"))-- and arg1 == player)
 	then
--- print("UNIT_SPELLCAST_FAILED/INTERRUPTED "..arg3..", "..arg2)
+	-- print("UNIT_SPELLCAST_FAILED/INTERRUPTED "..arg3..", "..arg2)
 		--print("Failed or interrupted: "..tostring(arg2)..", "..arg3)
 		Local.SpellCasted = {}
 		Necrosis.CurrentEnv.SpellCast[arg2] = nil
@@ -605,8 +1116,8 @@ function Necrosis.OnEvent(self, event, ...)
 
 	-- If the Warlock learns a new spell / spell, we get the new spells list || Si le Démoniste apprend un nouveau sort / rang de sort, on récupère la nouvelle liste des sorts
 	-- If the Warlock learns a new buff or summon spell, the buttons are recreated || Si le Démoniste apprend un nouveau sort de buff ou d'invocation, on recrée les boutons
-	elseif (event == "LEARNED_SPELL_IN_TAB") then
--- print("LEARNED_SPELL_IN_TAB")
+	elseif (event == "LEARNED_SPELL_IN_TAB" or event == "SPELLS_CHANGED") then
+	-- print("LEARNED_SPELL_IN_TAB")
 		Necrosis:SpellSetup()
 		Necrosis:CreateMenu()
 		Necrosis:ButtonSetup()
@@ -622,7 +1133,7 @@ function Necrosis.OnEvent(self, event, ...)
 
 		-- We are redefining the attributes of spell buttons in a situational way || On redéfinit les attributs des boutons de sorts de manière situationnelle
 		Necrosis:NoCombatAttribute(Local.Menu.Pet, Local.Menu.Buff, Local.Menu.Curse)
-		Necrosis:UpdateIcons()
+		UpdateIcons()
 
 	-- When the warlock changes demon || Quand le démoniste change de démon
 	elseif (event == "UNIT_PET" and arg1 == "player") then
@@ -641,7 +1152,7 @@ function Necrosis.OnEvent(self, event, ...)
 		else
 			Local.SomethingOnHand = "Rien"
 		end
-		Necrosis:UpdateIcons()
+		UpdateIcons()
 
 	-- If we come back into combat || Si on rentre en combat
 	elseif event == "PLAYER_REGEN_DISABLED" then
@@ -715,7 +1226,7 @@ function Necrosis:OnCombatLogEvent(event, ...)
 	elseif (subevent == "SPELL_AURA_APPLIED")
 	then
 		if (destGUID == Necrosis.CurrentEnv.PlayerGuid) then
-			Necrosis:SelfEffect("BUFF", spellName)
+			SelfEffect("BUFF", spellName)
 		end
 
 		if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid) then
@@ -770,7 +1281,7 @@ function Necrosis:OnCombatLogEvent(event, ...)
 	elseif (subevent == "SPELL_AURA_REMOVED")
 	then
 		if (destGUID == Necrosis.CurrentEnv.PlayerGuid) then
-			Necrosis:SelfEffect("DEBUFF", spellName)
+			SelfEffect("DEBUFF", spellName)
 		end
 
 		if (NecrosisConfig.EnableTimerBars) then
@@ -824,7 +1335,7 @@ print("Necrosis - Spell resisted: "..tostring(spellName))
 	then
 	-- print("ENCHANT_APPLIED: "..arg9)
 			Local.SomethingOnHand = arg9
-			Necrosis:UpdateIcons()
+			UpdateIcons()
 	-- End of enchantment detection || Détection fin d'enchant
 	elseif (subevent == "ENCHANT_REMOVE"
 		and destGUID == UnitGUID("player")
@@ -832,7 +1343,7 @@ print("Necrosis - Spell resisted: "..tostring(spellName))
 		or (BagHelper.Firestone_Name and arg9 == BagHelper.Firestone_Name)))
 	then
 			Local.SomethingOnHand = "Rien"
-			Necrosis:UpdateIcons()
+			UpdateIcons()
 	end
 end
 
@@ -850,150 +1361,36 @@ function CheckGroupStatus()
 	end
 end
 
-function Necrosis:CheckUnitDebuff(destGUID, spellName)
-	local i = 1
-	local maxSlots = 40
-	-- while (i < maxSlots) do
-		-- Duration is always 0 despite API descriptions, bug?
-		local name, icon, count, debuffType, duration, expirationTime, source, isStealable, 
-			nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
-			-- = UnitDebuff(destGUID, i, "PLAYER")
-			= UnitDebuff("target", i, "PLAYER")
-		if (spellName == name) then
-			print("Debuff found at "..i..": "..name..", "..duration..", "..spellId..", "..expirationTime..", "..timeMod)
-			return name, duration, spellId, timeMod
-		end
-		i = i + 1
-	-- end
-	print ("Debuff not found")
+-- function Necrosis:CheckUnitDebuff(destGUID, spellName)
+-- 	local i = 1
+-- 	local maxSlots = 40
+-- 	-- while (i < maxSlots) do
+-- 		-- Duration is always 0 despite API descriptions, bug?
+-- 		local name, icon, count, debuffType, duration, expirationTime, source, isStealable, 
+-- 			nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
+-- 			-- = UnitDebuff(destGUID, i, "PLAYER")
+-- 			= UnitDebuff("target", i, "PLAYER")
+-- 		if (spellName == name) then
+-- 			print("Debuff found at "..i..": "..name..", "..duration..", "..spellId..", "..expirationTime..", "..timeMod)
+-- 			return name, duration, spellId, timeMod
+-- 		end
+-- 		i = i + 1
+-- 	-- end
+-- 	print ("Debuff not found")
 	
-	-- print("UnitDebuff: "..tostring(name)..", "..tostring(icon)..", "..tostring(count)..", "
-	-- 	..tostring(debuffType)..", "..tostring(duration)..", "..tostring(expirationTime)..", "
-	-- 	..tostring(source)..", "..tostring(isStealable)..", "..tostring(nameplateShowPersonal)..", "
-	-- 	..tostring(spellId)..", "..tostring(canApplyAura)..", "..tostring(isBossDebuff)
-	-- )
-end
+-- 	-- print("UnitDebuff: "..tostring(name)..", "..tostring(icon)..", "..tostring(count)..", "
+-- 	-- 	..tostring(debuffType)..", "..tostring(duration)..", "..tostring(expirationTime)..", "
+-- 	-- 	..tostring(source)..", "..tostring(isStealable)..", "..tostring(nameplateShowPersonal)..", "
+-- 	-- 	..tostring(spellId)..", "..tostring(canApplyAura)..", "..tostring(isBossDebuff)
+-- 	-- )
+-- end
 
 ------------------------------------------------------------------------------------------------------
 -- FUNCTIONS NECROSIS "ON EVENT" || FONCTIONS NECROSIS "ON EVENT"
 ------------------------------------------------------------------------------------------------------
 
--- Event : UNIT_PET
--- Allows the servo to be timed, as well as to prevent for servo breaks || Permet de timer les asservissements, ainsi que de prévenir pour les ruptures d'asservissement
--- Also change the name of the pet to the replacement of it || Change également le nom du pet au remplacement de celui-ci
-function Necrosis:ChangeDemon()
-	-- If the new demon is a slave demon, we put a 5 minute timer || Si le nouveau démon est un démon asservi, on place un timer de 5 minutes
-	if (self:UnitHasEffect("pet", self.Spell[10].Name)) then
-		if (not Necrosis.CurrentEnv.DemonEnslaved) then
-			Necrosis.CurrentEnv.DemonEnslaved = true
-		end
-	else
-		-- When the enslaved demon is lost, remove the timer and warn the warlock || Quand le démon asservi est perdu, on retire le Timer et on prévient le Démoniste
-		if (Necrosis.CurrentEnv.DemonEnslaved) then
-			Necrosis.CurrentEnv.DemonEnslaved = false
-			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.EnslaveEnd) end
-			self.Chat:_Msg(self.ChatMessage.Information.EnslaveBreak, "USER")
-		end
-	end
 
-	-- If the demon is not enslaved we define its title, and we update its name in Necrosis || Si le démon n'est pas asservi on définit son titre, et on met à jour son nom dans Necrosis
-	Necrosis.CurrentEnv.LastDemonType = Necrosis.CurrentEnv.DemonType
-	Necrosis.CurrentEnv.DemonType = UnitCreatureFamily("pet")
 
-	if Necrosis.CurrentEnv.DemonType then
-		NecrosisConfig.PetName[Necrosis.CurrentEnv.DemonType] = UnitName("pet")
-	end
-
-	for i = 1, #self.Translation.DemonName, 1 do
-		if Necrosis.CurrentEnv.DemonType == self.Translation.DemonName[i] and not (NecrosisConfig.PetName[i] or (UnitName("pet") == UNKNOWNOBJECT)) then
-			NecrosisConfig.PetName[i] = UnitName("pet")
-			--self:Localization()
-			break
-		end
-	end
-	self:UpdateMana()
-
-	return
-end
-
--- Events : CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS, CHAT_MSG_SPELL_AURA_GONE_SELF et CHAT_MSG_SPELL_BREAK_AURA
--- Manage the appearing and disappearing effects on the warlock || Permet de gérer les effets apparaissants et disparaissants sur le démoniste
--- Based on CombatLog || Basé sur le CombatLog
-function Necrosis:SelfEffect(action, nom)
-	if NecrosisConfig.LeftMount then
-		local NomCheval1 = GetSpellInfo(NecrosisConfig.LeftMount)
-	else
-		local NomCheval1 = Necrosis.Spell[2].Name
-	end
-	if NecrosisConfig.RightMount then
-		local NomCheval2 = GetSpellInfo(NecrosisConfig.RightMount)
-	else
-		local NomCheval2 = Necrosis.Spell[1].Name
-	end
-
-	if action == "BUFF" then
-		-- Changing the mount button when the Warlock is disassembled || Changement du bouton de monture quand le Démoniste est démonté
-		if nom == Necrosis.Spell[1].Name or  nom == Necrosis.Spell[2].Name or nom == "NomCheval1" or nom == "NomCheval2" then
-			Local.BuffActif.Mount = true
-			if _G["NecrosisMountButton"] then
-				NecrosisMountButton:SetNormalTexture(GraphicsHelper:GetTexture("MountButton-02"))
-				NecrosisMountButton:GetNormalTexture():SetDesaturated(nil)
-			end
-		-- Change Dominated Domination Button if Enabled + Cooldown Timer || Changement du bouton de la domination corrompue si celle-ci est activée + Timer de cooldown
-		elseif  nom == Necrosis.Spell[15].Name then
-			Local.BuffActif.Domination = true
-			if _G["NecrosisPetMenu1"] then
-				NecrosisPetMenu1:SetNormalTexture(GraphicsHelper:GetTexture("Domination-02"))
-				NecrosisPetMenu1:GetNormalTexture():SetDesaturated(nil)
-			end
-		-- Change the spiritual link button if it is enabled || Changement du bouton du lien spirituel si celui-ci est activé
-		elseif nom == Necrosis.Spell[38].Name then
-			Local.BuffActif.SoulLink = true
-			if _G["NecrosisBuffMenu7"] then
-				NecrosisBuffMenu7:SetNormalTexture(GraphicsHelper:GetTexture("SoulLink-02"))
-				NecrosisBuffMenu7:GetNormalTexture():SetDesaturated(nil)
-			end
-		-- If Backlash, to display the icon and we proc the sound || si Contrecoup, pouf on affiche l'icone et on proc le son
-		-- If By-effect, one-on-one icon and one proc the sound || if By-effect, pouf one posts the icon and one proc the sound
-		elseif nom == Necrosis.Translation.Proc.Backlash and NecrosisConfig.ShadowTranceAlert then
-			self.Chat:_Msg(self.ProcText.Backlash, "USER")
-			if NecrosisConfig.Sound then PlaySoundFile(Necrosis.Sound.Backlash) end
-			NecrosisBacklashButton:Show()
-		-- If Twilight, to display the icon and sound || si Crépuscule, pouf on affiche l'icone et on proc le son
-		-- If Twilight / Nightfall, puff one posts the icon and one proc the sound || if Twilight/Nightfall, pouf one posts the icon and one proc the sound
-		elseif nom == Necrosis.Translation.Proc.ShadowTrance and NecrosisConfig.ShadowTranceAlert then
-			self.Chat:_Msg(self.ProcText.ShadowTrance, "USER")
-			if NecrosisConfig.Sound then PlaySoundFile(Necrosis.Sound.ShadowTrance) end
-			NecrosisShadowTranceButton:Show()
-		end
-	else
-		-- Changing the mount button when the Warlock is disassembled || Changement du bouton de monture quand le Démoniste est démonté
-		if nom == Necrosis.Spell[1].Name or  nom == Necrosis.Spell[2].Name or nom == "NomCheval1" or nom == "NomCheval2" then
-			Local.BuffActif.Mount = false
-			if _G["NecrosisMountButton"] then
-				NecrosisMountButton:SetNormalTexture(GraphicsHelper:GetTexture("MountButton-01"))
-			end
-		-- Domination button change when Warlock is no longer under control || Changement du bouton de Domination quand le Démoniste n'est plus sous son emprise
-		elseif  nom == Necrosis.Spell[15].Name then
-			Local.BuffActif.Domination = false
-			if _G["NecrosisPetMenu1"] then
-				NecrosisPetMenu1:SetNormalTexture(GraphicsHelper:GetTexture("Domination-01"))
-			end
-		-- Changing the Spiritual Link button when the Warlock is no longer under control || Changement du bouton du Lien Spirituel quand le Démoniste n'est plus sous son emprise
-		elseif nom == Necrosis.Spell[38].Name then
-			Local.BuffActif.SoulLink = false
-			if _G["NecrosisBuffMenu7"] then
-				NecrosisBuffMenu7:SetNormalTexture(GraphicsHelper:GetTexture("SoulLink-01"))
-			end
-		-- Hide the shadowtrance (nightfall) or backlash buttons when the state is ended
-		elseif nom == Necrosis.Translation.Proc.ShadowTrance or nom == Necrosis.Translation.Proc.Backlash then
-			NecrosisShadowTranceButton:Hide()
-			NecrosisBacklashButton:Hide()
-		end
-	end
-	Necrosis:UpdateMana()
-	return
-end
 
 -- -- Event : UNIT_SPELLCAST_SUCCEEDED
 -- -- Manages everything related to successful spell casts || Permet de gérer tout ce qui touche aux sorts une fois leur incantation réussie
@@ -1125,12 +1522,12 @@ end
 ------------------------------------------------------------------------------------------------------
 
 -- Function to move Necrosis elements on the screen ||Fonction permettant le déplacement d'éléments de Necrosis sur l'écran
-function Necrosis.OnDragStart(uiElement)
+function Necrosis:OnDragStart(uiElement)
 	uiElement:StartMoving()
 end
 
 -- Function stopping the movement of Necrosis elements on the screen ||Fonction arrêtant le déplacement d'éléments de Necrosis sur l'écran
-function Necrosis.OnDragStop(uiElement)
+function Necrosis:OnDragStop(uiElement)
 	-- We stop the movement effectively ||On arrête le déplacement de manière effective
 	uiElement:StopMovingOrSizing()
 	-- We save the location of the button ||On sauvegarde l'emplacement du bouton
@@ -1144,511 +1541,325 @@ function Necrosis.OnDragStop(uiElement)
 	NecrosisConfig.FramePosition[name] = {AncreBouton, BoutonParent, AncreParent, BoutonX, BoutonY}
 end
 
+-- helpers to reduce maintenance
+local function ManaLocalize(mana)
+	if GetLocale() == "ruRU" then
+		GameTooltip:AddLine(L["MANA"]..": "..mana)
+	else
+		GameTooltip:AddLine(mana.." "..L["MANA"])
+	end
+end
+local function AddCastAndCost(usage)
+	GameTooltip:AddLine(Necrosis.GetSpellCastName(usage))
+	ManaLocalize(Necrosis.GetSpellMana(usage)) 
+end
+local function AddShard()
+	if Local.Soulshard.Count == 0 then
+		GameTooltip:AddLine("|c00FF4444"..Necrosis.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
+	else
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.Soulshard..Local.Soulshard.Count)
+	end
+end
+local function AddDominion(start, duration)
+	if not (start and duration > 0) then
+		GameTooltip:AddLine(Necrosis.TooltipData.DominationCooldown)
+	end
+end
+local function AddMenuTip(Type)
+	if Local.PlayerInCombat and NecrosisConfig.AutomaticMenu then
+		GameTooltip:AddLine(Necrosis.TooltipData[Type].Text2)
+	else
+		GameTooltip:AddLine(Necrosis.TooltipData[Type].Text)
+	end
+end
+local function AddInfernalReagent()
+	if Local.Reagent.Infernal == 0 then
+		GameTooltip:AddLine("|c00FF4444"..Necrosis.TooltipData.Main.InfernalStone..Local.Reagent.Infernal.."|r")
+	else
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.InfernalStone..Local.Reagent.Infernal)
+	end
+end
+local function AddDemoniacReagent()
+	if Local.Reagent.Demoniac == 0 then
+		GameTooltip:AddLine("|c00FF4444"..Necrosis.TooltipData.Main.DemoniacStone..Local.Reagent.Demoniac.."|r")
+	else
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.DemoniacStone..Local.Reagent.Demoniac)
+	end
+end
+
 -- Function managing the help bubbles ||Fonction gérant les bulles d'aide
-function Necrosis:BuildTooltip(button, Type, anchor, sens)
+function Necrosis:BuildButtonTooltip(button)
 	-- If the display of help bubbles is disabled, Bye bye! ||Si l'affichage des bulles d'aide est désactivé, Bye bye !
 	if not NecrosisConfig.NecrosisToolTip then
 		return
 	end
 
+	local f = button:GetName()
+	local Type = ""
+	local b = nil
+	-- look up the button info
+	for i, v in pairs (Necrosis.Warlock_Buttons) do
+		if v.f == f then
+			Type = Necrosis.Warlock_Buttons[i].tip
+			b = v
+			break
+		else
+		end
+	end
+	if b.tip == nil then
+		return -- a button we are not interested in was given
+	else
+		Type = b.tip
+	end
+
+	if Necrosis.Debug.tool_tips then
+		_G["DEFAULT_CHAT_FRAME"]:AddMessage("BuildButtonTooltip"
+		.." b'"..tostring(f).."'"
+		.." T'"..tostring(Type).."'"
+		.." l'"..tostring(Necrosis.TooltipData[Type].Label).."'"
+		)
+	end
+	anchor = b.anchor or "ANCHOR_RIGHT" -- put to right in case not specified...
+
 	-- If the tooltip is associated with a menu button, we change the anchoring of the tooltip according to its meaning ||Si la bulle d'aide est associée à un bouton de menu, on change l'ancrage de la tooltip suivant son sens
-	if sens then
-		if (sens == "Pet" and NecrosisConfig.PetMenuPos.direction < 0)
+	if b.menu then
+		if (b.menu == "Pet" and NecrosisConfig.PetMenuPos.direction < 0)
 			or
-				(sens == "Buff" and NecrosisConfig.BuffMenuPos.direction < 0)
+				(b.menu == "Buff" and NecrosisConfig.BuffMenuPos.direction < 0)
 			or
-				(sens == "Curse" and NecrosisConfig.CurseMenuPos.direction < 0)
+				(b.menu == "Curse" and NecrosisConfig.CurseMenuPos.direction < 0)
 			or
-				(sens == "Timer" and NecrosisConfig.SpellTimerJust == "RIGHT")
+				(b.menu == "Timer" and NecrosisConfig.SpellTimerJust == "RIGHT")
 			then
 				anchor = "ANCHOR_LEFT"
 		end
+	else
+		-- use the anchor already grabbed
 	end
 
-	-- We look at whether corrupt domination, shadow guard or curse amplification are up (for tooltips) ||On regarde si la domination corrompue, le gardien de l'ombre ou l'amplification de malédiction sont up (pour tooltips)
-	-- local start, duration
-	-- local start2, duration2
-
-	local felDomCooldown, felDomCooldownTime = Necrosis.Spells:GetFelDominationCooldown()
-
-	-- if self.Spell[15].ID then
-	-- 	start, duration = GetSpellCooldown(self.Spell[15].ID, BOOKTYPE_SPELL)
-	-- else
-	-- 	start = 1
-	-- 	duration = 1
-	-- end
-
-	-- if self.Spell[43].ID then
-	-- 	start2, duration2 = GetSpellCooldown(self.Spell[43].ID, BOOKTYPE_SPELL)
-	-- 	if not start2 then start2 = 1 end
-	-- 	if not duration2 then duration2 = 1 end
-	-- else
-	-- 	start2 = 1
-	-- 	duration2 = 1
-	-- end
-
-	-- local start3, duration3
-	-- if self.Spell[50].ID then
-	-- 	start3, duration3 = GetSpellCooldown(self.Spell[50].ID, BOOKTYPE_SPELL)
-	-- else
-	-- 	start3 = 1
-	-- 	duration3 = 1
-	-- end
+	-- local start,  duration  = Necrosis.Utils.GetSpellCooldown("domination", "spell")
+	-- local start2, duration2  = Necrosis.Utils.GetSpellCooldown("ward", "spell")
+	local start,  duration  = Necrosis.Spells:GetFelDominationCooldown()
+	local start2, duration2 = Necrosis.Spells:GetShadowWardCooldown()
 
 	-- Creating help bubbles .... ||Création des bulles d'aides....
 	GameTooltip:SetOwner(button, anchor)
-	GameTooltip:SetText(self.TooltipData[Type].Label)
-
+	GameTooltip:SetText(Necrosis.TooltipData[Type].Label)
 	-- ..... for the main button ||..... pour le bouton principal
 	if (Type == "Main") then
-		GameTooltip:AddLine(self.TooltipData.Main.Soulshard..Local.Soulshard.Count)
-		GameTooltip:AddLine(self.TooltipData.Main.InfernalStone..Local.Reagent.Infernal)
-		GameTooltip:AddLine(self.TooltipData.Main.DemoniacStone..Local.Reagent.Demoniac)
-		GameTooltip:AddLine(" ") -- Add empy line
-		GameTooltip:AddLine(self.TooltipData.Main.Soulstone..self.TooltipData[Type].Stone[BagHelper.Soulstone_IsAvailable])
-		GameTooltip:AddLine(self.TooltipData.Main.Healthstone..self.TooltipData[Type].Stone[BagHelper.Healthstone_IsAvailable])
-		GameTooltip:AddLine(self.TooltipData.Main.Spellstone..self.TooltipData[Type].Stone[BagHelper.Spellstone_IsAvailable])
-		GameTooltip:AddLine(self.TooltipData.Main.Firestone..self.TooltipData[Type].Stone[BagHelper.Firestone_IsAvailable])
-
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.Soulshard..Local.Soulshard.Count)
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.InfernalStone..Local.Reagent.Infernal)
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.DemoniacStone..Local.Reagent.Demoniac)
+		local SoulOnHand = false
+		local HealthOnHand = false
+		local SpellOnHand = false
+		local FireOnHand = false
+		if Local.Stone.Soul.OnHand then SoulOnHand = true end
+		if Local.Stone.Health.OnHand then HealthOnHand = true end
+		if Local.Stone.Spell.OnHand then SpellOnHand = true end
+		if Local.Stone.Fire.OnHand then FireOnHand = true end
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.Soulstone..Necrosis.TooltipData[Type].Stone[SoulOnHand])
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.Healthstone..Necrosis.TooltipData[Type].Stone[HealthOnHand])
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.Spellstone..Necrosis.TooltipData[Type].Stone[SpellOnHand])
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.Firestone..Necrosis.TooltipData[Type].Stone[FireOnHand])
 		-- View the name of the daemon, or if it is slave, or "None" if no daemon is present ||Affichage du nom du démon, ou s'il est asservi, ou "Aucun" si aucun démon n'est présent
 		if (Necrosis.CurrentEnv.DemonType) then
-			GameTooltip:AddLine(self.TooltipData.Main.CurrentDemon..Necrosis.CurrentEnv.DemonType)
-		elseif Necrosis.CurrentEnv.DemonEnslaved then
-			GameTooltip:AddLine(self.TooltipData.Main.EnslavedDemon)
+			GameTooltip:AddLine(Necrosis.TooltipData.Main.CurrentDemon..Necrosis.CurrentEnv.DemonType)
+		elseif (Necrosis.CurrentEnv.DemonEnslaved) then
+			GameTooltip:AddLine(Necrosis.TooltipData.Main.EnslavedDemon)
 		else
-			GameTooltip:AddLine(self.TooltipData.Main.NoCurrentDemon)
+			GameTooltip:AddLine(Necrosis.TooltipData.Main.NoCurrentDemon)
 		end
-
 	-- ..... for stone buttons ||..... pour les boutons de pierre
 	elseif Type:find("stone") then
-
 		-- Soul Stone ||Pierre d'âme
 		if (Type == "Soulstone") then
+			AddCastAndCost("soulstone")
 			-- We display the name of the stone and the action that will produce the click on the button ||On affiche le nom de la pierre et l'action que produira le clic sur le bouton
 			-- And also the cooldown ||Et aussi le Temps de recharge
-			GameTooltip:AddLine(self.Spell[51].Mana.." Mana")
-			if BagHelper.Soulstone_IsAvailable then
-				local isOnCooldown, formattedCooldown = ItemHelper:GetSoulstoneCooldown()
-				if isOnCooldown then
-					GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..formattedCooldown)
-				else
-					GameTooltip:AddLine(Necrosis.TooltipData.Use)
-				end
-			else
-				GameTooltip:AddLine(Necrosis.TooltipData.Create)
-			end
-			GameTooltip:AddLine(self.TooltipData[Type].Ritual)
 
+			-- cool down or not
+			local color = "|CFF808080"
+			local str = ""
+			local cool = ""
+			if Local.Stone.Soul.Location[1] and Local.Stone.Soul.Location[2] then
+				local startTime, duration, isEnabled = GetContainerItemCooldown(Local.Stone.Soul.Location[1], Local.Stone.Soul.Location[2])
+				if startTime == 0 then
+					-- not on cool down
+				else
+					str = Necrosis.Translation.Misc.Cooldown
+					cool = " - "..Necrosis.Utils.TimeLeft(((startTime - GetTime()) + duration))
+					cool = str..cool
+				end
+			end
+			
+			-- L click - use
+			str = Necrosis.TooltipData[Type].Text[2]
+			if cool == "" then
+			else
+				str = color..str.."|r" -- must wait for cool down
+			end
+			GameTooltip:AddLine(str)
+			
+			-- R click - create
+			str = Necrosis.TooltipData[Type].Text[1]
+			if Local.Stone.Soul.OnHand then
+				str = color..str.."|r" -- already have one
+			else
+			end
+			GameTooltip:AddLine(str)
+			
+			GameTooltip:AddLine(Necrosis.TooltipData[Type].Ritual)
+			
+			-- show cool down
+			GameTooltip:AddLine(cool)
 		-- Healthstone | Stone of life ||Healthstone | Pierre de vie
 		elseif (Type == "Healthstone") then
-
 			-- Idem ||Idem
-			GameTooltip:AddLine(self.Spell[52].Mana.." Mana")
-			if BagHelper.Healthstone_IsAvailable then
-				local isOnCooldown, formattedCooldown = ItemHelper:GetHealthstoneCooldown()
-				if isOnCooldown then
-					GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..formattedCooldown)
-				else
-					GameTooltip:AddLine(Necrosis.TooltipData.Use)
-				end
-				GameTooltip:AddLine(Necrosis.TooltipData[Type].Text2)
-			else
-				GameTooltip:AddLine(Necrosis.TooltipData.Create)
+			if Local.Stone.Health.Mode == 1 then
+				AddCastAndCost("healthstone")
 			end
-
-			-- TODO: Ritual of Souls doesn't exist in classic (yet)
-			-- local rosCooldown, rosCooldownTime = Necrosis.Spells:GetRitualOfSoulsCooldown()
-			-- if Local.Soulshard.Count > 0 and not rosCooldown then
-			-- 	GameTooltip:AddLine(self.TooltipData[Type].Ritual)
-			-- end
-
+			GameTooltip:AddLine(Necrosis.TooltipData[Type].Text[Local.Stone.Health.Mode])
+			if Local.Stone.Health.Mode == 2 then
+				GameTooltip:AddLine(Necrosis.TooltipData[Type].Text2)
+			end
+			
+			-- cool down or not
+			if Necrosis.Debug.tool_tips then
+				_G["DEFAULT_CHAT_FRAME"]:AddMessage("BuildButtonTooltip"
+				.." b'"..tostring(f).."'"
+				.." T'"..tostring(Type).."'"
+				.." l'"..tostring(Necrosis.TooltipData[Type].Label).."'"
+				)
+			end
+			if Local.Stone.Health.Location[1] and Local.Stone.Health.Location[2] then
+				local startTime, duration, isEnabled = GetContainerItemCooldown(Local.Stone.Health.Location[1], Local.Stone.Health.Location[2])
+				if startTime == 0 then
+					-- not on cool down
+				else
+					local cool = ""
+					local color = ""
+					local str = Necrosis.Translation.Misc.Cooldown
+					color = "|CFF808080"
+					cool = " - "..Necrosis.Utils.TimeLeft(((startTime - GetTime()) + duration))
+					GameTooltip:AddLine(color..str..cool.."|r")
+				end
+			end
+			--[[
+						if itemName:find(Necrosis.Translation.Misc.Cooldown) then
+							GameTooltip:AddLine(itemName)
+						end
+			--]]
+			if  Local.Soulshard.Count > 0 then
+				GameTooltip:AddLine(Necrosis.TooltipData[Type].Ritual)
+			end
 		-- Stone of spell ||Pierre de sort
 		elseif (Type == "Spellstone") then
-
 			-- Eadem ||Eadem
 			if Local.Stone.Spell.Mode == 1 then
-				GameTooltip:AddLine(self.Spell[53].Mana.." Mana")
+				AddCastAndCost("spellstone")
 			end
 			GameTooltip:AddLine(Necrosis.TooltipData[Type].Text[Local.Stone.Spell.Mode])
-
 		-- Fire stone ||Pierre de feu
 		elseif (Type == "Firestone") then
 			-- Idem ||Idem
 			if Local.Stone.Fire.Mode == 1 then
-				GameTooltip:AddLine(self.Spell[54].Mana.." Mana")
+				AddCastAndCost("firestone")
 			end
-			GameTooltip:AddLine(self.TooltipData[Type].Text[Local.Stone.Fire.Mode])
+			GameTooltip:AddLine(Necrosis.TooltipData[Type].Text[Local.Stone.Fire.Mode])
 		end
-
 	-- ..... for the Timers button ||..... pour le bouton des Timers
 	elseif (Type == "SpellTimer") then
-
-		local hsCooldown, hsCooldownTime = ItemHelper:GetHearthstoneCooldown()
-		if hsCooldown then
-			GameTooltip:AddLine(self.Translation.Item.Hearthstone.." - "..hsCooldownTime)
-		else
-			GameTooltip:AddLine(self.TooltipData[Type].Right..GetBindLocation())
+		GameTooltip:AddLine(Necrosis.TooltipData[Type].Text)
+		local cool = ""
+		local color = ""
+		local str = Necrosis.TooltipData[Type].Right..GetBindLocation()
+		if Local.Stone.Hearth.Location[1] and Local.Stone.Hearth.Location[2] then
+			local startTime, duration, isEnabled = GetContainerItemCooldown(Local.Stone.Hearth.Location[1], Local.Stone.Hearth.Location[2])
+			if startTime == 0 then
+				color = "|CFFFFFFFF"
+			else
+				color = "|CFF808080"
+				cool = " - "..Necrosis.Utils.TimeLeft(((startTime - GetTime()) + duration))
+			end
 		end
-
+		GameTooltip:AddLine(color..str..cool.."|r")
 	-- ..... for the shadow trance button ||..... pour le bouton de la Transe de l'ombre
-	elseif (Type == "ShadowTrance") or (Type == "Backlash") then
-		GameTooltip:SetText(self.TooltipData[Type].Label.."          |CFF808080"..self.Spell[45].Rank.."|r")
+	elseif (Type == "ShadowTrance") then
+		GameTooltip:SetText(Necrosis.TooltipData[Type].Label.."          |CFF808080"..Necrosis.GetSpellCastName("bolt").."|r")
 	-- ..... for other buffs and demons, the mana cost ... ||..... pour les autres buffs et démons, le coût en mana...
-	elseif (Type == "Enslave") then
-		GameTooltip:AddLine(self.Spell[35].Mana.." Mana")
-		if Local.Soulshard.Count == 0 then
-			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		end
-	elseif (Type == "Mount") and self.Spell[2].ID then
+	elseif (Type == "Enslave") then AddCastAndCost("enslave"); AddShard()
+	elseif (Type == "Mount") and Necrosis.Warlock_Spells[23161].InSpellBook then
 		if (NecrosisConfig.LeftMount) then
 			local leftMountName = GetSpellInfo(NecrosisConfig.LeftMount);
 			GameTooltip:AddLine(leftMountName);
 		else
 			--use tooltip for default mounts
-			GameTooltip:AddLine(self.TooltipData[Type].Text);
+			GameTooltip:AddLine(Necrosis.TooltipData[Type].Text);
 		end
 		if (NecrosisConfig.RightMount) then
 			local rightMountName = GetSpellInfo(NecrosisConfig.RightMount)
 			GameTooltip:AddLine(rightMountName);
 		end
 
-	elseif (Type == "Armor") then
-		if self.Spell[31].ID then
-			GameTooltip:AddLine(self.Spell[31].Mana.." Mana")
-		else
-			GameTooltip:AddLine(self.Spell[36].Mana.." Mana")
+	elseif (Type == "Armor") 		then AddCastAndCost("armor")
+	elseif (Type == "Invisible")	then AddCastAndCost("invisible")
+	elseif (Type == "Aqua")			then AddCastAndCost("breath")
+	elseif (Type == "Kilrogg")		then AddCastAndCost("eye")
+	elseif (Type == "Banish") 		then AddCastAndCost("banish")
+--		if Necrosis.Warlock_Spells[Necrosis.Warlock_Spell_Use["banish"]].SpellRank == 2 then
+		if Necrosis.GetSpellRank("banish") == 2 then
+			GameTooltip:AddLine(Necrosis.TooltipData[Type].Text) -- R click rank 1
 		end
-	elseif (Type == "FelArmor") then
-		GameTooltip:AddLine(self.Spell[47].Mana.." Mana")
-	elseif (Type == "Invisible") then
-		GameTooltip:AddLine(self.Spell[33].Mana.." Mana")
-	elseif (Type == "Aqua") then
-		GameTooltip:AddLine(self.Spell[32].Mana.." Mana")
-	elseif (Type == "Kilrogg") then
-		GameTooltip:AddLine(self.Spell[34].Mana.." Mana")
-	elseif (Type == "Banish") then
-		GameTooltip:AddLine(self.Spell[9].Mana.." Mana")
-		if (self.Spell[9].Rank == 2) then
-			GameTooltip:AddLine(self.TooltipData[Type].Text)
+	elseif (Type == "Weakness")		then AddCastAndCost("weakness")
+	elseif (Type == "Agony")		then AddCastAndCost("agony")
+	elseif (Type == "Tongues")		then AddCastAndCost("tongues")
+	elseif (Type == "Exhaust")		then AddCastAndCost("exhaustion")
+	elseif (Type == "Elements")		then AddCastAndCost("elements")
+	elseif (Type == "Doom")			then AddCastAndCost("doom")
+	elseif (Type == "Corruption")	then AddCastAndCost("corruption")
+	elseif (Type == "Reckless")		then AddCastAndCost("recklessness")
+	elseif (Type == "TP")			then AddCastAndCost("summoning"); AddShard()
+	elseif (Type == "SoulLink")		then AddCastAndCost("link")
+	elseif (Type == "ShadowProtection") then AddCastAndCost("ward")
+		if start2 and duration2 > 0 then
+			local seconde = duration2 - ( GetTime() - start2)
+			local affiche
+			affiche = tostring(floor(seconde)).." sec"
+			GameTooltip:AddLine("Cooldown : "..affiche)
 		end
-	elseif (Type == "Weakness") then
-		GameTooltip:AddLine(self.Spell[23].Mana.." Mana")
-	elseif (Type == "Agony") then
-		GameTooltip:AddLine(self.Spell[22].Mana.." Mana")
-	elseif (Type == "Tongues") then
-		GameTooltip:AddLine(self.Spell[25].Mana.." Mana")
-	elseif (Type == "Exhaust") then
-		GameTooltip:AddLine(self.Spell[40].Mana.." Mana")
-	elseif (Type == "Elements") then
-		GameTooltip:AddLine(self.Spell[26].Mana.." Mana")
-	elseif (Type == "Doom") then
-		GameTooltip:AddLine(self.Spell[16].Mana.." Mana")
-	elseif (Type == "Corruption") then
-		GameTooltip:AddLine(self.Spell[14].Mana.." Mana")
-	elseif (Type == "TP") then
-		GameTooltip:AddLine(self.Spell[37].Mana.." Mana")
-		if Local.Soulshard.Count == 0 then
-			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		end
-	elseif (Type == "SoulLink") then
-		GameTooltip:AddLine(self.Spell[38].Mana.." Mana")
-
-	elseif (Type == "ShadowProtection") then
-
-		GameTooltip:AddLine(self.Spell[43].Mana.." Mana")
-		local shadowWardCooldown, shadowWardCooldownTime = Necrosis.Spells:GetShadowWardCooldown()
-		if shadowWardCooldown then
-		-- if start2 > 0 and duration2 > 0 then
-			-- local seconde = duration2 - ( GetTime() - start2)
-			-- local affiche
-			-- affiche = tostring(floor(seconde)).." sec"
-			-- GameTooltip:AddLine("Cooldown : "..affiche)
-			GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..shadowWardCooldownTime)
-		end
-
 	elseif (Type == "Domination") then
-
-		if felDomCooldown then
-			-- local seconde = duration - ( GetTime() - start)
-			-- local affiche, minute, time
-			-- if seconde <= 59 then
-			-- 	affiche = tostring(floor(seconde)).." sec"
-			-- else
-			-- 	minute = tostring(floor(seconde/60))
-			-- 	seconde = mod(seconde, 60)
-			-- 	if seconde <= 9 then
-			-- 		time = "0"..tostring(floor(seconde))
-			-- 	else
-			-- 		time = tostring(floor(seconde))
-			-- 	end
-			-- 	affiche = minute..":"..time
-			-- end
-			GameTooltip:AddLine(Necrosis.TooltipData.OnCooldown..felDomCooldownTime)
+		if start and duration > 0 then
+			local seconde = duration - ( GetTime() - start)
+			local affiche, minute, time
+			if seconde <= 59 then
+				affiche = tostring(floor(seconde)).." sec"
+			else
+				minute = tostring(floor(seconde/60))
+				seconde = mod(seconde, 60)
+				if seconde <= 9 then
+					time = "0"..tostring(floor(seconde))
+				else
+					time = tostring(floor(seconde))
+				end
+				affiche = minute..":"..time
+			end
+			GameTooltip:AddLine("Cooldown : "..affiche)
 		end
-
-	elseif (Type == "Imp") then
-
-		GameTooltip:AddLine(self.Spell[3].Mana.." Mana")
-		if not felDomCooldown then
-			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
-		end
-
-	elseif (Type == "Voidwalker") then
-		GameTooltip:AddLine(self.Spell[4].Mana.." Mana")
-		if Local.Soulshard.Count == 0 then
-			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		elseif not felDomCooldown then
-			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
-		end
-	elseif (Type == "Succubus") then
-		GameTooltip:AddLine(self.Spell[5].Mana.." Mana")
-		if Local.Soulshard.Count == 0 then
-			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		elseif not felDomCooldown then
-			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
-		end
-	elseif (Type == "Felhunter") then
-		GameTooltip:AddLine(self.Spell[6].Mana.." Mana")
-		if Local.Soulshard.Count == 0 then
-			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		elseif not felDomCooldown then
-			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
-		end
-	elseif (Type == "Felguard") then
-		GameTooltip:AddLine(self.Spell[7].Mana.." Mana")
-		if Local.Soulshard.Count == 0 then
-			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
-		elseif not felDomCooldown then
-			GameTooltip:AddLine(self.TooltipData.DominationCooldown)
-		end
-	elseif (Type == "Infernal") then
-		GameTooltip:AddLine(self.Spell[8].Mana.." Mana")
-		if Local.Reagent.Infernal == 0 then
-			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.InfernalStone..Local.Reagent.Infernal.."|r")
-		else
-			GameTooltip:AddLine(self.TooltipData.Main.InfernalStone..Local.Reagent.Infernal)
-		end
-	elseif (Type == "Doomguard") then
-		GameTooltip:AddLine(self.Spell[30].Mana.." Mana")
-		if DemoniacStone == 0 then
-			GameTooltip:AddLine("|c00FF4444"..self.TooltipData.Main.DemoniacStone..Local.Reagent.Demoniac.."|r")
-		else
-			GameTooltip:AddLine(self.TooltipData.Main.DemoniacStone..Local.Reagent.Demoniac)
-		end
-	elseif (Type == "BuffMenu") then
-		if Local.PlayerInCombat and NecrosisConfig.AutomaticMenu then
-			GameTooltip:AddLine(self.TooltipData[Type].Text2)
-		else
-			GameTooltip:AddLine(self.TooltipData[Type].Text)
-		end
-	elseif (Type == "CurseMenu") then
-		if Local.PlayerInCombat and NecrosisConfig.AutomaticMenu then
-			GameTooltip:AddLine(self.TooltipData[Type].Text2)
-		else
-			GameTooltip:AddLine(self.TooltipData[Type].Text)
-		end
-	elseif (Type == "PetMenu") then
-		if Local.PlayerInCombat and NecrosisConfig.AutomaticMenu then
-			GameTooltip:AddLine(self.TooltipData[Type].Text2)
-		else
-			GameTooltip:AddLine(self.TooltipData[Type].Text)
-		end
+	elseif (Type == "Imp")			then AddCastAndCost("imp"); AddDominion(start, duration)
+	elseif (Type == "Voidwalker")	then AddCastAndCost("voidwalker"); AddShard(); AddDominion(start, duration)
+	elseif (Type == "Succubus")		then AddCastAndCost("succubus"); AddShard(); AddDominion(start, duration)
+	elseif (Type == "Felhunter")	then AddCastAndCost("felhunter"); AddShard(); AddDominion(start, duration)
+	elseif (Type == "Infernal")		then AddCastAndCost("inferno"); AddInfernalReagent()
+	elseif (Type == "Doomguard")	then AddCastAndCost("ritual_doom"); AddDemoniacReagent()
+	elseif (Type == "BuffMenu")		then AddMenuTip(Type)
+	elseif (Type == "CurseMenu")	then AddMenuTip(Type)
+	elseif (Type == "PetMenu")		then AddMenuTip(Type)
 	end
 	-- And hop, posting! || Et hop, affichage !
 	GameTooltip:Show()
 end
 
--- Function updating the buttons Necrosis and giving the state of the button of the soul stone || Fonction mettant à jour les boutons Necrosis et donnant l'état du bouton de la pierre d'âme
-function Necrosis:UpdateIcons()
---print("UpdateIcons...")
-
-	-- If the function was called to detect an enchantment, it is detected! || Si la fonction a été appelée pour détecter un enchantement, on le détecte !
-	if (Local.SomethingOnHand == "Truc") then
-		self:MoneyToggle()
-		NecrosisTooltip:SetInventoryItem("player", 16)
-		local itemName = tostring(NecrosisTooltipTextLeft8:GetText())
-		if (itemName and BagHelper.Spellstone_Name) then
-			if (itemName:find(BagHelper.Spellstone_Name)) then
-				Local.SomethingOnHand = BagHelper.Spellstone_Name
-			end
-		end
-		if (itemName and BagHelper.Firestone_Name) then
-			if (itemName:find(BagHelper.Firestone_Name)) then
-				Local.SomethingOnHand = BagHelper.Firestone_Name
-			end
-		end
-	end
-
-	-- Soul Stone || Pierre d'âme
-	-----------------------------------------------
-
-	-- We inquire to know if a stone of soul was used -> verification in the timers || On se renseigne pour savoir si une pierre d'âme a été utilisée --> vérification dans les timers
-	-- local SoulstoneInUse = false
-	-- if Local.TimerManagement.SpellTimer then
-	-- 	for index = 1, #Local.TimerManagement.SpellTimer, 1 do
-	-- 		if (Local.TimerManagement.SpellTimer[index].Name == self.Spell[11].Name)  and Local.TimerManagement.SpellTimer[index].TimeMax > 0 then
-	-- 			SoulstoneInUse = true
-	-- 			break
-	-- 		end
-	-- 	end
-	-- end
-	local soulstoneInUse = ItemHelper:IsSoulstoneOnCooldown()
-
-	if BagHelper.Soulstone_IsAvailable then
-		if soulstoneInUse then
-			Local.Stone.Soul.Mode = 4
-		else
-			Local.Stone.Soul.Mode = 2
-		end
-	else
-		if soulstoneInUse then
-			Local.Stone.Soul.Mode = 3
-		else
-			-- If the stone was not used, and there is no stone in inventory -> Mode 1 || Si la Pierre n'a pas été utilisée, et qu'il n'y a pas de pierre en inventaire -> Mode 1
-			Local.Stone.Soul.Mode = 1
-		end
-	end
-
--- 	-- If the stone was not used, and there is no stone in inventory -> Mode 1 || Si la Pierre n'a pas été utilisée, et qu'il n'y a pas de pierre en inventaire -> Mode 1
--- 	-- if not (Local.Stone.Soul.OnHand or SoulstoneInUse) then
--- 	if not (BagHelper.Soulstone_IsAvailable or SoulstoneInUse) then
--- print("Local.Stone.Soul.Mode = 1")
--- 		Local.Stone.Soul.Mode = 1
--- 	end
-
--- 	-- If the stone was not used, but there is a stone in inventory || Si la Pierre n'a pas été utilisée, mais qu'il y a une pierre en inventaire
--- 	-- if Local.Stone.Soul.OnHand and (not SoulstoneInUse) then
--- 	if BagHelper.Soulstone_IsAvailable and (not SoulstoneInUse) then
--- 		-- If the stone in inventory contains a timer, and we leave a RL -> Mode 4 || Si la pierre en inventaire contient un timer, et qu'on sort d'un RL --> Mode 4
--- 		-- local start, duration = GetContainerItemCooldown(Local.Stone.Soul.Location[1],Local.Stone.Soul.Location[2])
--- 		local start, duration = GetContainerItemCooldown(BagHelper.Soulstone_BagId, BagHelper.Soulstone_SlotId)
--- 		if Local.LoggedIn and start > 0 and duration > 0 then
--- 			Local.TimerManagement = self:InsertTimerStone("Soulstone", start, duration, Local.TimerManagement)
--- 			Local.Stone.Soul.Mode = 4
--- 			Local.LoggedIn = false
--- 		-- If the stone does not contain a timer, or you do not leave an RL -> Mode 2 || Si la pierre ne contient pas de timer, ou qu'on ne sort pas d'un RL --> Mode 2
--- 		else
--- 			Local.Stone.Soul.Mode = 2
--- 			Local.LoggedIn = false
--- 		end
--- 	end
-
--- 	-- If the stone was used but there is no stone in inventory -> Mode 3 || Si la Pierre a été utilisée mais qu'il n'y a pas de pierre en inventaire --> Mode 3
--- 	-- if (not Local.Stone.Soul.OnHand) and SoulstoneInUse then
--- 	if (not BagHelper.Soulstone_IsAvailable) and SoulstoneInUse then
--- 		Local.Stone.Soul.Mode = 3
--- 	end
-
--- 	-- If the stone was used and there is a stone in inventory || Si la Pierre a été utilisée et qu'il y a une pierre en inventaire
--- 	-- if Local.Stone.Soul.OnHand and SoulstoneInUse then
--- 	if BagHelper.Soulstone_IsAvailable and SoulstoneInUse then
--- 		Local.Stone.Soul.Mode = 4
--- 	end
-
-	-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
-	if (self.Spell[51].ID
-		and BagHelper.Soulstone_Name
-		and (Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 3))
-	then
-		self:SoulstoneUpdateAttribute("NoStone")
-	end
-
-	-- Display of the mode icon || Affichage de l'icone liée au mode
-	if (_G["NecrosisSoulstoneButton"]) then
-		NecrosisSoulstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("SoulstoneButton-0")..Local.Stone.Soul.Mode)
-	end
-
-	-- Stone of life || Pierre de vie
-	-----------------------------------------------
-
-	-- Mode "I have one" (2) / "I have none" (1) || Mode "j'en ai une" (2) / "j'en ai pas" (1)
-	if (not BagHelper.Healthstone_IsAvailable) then
-		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
-		if (self.Spell[52].ID and BagHelper.Healthstone_Name) then
-			self:HealthstoneUpdateAttribute("NoStone")
-		end
-	end
-
-	--Display of the mode icon || Affichage de l'icone liée au mode
-	if (_G["NecrosisHealthstoneButton"]) then
-		if (BagHelper.Healthstone_IsAvailable) then
-			NecrosisHealthstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-02"))
-		else
-			NecrosisHealthstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("HealthstoneButton-01"))
-		end
-	end
-
-	-- Stone of spell || Pierre de sort
-	-----------------------------------------------
-
-	-- Stone in the inventory ... || Pierre dans l'inventaire...
-	-- if Local.Stone.Spell.OnHand then
-	if (BagHelper.Spellstone_IsAvailable) then
-		-- ... and on the weapon = mode 3, otherwise = mode 2 || ... et sur l'arme = mode 3, sinon = mode 2
-		if (Local.SomethingOnHand == BagHelper.Spellstone_Name) then
-			Local.Stone.Spell.Mode = 3
-		else
-			Local.Stone.Spell.Mode = 2
-		end
-	-- Stone nonexistent ... || Pierre inexistante...
-	else
-		-- ... but on the weapon = mode 4, otherwise = mode 1 || ... mais sur l'arme = mode 4, sinon = mode 1
-		if (Local.SomethingOnHand == BagHelper.Spellstone_Name) then
-			Local.Stone.Spell.Mode = 4
-		else
-			Local.Stone.Spell.Mode = 1
-		end
-		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
-		if (self.Spell[53].ID and BagHelper.Spellstone_Name) then
-			self:SpellstoneUpdateAttribute("NoStone")
-		end
-	end
-
-	-- Display of the mode icon || Affichage de l'icone liée au mode
-	if _G["NecrosisSpellstoneButton"] then
-		NecrosisSpellstoneButton:SetNormalTexture(GraphicsHelper:GetTexture("SpellstoneButton-0"..Local.Stone.Spell.Mode))
-	end
-
-	-- Fire stone || Pierre de feu
-	-----------------------------------------------
-
-	-- Stone in the inventory ... || Pierre dans l'inventaire...
-	-- if Local.Stone.Fire.OnHand then
-	if (BagHelper.Firestone_IsAvailable) then
-		-- ... and on the weapon = mode 3, otherwise = mode 2 || ... et sur l'arme = mode 3, sinon = mode 2
-		if (Local.SomethingOnHand == BagHelper.Firestone_Name) then
-			Local.Stone.Fire.Mode = 3
-		else
-			Local.Stone.Fire.Mode = 2
-		end
-	-- Stone nonexistent ... || Pierre inexistante...
-	else
-		-- ... but on the weapon = mode 4, otherwise = mode 1 || ... mais sur l'arme = mode 4, sinon = mode 1
-		if (Local.SomethingOnHand == BagHelper.Firestone_Name) then
-			Local.Stone.Fire.Mode = 4
-		else
-			Local.Stone.Fire.Mode = 1
-		end
-		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
-		if (self.Spell[54].ID and BagHelper.Firestone_Name) then
-			self:FirestoneUpdateAttribute("NoStone")
-		end
-	end
-
-	-- Display of the mode icon || Affichage de l'icone liée au mode
-	if _G["NecrosisFirestoneButton"] then
-		NecrosisFirestoneButton:SetNormalTexture(GraphicsHelper:GetTexture("FirestoneButton-0"..Local.Stone.Fire.Mode))
-	end
-	
-
-	local hsCooldown = ItemHelper:GetHearthstoneCooldown()
-	if hsCooldown then
-		NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(1)
-	else
-		NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(nil)
-	end
-	
-end
 
 -- Update the sphere according to life || Update de la sphere en fonction de la vie
 function Necrosis:UpdateHealth()
@@ -1977,9 +2188,13 @@ function Necrosis:BagExplore(containerId)
 
 	BagHelper:GetStoneCounts()
 
-	Local.Soulshard.Count = BagHelper.Soulshard_Count
-	Local.Reagent.Infernal = BagHelper.InfernalStone_Count
-	Local.Reagent.Demoniac = BagHelper.DemonicFigure_Count
+	Local.Soulshard.Count     = BagHelper.Soulshard_Count
+	Local.Reagent.Infernal    = BagHelper.InfernalStone_Count
+	Local.Reagent.Demoniac    = BagHelper.DemonicFigure_Count
+	Local.Stone.Soul.OnHand   = BagHelper.Soulstone_IsAvailable
+	Local.Stone.Health.OnHand = BagHelper.Healthstone_IsAvailable
+	Local.Stone.Spell.OnHand  = BagHelper.Spellstone_IsAvailable
+	Local.Stone.Fire.OnHand   = BagHelper.Firestone_IsAvailable
 
 	local AncienCompte = Local.Soulshard.Count
 
@@ -2031,7 +2246,7 @@ function Necrosis:BagExplore(containerId)
 	end
 
 	-- Update icons and we're done || Et on met le tout à jour !
-	self:UpdateIcons()
+	UpdateIcons()
 
 	-- If bags are full (or if we have reached the limit) then display a notification message || S'il y a plus de fragment que d'emplacements dans le sac défini, on affiche un message d'avertissement
 	if NecrosisConfig.SoulshardSort then
@@ -2119,90 +2334,71 @@ end
 function Necrosis:ButtonSetup()
 -- print("Necrosis:ButtonSetup")
 	local NBRScale = (100 + (NecrosisConfig.NecrosisButtonScale - 85)) / 100
-	if NecrosisConfig.NecrosisButtonScale <= 95 then
+	local dist = 35 * NBRScale
+	dist = dist
+	if NecrosisConfig.NecrosisButtonScale <= 100 then
 		NBRScale = 1.1
+		dist = 40 * NBRScale
 	end
 
-	local ButtonName = new("array",
-		"NecrosisFirestoneButton",
-		"NecrosisSpellstoneButton",
-		"NecrosisHealthstoneButton",
-		"NecrosisSoulstoneButton",
-		"NecrosisBuffMenuButton",
-		"NecrosisMountButton",
-		"NecrosisPetMenuButton",
-		"NecrosisCurseMenuButton"
-	)
-
-	for index, valeur in ipairs(ButtonName) do
-		local f = _G[valeur]
-		if f then f:Hide() end
+---[==[
+	if Necrosis.Debug.buttons then
+		_G["DEFAULT_CHAT_FRAME"]:AddMessage("ButtonSetup === Begin"
+		)
 	end
+	local fm = Necrosis.Warlock_Buttons.main.f
+	local indexScale = -36
+	for index=1, #Necrosis.Warlock_Lists.on_sphere, 1 do
+		local v = Necrosis.Warlock_Lists.on_sphere[index]
+		local fr = Necrosis.Warlock_Buttons[v.f_ptr].f
 
-	local SpellExist = new("array",
-		self.Spell[54].ID,
-		self.Spell[53].ID,
-		self.Spell[52].ID,
-		self.Spell[51].ID,
-		Local.Menu.Buff[1],
-		Necrosis.CurrentEnv.SteedAvailable,
-		Local.Menu.Pet[1],
-		Local.Menu.Curse[1]
-		-- self.Spell[27].ID  Not in classic //TODO clear up
-	)
-	if NecrosisConfig.NecrosisLockServ then
-
-		local indexScale = -36
-		for index=1, #NecrosisConfig.StonePosition, 1 do
-			for button = 1, #NecrosisConfig.StonePosition, 1 do
-				if math.abs(NecrosisConfig.StonePosition[index]) == button
-					and NecrosisConfig.StonePosition[button] > 0
-					and SpellExist[button] then
-						local f = _G[ButtonName[button]]
-
-						if not f then
-							f = self:CreateSphereButtons(ButtonName[button])
-							self:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
-						end
-						f:ClearAllPoints()
-						f:SetPoint(
-							"CENTER", "NecrosisButton", "CENTER",
-							((40 * NBRScale) * cos(NecrosisConfig.NecrosisAngle - indexScale)),
-							((40 * NBRScale) * sin(NecrosisConfig.NecrosisAngle - indexScale))
-						)
-						f:Show()
-						indexScale = indexScale + 36
-						break
-				end
-			end
+		if Necrosis.Debug.buttons then
+			_G["DEFAULT_CHAT_FRAME"]:AddMessage("ButtonSetup"
+			.." '"..tostring(fr)
+			)
 		end
-	else
-		for index=1, #NecrosisConfig.StonePosition, 1 do
-			for button = 1, #NecrosisConfig.StonePosition, 1 do
-				if math.abs(NecrosisConfig.StonePosition[index]) == button
-					and NecrosisConfig.StonePosition[button] > 0
-					and SpellExist[button] then
-						local f = _G[ButtonName[button]]
-						if not f then
-							f = self:CreateSphereButtons(ButtonName[button])
-							self:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
-						end
-						f:ClearAllPoints()
-						f:SetPoint(
-							NecrosisConfig.FramePosition[ButtonName[button]][1],
-							NecrosisConfig.FramePosition[ButtonName[button]][2],
-							NecrosisConfig.FramePosition[ButtonName[button]][3],
-							NecrosisConfig.FramePosition[ButtonName[button]][4],
-							NecrosisConfig.FramePosition[ButtonName[button]][5]
-						)
-						f:Show()
-						break
-				end
+		local f = _G[fr]
+		if (Necrosis.IsSpellKnown(v.high_of) 	-- in spell book
+		or v.menu                           -- or on menu of spells
+		or v.item)                          -- or item to use
+		and NecrosisConfig.StonePosition[index] > 0 -- and requested
+		then
+			if not f then
+				f = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons[v.f_ptr])
+				Necrosis:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
+			end
+			f:ClearAllPoints()
+---[[
+			if NecrosisConfig.NecrosisLockServ then
+				f:SetPoint(
+					"CENTER", fm, "CENTER",
+					((dist) * cos(NecrosisConfig.NecrosisAngle - indexScale)),
+					((dist) * sin(NecrosisConfig.NecrosisAngle - indexScale))
+				)
+				indexScale = indexScale + 36
+			else
+--]]
+				f:SetPoint(
+					NecrosisConfig.FramePosition[fr][1],
+					NecrosisConfig.FramePosition[fr][2],
+					NecrosisConfig.FramePosition[fr][3],
+					NecrosisConfig.FramePosition[fr][4],
+					NecrosisConfig.FramePosition[fr][5]
+				)
+			end
+			f:Show()
+			f:SetScale(NBRScale)
+		else
+			if f then
+				f:Hide()
 			end
 		end
 	end
-	del(ButtonName)
-	del(SpellExist)
+	if Necrosis.Debug.buttons then
+		_G["DEFAULT_CHAT_FRAME"]:AddMessage("ButtonSetup === Done"
+		)
+	end
+--]==]
 end
 
 -- TODO: Unused function?
@@ -2219,103 +2415,103 @@ end
 -- MISCELLANEOUS FUNCTIONS || FONCTIONS DIVERSES
 ------------------------------------------------------------------------------------------------------
 
--- Function to check the presence of a debuff on the unit || Fonction pour savoir si une unité subit un effet
--- F(string, string)->bool
-function Necrosis:UnitHasEffect(unit, effect)
-	local index = 1
-	while UnitDebuff(unit, index) do
-		self:MoneyToggle()
-		NecrosisTooltip:SetUnitDebuff(unit, index)
-		local DebuffName = tostring(NecrosisTooltipTextLeft1:GetText())
-   		if DebuffName:find(effect) then
-			return true
-		end
-		index = index + 1
-	end
-	return false
-end
+-- -- Function to check the presence of a debuff on the unit || Fonction pour savoir si une unité subit un effet
+-- -- F(string, string)->bool
+-- function Necrosis:UnitHasEffect(unit, effect)
+-- 	local index = 1
+-- 	while UnitDebuff(unit, index) do
+-- 		self:MoneyToggle()
+-- 		NecrosisTooltip:SetUnitDebuff(unit, index)
+-- 		local DebuffName = tostring(NecrosisTooltipTextLeft1:GetText())
+--    		if DebuffName:find(effect) then
+-- 			return true
+-- 		end
+-- 		index = index + 1
+-- 	end
+-- 	return false
+-- end
 
--- Function to check the presence of a buff on the unit.
--- Strictly identical to UnitHasEffect, but as WoW distinguishes Buff and DeBuff, so we have to.
-function Necrosis:UnitHasBuff(unit, effect)
-	local index = 1
-	while UnitBuff(unit, index) do
-	-- Here we'll cheat a little. checking a buff or debuff return the internal spell name, and not the name we give at start
-		-- So we use an API widget that will use the internal name to return the known name.
-		-- For example, the "Curse of Agony" spell is internaly known as "Spell_Shadow_CurseOfSargeras". Much easier to use the first one than the internal one.
-		self:MoneyToggle()
-		NecrosisTooltip:SetUnitBuff(unit, index)
-		local BuffName = tostring(NecrosisTooltipTextLeft1:GetText())
-   		if BuffName:find(effect) then
-			return true
-		end
-		index = index + 1
-	end
-	return false
-end
+-- -- Function to check the presence of a buff on the unit.
+-- -- Strictly identical to UnitHasEffect, but as WoW distinguishes Buff and DeBuff, so we have to.
+-- function Necrosis:UnitHasBuff(unit, effect)
+-- 	local index = 1
+-- 	while UnitBuff(unit, index) do
+-- 	-- Here we'll cheat a little. checking a buff or debuff return the internal spell name, and not the name we give at start
+-- 		-- So we use an API widget that will use the internal name to return the known name.
+-- 		-- For example, the "Curse of Agony" spell is internaly known as "Spell_Shadow_CurseOfSargeras". Much easier to use the first one than the internal one.
+-- 		self:MoneyToggle()
+-- 		NecrosisTooltip:SetUnitBuff(unit, index)
+-- 		local BuffName = tostring(NecrosisTooltipTextLeft1:GetText())
+--    		if BuffName:find(effect) then
+-- 			return true
+-- 		end
+-- 		index = index + 1
+-- 	end
+-- 	return false
+-- end
 
 
--- Display the antifear button / warning || Affiche ou cache le bouton de détection de la peur suivant la cible.
-function Necrosis:ShowAntiFearWarning()
-	local Actif = false -- Must be False, or a number from 1 to Local.Warning.Antifear.Icon[] max element.
+-- -- Display the antifear button / warning || Affiche ou cache le bouton de détection de la peur suivant la cible.
+-- function Necrosis:ShowAntiFearWarning()
+-- 	local Actif = false -- Must be False, or a number from 1 to Local.Warning.Antifear.Icon[] max element.
 
-	-- Checking if we have a target. Any fear need a target to be casted on
-	if UnitExists("target") and UnitCanAttack("player", "target") and not UnitIsDead("target") then
-		-- Checking if the target has natural immunity (only NPC target)
-		if not UnitIsPlayer("target") and ( UnitCreatureType("target") == self.Unit.Undead or UnitCreatureType("target") == "Mechanical" ) then
-			Actif = 2 -- Immun
-		end
-		-- We'll start to parse the target buffs, as his class doesn't give him natural permanent immunity
-		if not Actif then
-			for index=1, #self.AntiFear.Buff, 1 do
-				if self:UnitHasBuff("target",self.AntiFear.Buff[index]) then
-					Actif = 3 -- Prot
-					break
-				end
-			end
+-- 	-- Checking if we have a target. Any fear need a target to be casted on
+-- 	if UnitExists("target") and UnitCanAttack("player", "target") and not UnitIsDead("target") then
+-- 		-- Checking if the target has natural immunity (only NPC target)
+-- 		if not UnitIsPlayer("target") and ( UnitCreatureType("target") == self.Unit.Undead or UnitCreatureType("target") == "Mechanical" ) then
+-- 			Actif = 2 -- Immun
+-- 		end
+-- 		-- We'll start to parse the target buffs, as his class doesn't give him natural permanent immunity
+-- 		if not Actif then
+-- 			for index=1, #self.AntiFear.Buff, 1 do
+-- 				if self:UnitHasBuff("target",self.AntiFear.Buff[index]) then
+-- 					Actif = 3 -- Prot
+-- 					break
+-- 				end
+-- 			end
 
-			-- No buff found, let's try the debuffs
-			for index=1, #self.AntiFear.Debuff, 1 do
-				if self:UnitHasEffect("target",self.AntiFear.Debuff[index]) then
-					Actif = 3 -- Prot
-					break
-				end
-			end
-		end
+-- 			-- No buff found, let's try the debuffs
+-- 			for index=1, #self.AntiFear.Debuff, 1 do
+-- 				if self:UnitHasEffect("target",self.AntiFear.Debuff[index]) then
+-- 					Actif = 3 -- Prot
+-- 					break
+-- 				end
+-- 			end
+-- 		end
 
-		-- An immunity has been detected before, but we still don't know why => show the button anyway
-		if Local.Warning.Antifear.Immune and not Actif then
-			Actif = 1
-		end
-	end
+-- 		-- An immunity has been detected before, but we still don't know why => show the button anyway
+-- 		if Local.Warning.Antifear.Immune and not Actif then
+-- 			Actif = 1
+-- 		end
+-- 	end
 
-	if Actif then
-		-- Antifear button is currently not visible, we have to change that
-		if not Local.Warning.Antifear.Actif then
-			Local.Warning.Antifear.Actif = true
-			self.Chat:_Msg(self.ChatMessage.Information.FearProtect, "USER")
-			NecrosisAntiFearButton:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear"..Local.Warning.Antifear.Icon[Actif].."-02"))
-			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.Fear) end
-			ShowUIPanel(NecrosisAntiFearButton)
-			Local.Warning.Antifear.Blink = GetTime() + 0.6
-			Local.Warning.Antifear.Toggle = 2
+-- 	if Actif then
+-- 		-- Antifear button is currently not visible, we have to change that
+-- 		if not Local.Warning.Antifear.Actif then
+-- 			Local.Warning.Antifear.Actif = true
+-- 			self.Chat:_Msg(self.ChatMessage.Information.FearProtect, "USER")
+-- 			NecrosisAntiFearButton:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear"..Local.Warning.Antifear.Icon[Actif].."-02"))
+-- 			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.Fear) end
+-- 			ShowUIPanel(NecrosisAntiFearButton)
+-- 			Local.Warning.Antifear.Blink = GetTime() + 0.6
+-- 			Local.Warning.Antifear.Toggle = 2
 
-		-- Timer to make the button blink
-		elseif GetTime() >= Local.Warning.Antifear.Blink then
-			if Local.Warning.Antifear.Toggle == 1 then
-				Local.Warning.Antifear.Toggle = 2
-			else
-				Local.Warning.Antifear.Toggle = 1
-			end
-			Local.Warning.Antifear.Blink = GetTime() + 0.4
-			NecrosisAntiFearButton:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear"..Local.Warning.Antifear.Icon[Actif].."-0"..Local.Warning.Antifear.Toggle))
-		end
+-- 		-- Timer to make the button blink
+-- 		elseif GetTime() >= Local.Warning.Antifear.Blink then
+-- 			if Local.Warning.Antifear.Toggle == 1 then
+-- 				Local.Warning.Antifear.Toggle = 2
+-- 			else
+-- 				Local.Warning.Antifear.Toggle = 1
+-- 			end
+-- 			Local.Warning.Antifear.Blink = GetTime() + 0.4
+-- 			NecrosisAntiFearButton:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear"..Local.Warning.Antifear.Icon[Actif].."-0"..Local.Warning.Antifear.Toggle))
+-- 		end
 
-	elseif Local.Warning.Antifear.Actif then	-- No antifear on target, but the button is still visible => gonna hide it
-		Local.Warning.Antifear.Actif = false
-		HideUIPanel(NecrosisAntiFearButton)
-	end
-end
+-- 	elseif Local.Warning.Antifear.Actif then	-- No antifear on target, but the button is still visible => gonna hide it
+-- 		Local.Warning.Antifear.Actif = false
+-- 		HideUIPanel(NecrosisAntiFearButton)
+-- 	end
+-- end
 
 -- Trade healthstone (out of combat) || Fonction pour gérer l'échange de pierre (hors combat)
 function Necrosis:TradeStone()
@@ -2388,6 +2584,16 @@ function Necrosis:Drag()
 end
 
 
+local function HideList(list, parent)
+	for i, v in pairs(list) do
+		menuVariable = _G[Necrosis.Warlock_Buttons[v.f_ptr].f]
+		if menuVariable then
+			menuVariable:Hide()
+			menuVariable:ClearAllPoints()
+			menuVariable:SetPoint("CENTER", parent, "CENTER", 3000, 3000)
+		end
+	end
+end
 -- Rebuild the menus at mod startup or when the spellbook changes || A chaque changement du livre des sorts, au démarrage du mod, ainsi qu'au changement de sens du menu on reconstruit les menus des sorts
 function Necrosis:CreateMenu()
 	Local.Menu.Pet = setmetatable({}, metatable)
@@ -2398,84 +2604,66 @@ function Necrosis:CreateMenu()
 	local BuffButtonPosition = "Button"
 	local CurseButtonPosition = "Button"
 
-	-- Hide all the pet demon buttons || On cache toutes les icones des démons
-	for i = 1, #NecrosisConfig.DemonSpellPosition, 1 do
-		menuVariable = _G["NecrosisPetMenu"..i]
-		if menuVariable then
-			menuVariable:Hide()
-			menuVariable:ClearAllPoints()
-			menuVariable:SetPoint("CENTER", "NecrosisButton", "CENTER", 3000, 3000)
+	local f = Necrosis.Warlock_Buttons.main.f
+	HideList(Necrosis.Warlock_Lists.pets, f) -- Hide all the pet demon buttons || On cache toutes les icones des démons
+	HideList(Necrosis.Warlock_Lists.buffs, f) -- Hide the general buff spell buttons || On cache toutes les icones des sorts
+	HideList(Necrosis.Warlock_Lists.curses, f) -- Hide the curse buttons || On cache toutes les icones des curses
+
+	if NecrosisConfig.StonePosition[7] > 0 then -- pets
+		-- Setup the buttons available on the pets menu 
+		local prior_button = Necrosis.Warlock_Buttons.pets.f -- menu button on sphere
+		-- Create on demand 
+		if not _G[prior_button] then
+			_ = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons.pets)
 		end
-	end
-	-- Hide the general buff spell buttons || On cache toutes les icones des sorts
-	for i = 1, #NecrosisConfig.BuffSpellPosition, 1 do
-		menuVariable = _G["NecrosisBuffMenu"..i]
-		if menuVariable then
-			menuVariable:Hide()
-			menuVariable:ClearAllPoints()
-			menuVariable:SetPoint("CENTER", "NecrosisButton", "CENTER", 3000, 3000)
-		end
-	end
-	-- Hide the curse buttons || On cache toutes les icones des curses
-	for i = 1, #NecrosisConfig.CurseSpellPosition, 1 do
-		menuVariable = _G["NecrosisCurseMenu"..i]
-		if menuVariable then
-			menuVariable:Hide()
-			menuVariable:ClearAllPoints()
-			menuVariable:SetPoint("CENTER", "NecrosisButton", "CENTER", 3000, 3000)
-		end
-	end
-	if NecrosisConfig.StonePosition[7] > 0 then
-		local MenuID = new("array",
-			15, 3, 4, 5, 6, 8, 30, 35, 44, 59
-		)
-		-- We order and display the buttons in the demon menu || On ordonne et on affiche les boutons dans le menu des démons
-		for index = 1, #NecrosisConfig.DemonSpellPosition, 1 do
-			-- If the summoning spell exists, the button is displayed in the pets menu || Si le sort d'invocation existe, on affiche le bouton dans le menu des pets
-			for spell = 1, #NecrosisConfig.DemonSpellPosition, 1 do
-				if math.abs(NecrosisConfig.DemonSpellPosition[index]) == spell
-					and NecrosisConfig.DemonSpellPosition[spell] > 0
-					and self.Spell[ MenuID[spell] ].ID then
-						-- On-Demand Creation of the Demon Menu Button || Création à la demande du bouton du menu des démons
-						if not _G["NecrosisPetMenuButton"] then
-							_ = self:CreateSphereButtons("PetMenu")
-						end
-						menuVariable = self:CreateMenuPet(spell)
-						menuVariable:ClearAllPoints()
-						menuVariable:SetPoint(
-							"CENTER", "NecrosisPetMenu"..PetButtonPosition, "CENTER",
-							NecrosisConfig.PetMenuPos.direction * NecrosisConfig.PetMenuPos.x * 32,
-							NecrosisConfig.PetMenuPos.y * 32
-						)
-						PetButtonPosition = spell
-						Local.Menu.Pet:insert(menuVariable)
-						break
+		for index = 1, #Necrosis.Warlock_Lists.pets, 1 do
+			local petItem = Necrosis.Warlock_Lists.pets[index]
+			local f = Necrosis.Warlock_Buttons[petItem.f_ptr].f
+			if Necrosis.IsSpellKnown(petItem.high_of) -- in spell book
+--			and NecrosisConfig.DemonSpellPosition[index] > 0 -- and requested
+			then
+				if Necrosis.Debug.buttons then
+					_G["DEFAULT_CHAT_FRAME"]:AddMessage("CreateMenu pets"
+					.." f'"..(petItem.f_ptr or "nyl")..'"'
+--					.." p'"..(NecrosisConfig.DemonSpellPosition[index] or "nyl")..'"'
+					.." pr'"..(prior_button or "nyl")..'"'
+					)
 				end
+				menuVariable = Necrosis:CreateMenuItem(petItem) -- Necrosis:CreateMenuPet(v.f_ptr)
+				menuVariable:ClearAllPoints()
+				menuVariable:SetPoint(
+					"CENTER", prior_button, "CENTER",
+					NecrosisConfig.PetMenuPos.direction * NecrosisConfig.PetMenuPos.x * 32,
+					NecrosisConfig.PetMenuPos.y * 32
+				)
+				prior_button = f -- anchor the next button
+				Local.Menu.Pet:insert(menuVariable)
 			end
 		end
-		del(MenuID)
 
 		-- Display the pets menu button || Maintenant que tous les boutons de pet sont placés les uns à côté des autres, on affiche les disponibles
 		if Local.Menu.Pet[1] then
+			local f = _G[Necrosis.Warlock_Buttons.pets.f]
+			local fs = Necrosis.Warlock_Buttons.pets.f
 			Local.Menu.Pet[1]:ClearAllPoints()
 			Local.Menu.Pet[1]:SetPoint(
-				"CENTER", "NecrosisPetMenuButton", "CENTER",
+				"CENTER", f, "CENTER",
 				NecrosisConfig.PetMenuPos.direction * NecrosisConfig.PetMenuPos.x * 32 + NecrosisConfig.PetMenuDecalage.x,
 				NecrosisConfig.PetMenuPos.y * 32 + NecrosisConfig.PetMenuDecalage.y
 			)
 			-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
 			for i = 1, #Local.Menu.Pet, 1 do
-				Local.Menu.Pet[i]:SetParent(NecrosisPetMenuButton)
+				Local.Menu.Pet[i]:SetParent(f)
 				-- Close the menu when a child button is clicked || Si le menu se ferme à l'appui d'un bouton, alors il se ferme à l'appui d'un bouton !
-				NecrosisPetMenuButton:WrapScript(Local.Menu.Pet[i], "OnClick", [[
+				f:WrapScript(Local.Menu.Pet[i], "OnClick", [[
 					if self:GetParent():GetAttribute("state") == "Ouvert" then
 						self:GetParent():SetAttribute("state", "Ferme")
 					end
 				]])
-				NecrosisPetMenuButton:WrapScript(Local.Menu.Pet[i], "OnEnter", [[
+				f:WrapScript(Local.Menu.Pet[i], "OnEnter", [[
 					self:GetParent():SetAttribute("mousehere", true)
 				]])
-				NecrosisPetMenuButton:WrapScript(Local.Menu.Pet[i], "OnLeave", [[
+				f:WrapScript(Local.Menu.Pet[i], "OnLeave", [[
 					self:GetParent():SetAttribute("mousehere", false)
 					local stateMenu = self:GetParent():GetAttribute("state")
 					if not (stateMenu == "Bloque" or stateMenu == "Combat" or stateMenu == "ClicDroit") then
@@ -2483,84 +2671,64 @@ function Necrosis:CreateMenu()
 					end
 				]])
 				if NecrosisConfig.BlockedMenu or not NecrosisConfig.ClosingMenu then
-					NecrosisPetMenuButton:UnwrapScript(Local.Menu.Pet[i], "OnClick")
+					f:UnwrapScript(Local.Menu.Pet[i], "OnClick")
 				end
+--				Necrosis:SetPetSpellAttribute(Local.Menu.Pet[i])
 			end
-			self:MenuAttribute("NecrosisPetMenuButton")
-			self:PetSpellAttribute()
+			Necrosis:MenuAttribute(fs)
+			Necrosis:PetSpellAttribute()
 		end
 	end
 
-	if NecrosisConfig.StonePosition[5] > 0 then
+	if NecrosisConfig.StonePosition[5] > 0 then -- buffs
 		-- Setup the buttons available on the buffs menu || On ordonne et on affiche les boutons dans le menu des buffs
-		local MenuID = new("array",
-			31, 47, 32, 33, 34, 37, 38, 43, 59, 9
-		)
-		for index = 1, #NecrosisConfig.BuffSpellPosition, 1 do
-			-- Display the button if the spell is known || Si le buff existe, on affiche le bouton dans le menu des buffs
-			if math.abs(NecrosisConfig.BuffSpellPosition[index]) == 1
-				and NecrosisConfig.BuffSpellPosition[1] > 0
-				and (self.Spell[31].ID or self.Spell[36].ID) then
-					-- Create on demand || Création à la demande du bouton du menu des Buffs
-					if not _G["NecrosisBuffMenuButton"] then
-						_ = self:CreateSphereButtons("BuffMenu")
-					end
-					menuVariable = self:CreateMenuBuff(1)
-					menuVariable:ClearAllPoints()
-					menuVariable:SetPoint(
-						"CENTER", "NecrosisBuffMenu"..BuffButtonPosition, "CENTER",
-						NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32,
-						NecrosisConfig.BuffMenuPos.y * 32
-					)
-					BuffButtonPosition = 1
-					Local.Menu.Buff:insert(menuVariable)
-			else
-				for spell = 2, #NecrosisConfig.BuffSpellPosition, 1 do
-print("Nc CreateMenuBuff "..tostring(spell))
-					if math.abs(NecrosisConfig.BuffSpellPosition[index]) == spell
-						and NecrosisConfig.BuffSpellPosition[spell] > 0
-						and self.Spell[ MenuID[spell] ].ID then
-							-- Create on demand || Création à la demande du bouton du menu des Buffs
-							if not _G["NecrosisBuffMenuButton"] then
-								_ = self:CreateSphereButtons("BuffMenu")
-							end
-							menuVariable = self:CreateMenuBuff(spell)
-							menuVariable:ClearAllPoints()
-							menuVariable:SetPoint(
-								"CENTER", "NecrosisBuffMenu"..BuffButtonPosition, "CENTER",
-								NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32,
-								NecrosisConfig.BuffMenuPos.y * 32
-							)
-							BuffButtonPosition = spell
-							Local.Menu.Buff:insert(menuVariable)
-							break
-					end
-				end
+		local prior_button = Necrosis.Warlock_Buttons.buffs.f -- menu button on sphere
+		-- Create on demand || Création à la demande du bouton du menu des Buffs
+		if not _G[prior_button] then
+			_ = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons.buffs)
+		end
+
+		for index = 1, #Necrosis.Warlock_Lists.buffs, 1 do
+			local buffItem = Necrosis.Warlock_Lists.buffs[index]
+			local f = Necrosis.Warlock_Buttons[buffItem.f_ptr].f
+			if Necrosis.IsSpellKnown(buffItem.high_of) -- in spell book
+--			and NecrosisConfig.BuffSpellPosition[index] > 0 -- and requested
+			then
+				menuVariable = Necrosis:CreateMenuItem(buffItem) -- Necrosis:CreateMenuBuff(v.f_ptr)
+				menuVariable:ClearAllPoints()
+				menuVariable:SetPoint(
+					"CENTER", prior_button, "CENTER",
+					NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32,
+					NecrosisConfig.BuffMenuPos.y * 32
+				)
+				prior_button = f -- anchor the next button
+				Local.Menu.Buff:insert(menuVariable)
 			end
 		end
-		del(MenuID)
 
 		-- Display the buffs menu button on the sphere || Maintenant que tous les boutons de buff sont placés les uns à côté des autres, on affiche les disponibles
 		if Local.Menu.Buff[1] then
+			local fs = Necrosis.Warlock_Buttons.buffs.f
+			local f = _G[fs]
 			Local.Menu.Buff[1]:ClearAllPoints()
 			Local.Menu.Buff[1]:SetPoint(
-				"CENTER", "NecrosisBuffMenuButton", "CENTER",
+				"CENTER", f, "CENTER",
 				NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32 + NecrosisConfig.BuffMenuDecalage.x,
 				NecrosisConfig.BuffMenuPos.y * 32 + NecrosisConfig.BuffMenuDecalage.y
 			)
 			-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
 			for i = 1, #Local.Menu.Buff, 1 do
-				Local.Menu.Buff[i]:SetParent(NecrosisBuffMenuButton)
+				Local.Menu.Buff[i]:SetParent(f)
 				-- Close the menu upon button Click || Si le menu se ferme à l'appui d'un bouton, alors il se ferme à l'appui d'un bouton !
-				NecrosisBuffMenuButton:WrapScript(Local.Menu.Buff[i], "OnClick", [[
+				f:WrapScript(Local.Menu.Buff[i], "OnClick", [[
 					if self:GetParent():GetAttribute("state") == "Ouvert" then
 						self:GetParent():SetAttribute("state", "Ferme")
 					end
 				]])
-				NecrosisBuffMenuButton:WrapScript(Local.Menu.Buff[i], "OnEnter", [[
+				f:WrapScript(Local.Menu.Buff[i], "OnEnter", [[
 					self:GetParent():SetAttribute("mousehere", true)
 				]])
-				NecrosisBuffMenuButton:WrapScript(Local.Menu.Buff[i], "OnLeave", [[
+				f:WrapScript(Local.Menu.Buff[i], "OnLeave", [[
 					self:GetParent():SetAttribute("mousehere", false)
 					local stateMenu = self:GetParent():GetAttribute("state")
 					if not (stateMenu == "Bloque" or stateMenu == "Combat" or stateMenu == "ClicDroit") then
@@ -2568,73 +2736,63 @@ print("Nc CreateMenuBuff "..tostring(spell))
 					end
 				]])
 				if NecrosisConfig.BlockedMenu or not NecrosisConfig.ClosingMenu then
-					NecrosisBuffMenuButton:UnwrapScript(Local.Menu.Buff[i], "OnClick")
+					f:UnwrapScript(Local.Menu.Buff[i], "OnClick")
 				end
 			end
-			self:MenuAttribute("NecrosisBuffMenuButton")
-			self:BuffSpellAttribute()
+			Necrosis:MenuAttribute(fs)
+			Necrosis:BuffSpellAttribute()
 		end
 	end
 
+	if NecrosisConfig.StonePosition[8] > 0 then -- curses
+		-- Setup the buttons available on the curses menu 
+		local prior_button = Necrosis.Warlock_Buttons.curses.f -- menu button on sphere
+		-- Create on demand 
+		if not _G[prior_button] then
+			_ = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons.curses)
+		end
 
-	if NecrosisConfig.StonePosition[8] > 0 then
-		-- Setup the buttons to be displayed on the curse menu || On ordonne et on affiche les boutons dans le menu des malédictions
-		-- MenuID contient l'emplacement des sorts en question dans la table des sorts de Necrosis.
-		local MenuID = new("array",
-												23, -- Curse of weakness
-												22, -- Curse of agony
-												25, -- Curse of tongues
-												40, -- Curse of exhaustion
-												26, -- Curse of the elements
-												16, -- Curse of doom
-												14 -- Corruption
-											 )
-		for index = 1, #NecrosisConfig.CurseSpellPosition, 1 do
-			for sort = 1, #NecrosisConfig.CurseSpellPosition, 1 do
-				-- Si la Malédiction existe, on affiche le bouton dans le menu des curses
-				if math.abs(NecrosisConfig.CurseSpellPosition[index]) == sort
-					and NecrosisConfig.CurseSpellPosition[sort] > 0
-					and self.Spell[MenuID[sort]].ID then
-						-- Création à la demande du bouton du menu des malédictions
-						if not _G["NecrosisCurseMenuButton"] then
-							_ = self:CreateSphereButtons("CurseMenu")
-						end
-						menuVariable = self:CreateMenuCurse(sort)
-						menuVariable:ClearAllPoints()
-						menuVariable:SetPoint(
-							"CENTER", "NecrosisCurseMenu"..CurseButtonPosition, "CENTER",
-							NecrosisConfig.CurseMenuPos.direction * NecrosisConfig.CurseMenuPos.x * 32,
-							NecrosisConfig.CurseMenuPos.y * 32
-						)
-						CurseButtonPosition = sort
-						Local.Menu.Curse:insert(menuVariable)
-						break
-				end
+		for index = 1, #Necrosis.Warlock_Lists.curses, 1 do
+			local curseItem = Necrosis.Warlock_Lists.curses[index]
+			local f = Necrosis.Warlock_Buttons[curseItem.f_ptr].f
+			if Necrosis.IsSpellKnown(curseItem.high_of) -- in spell book
+--			and NecrosisConfig.DemonSpellPosition[index] > 0 -- and requested
+			then
+				menuVariable = Necrosis:CreateMenuItem(curseItem)   -- Necrosis:CreateMenuCurse(v.f_ptr)
+				menuVariable:ClearAllPoints()
+				menuVariable:SetPoint(
+					"CENTER", prior_button, "CENTER",
+					NecrosisConfig.CurseMenuPos.direction * NecrosisConfig.CurseMenuPos.x * 32,
+					NecrosisConfig.CurseMenuPos.y * 32
+				)
+--				menuVariable.high_of = v.high_of
+				prior_button = f -- anchor the next button
+				Local.Menu.Curse:insert(menuVariable)
 			end
 		end
-		del(MenuID)
-
 		-- Display the curse menu button on the sphere || Maintenant que tous les boutons de curse sont placés les uns à côté des autres, on affiche les disponibles
 		if Local.Menu.Curse[1] then
+			local f = _G[Necrosis.Warlock_Buttons.curses.f]
+			local fs = Necrosis.Warlock_Buttons.curses.f
 			Local.Menu.Curse[1]:ClearAllPoints()
 			Local.Menu.Curse[1]:SetPoint(
-				"CENTER", "NecrosisCurseMenuButton", "CENTER",
+				"CENTER", f, "CENTER",
 				NecrosisConfig.CurseMenuPos.direction * NecrosisConfig.CurseMenuPos.x * 32 + NecrosisConfig.CurseMenuDecalage.x,
 				NecrosisConfig.CurseMenuPos.y * 32 + NecrosisConfig.CurseMenuDecalage.y
 			)
 			-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
 			for i = 1, #Local.Menu.Curse, 1 do
-				Local.Menu.Curse[i]:SetParent(NecrosisCurseMenuButton)
+				Local.Menu.Curse[i]:SetParent(f)
 				-- Respond to clicks || Si le menu se ferme à l'appui d'un bouton, alors il se ferme à l'appui d'un bouton !
-				NecrosisCurseMenuButton:WrapScript(Local.Menu.Curse[i], "OnClick", [[
+				f:WrapScript(Local.Menu.Curse[i], "OnClick", [[
 					if self:GetParent():GetAttribute("state") == "Ouvert" then
 						self:GetParent():SetAttribute("state","Ferme")
 					end
 				]])
-				NecrosisCurseMenuButton:WrapScript(Local.Menu.Curse[i], "OnEnter", [[
+				f:WrapScript(Local.Menu.Curse[i], "OnEnter", [[
 					self:GetParent():SetAttribute("mousehere", true)
 				]])
-				NecrosisCurseMenuButton:WrapScript(Local.Menu.Curse[i], "OnLeave", [[
+				f:WrapScript(Local.Menu.Curse[i], "OnLeave", [[
 					self:GetParent():SetAttribute("mousehere", false)
 					local stateMenu = self:GetParent():GetAttribute("state")
 					if not (stateMenu == "Bloque" or stateMenu == "Combat" or stateMenu == "ClicDroit") then
@@ -2642,19 +2800,20 @@ print("Nc CreateMenuBuff "..tostring(spell))
 					end
 				]])
 				if NecrosisConfig.BlockedMenu or not NecrosisConfig.ClosingMenu then
-					NecrosisCurseMenuButton:UnwrapScript(Local.Menu.Curse[i], "OnClick")
+					f:UnwrapScript(Local.Menu.Curse[i], "OnClick")
 				end
 			end
-			self:MenuAttribute("NecrosisCurseMenuButton")
-			self:CurseSpellAttribute()
+			Necrosis:MenuAttribute(fs)
+			Necrosis:CurseSpellAttribute()
 		end
 	end
 
 	-- Always keep menus Open (if enabled) || On bloque le menu en position ouverte si configuré
 	if NecrosisConfig.BlockedMenu then
-		if _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:SetAttribute("state", "Bloque") end
-		if _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:SetAttribute("state", "Bloque") end
-		if _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:SetAttribute("state", "Bloque") end
+		local s = "Bloque"
+		SetState(_G[Necrosis.Warlock_Buttons.buffs.f], s)
+		SetState(_G[Necrosis.Warlock_Buttons.pets.f], s)
+		SetState(_G[Necrosis.Warlock_Buttons.curses.f], s)
 	end
 end
 

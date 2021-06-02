@@ -5,7 +5,7 @@
 ## Notes: Warlock UI & Shard Management
 ## Notes-frFR: Gestion graphique des shards.
 ## Notes-ruRU: Менеджер заклинаний, камней и демонов для чернокнижника.
-## Version: 1.0
+## Version: 8.3 bcc
 ## Author: kricklen
 ## DefaultState: Enabled
 ## X-Website: https://github.com/kricklen/Necrosis-Classic
@@ -17,6 +17,11 @@
 ## SavedVariablesPerCharacter: NecrosisConfig
 
 Necrosis.xml
+
+libs\LibStub\LibStub.lua
+# libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+# libs\AceAddon-3.0\AceAddon-3.0.xml
+libs\AceLocale-3.0\AceLocale-3.0.xml
 
 BlizzardUI\AsyncCallbackSystem.lua
 BlizzardUI\Item.lua
@@ -32,6 +37,16 @@ Helpers\GraphicsHelper.lua
 Helpers\EventHelper.lua
 
 Chat.lua
+
+Locales\Localization.lua
+Locales\Localization.CN.lua
+Locales\Localization.DE.lua
+Locales\Localization.ES.lua
+Locales\Localization.FR.lua
+Locales\Localization.RU.lua
+Locales\Localization.TW.lua
+Locales\Localization.MX.lua
+Dialog.lua
 
 Localization\Functions-fr.lua
 Localization\Functions-en.lua

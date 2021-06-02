@@ -135,7 +135,7 @@ function _mw:Show()
 		-- Credits
 		self.fsCredits = GraphicsHelper:CreateFontString(
 			self.Frame,
-			"Developed by Lomig & Tarcalion, adopted by kricklen",
+			"Developed by Lomig & Tarcalion, rewritten by urnati & kricklen",
 			"TOP",
 			0, -44
 		)
