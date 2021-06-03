@@ -535,11 +535,18 @@ function Necrosis:SpellSetup()
 	-- end
 
 	-- associate the mounts to the sphere button || Association du sort de monture correct au bouton
-	if (Necrosis.Spell[1].ID or Necrosis.Spell[2].ID) then
-		Necrosis.CurrentEnv.SteedAvailable = true
+	if (Necrosis.Spell[1].ID) then
+		Necrosis.CurrentEnv.FelsteedAvailable = true
 	else
-		Necrosis.CurrentEnv.SteedAvailable = false
+		Necrosis.CurrentEnv.FelsteedAvailable = false
 	end
+	if (Necrosis.Spell[2].ID) then
+		Necrosis.CurrentEnv.DreadsteedAvailable = true
+	else
+		Necrosis.CurrentEnv.DreadsteedAvailable = false
+	end
+
+	Necrosis.CurrentEnv.SteedAvailable = Necrosis.CurrentEnv.FelsteedAvailable or Necrosis.CurrentEnv.DreadsteedAvailable
 
 	if (not InCombatLockdown()) then
 		Necrosis:MainButtonAttribute()

@@ -108,6 +108,7 @@ function Necrosis:Initialize(Config)
 
 	f = _G[f]
 	-- Now ready to activate Necrosis
+	f:SetScript("OnEvent", Necrosis.OnEvent)
 	-- f:SetScript("OnUpdate", 	function(self, arg1) Necrosis:OnUpdate(self, arg1) end)
 	f:SetScript("OnEnter", 		function(self) Necrosis:BuildButtonTooltip(self) end)
 	f:SetScript("OnLeave", 		function() GameTooltip:Hide() end)

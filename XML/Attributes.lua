@@ -17,7 +17,6 @@ local function SetSSAttribs(nostone, reason)
 	if not f then
 		return
 	end
-
 	if Necrosis.IsSpellKnown("soulstone") then
 		local str = ""
 		-- R click to create; will cause an error if one is in bags
@@ -29,9 +28,9 @@ local function SetSSAttribs(nostone, reason)
 		-- L click or Middle click to use; will not cause error if a stone not in bag
 		f:SetAttribute("type1", "item")
 		f:SetAttribute("type3", "item")
---		f:SetAttribute("unit", "target") -- forces player to target self first
-		f:SetAttribute("item1", NecrosisConfig.ItemSwitchCombat[4])
-		f:SetAttribute("item3", NecrosisConfig.ItemSwitchCombat[4])
+		-- f:SetAttribute("unit", "target") -- forces player to target self first
+		f:SetAttribute("item1", BagHelper.Soulstone_Name)
+		f:SetAttribute("item3", BagHelper.Soulstone_Name)
 
 --		if nostone then 
 --		else	
@@ -178,12 +177,12 @@ local r_click = 2
 ------------------------------------------------------------------------------------------------------
 
 -- On associe les malédictions au clic sur le bouton concerné
-function Necrosis:SetBuffSpellAttribute(button)
+function Necrosis:SetBuffSpellAttribute(frameWrapper)
 	if InCombatLockdown() then
 		return
 	end
 
-	local f = _G[button]
+	local f = _G[frameWrapper.f]
 	if f then
 		if Necrosis.Debug.buttons then
 			_G["DEFAULT_CHAT_FRAME"]:AddMessage("SetBuffSpellAttribute"
@@ -192,12 +191,12 @@ function Necrosis:SetBuffSpellAttribute(button)
 			.." c'"..tostring(Necrosis.GetSpellCastName(f.high_of) or "nyl").."'"
 			)
 		end
-		if f.high_of == 'banish' then
+		if (f.high_of == "banish") then
 			local spellName = Necrosis.GetSpellCastName(f.high_of)
 			-- Do NOT like hard coding but leave for now...
 			-- local Rank1 = self.Warlock_Spells[710].InSpellBook and self.Warlock_Spells[710].CastName
 			-- if Necrosis.Warlock_Spells[Necrosis.Warlock_Spell_Use[f.high_of]].SpellRank == 2 then -- has rank 2
-			if Necrosis.GetSpellRank(f.high_of) == 2 then -- has rank 2
+			if (Necrosis.GetSpellRank(f.high_of) == 2) then -- has rank 2
 				-- local Rank2 = self.Warlock_Spells[18647].InSpellBook and self.Warlock_Spells[18647].CastName
 				-- so lets use the "harmbutton" special attribute!
 				-- assign Banish(rank 2) to LEFT click 
@@ -228,11 +227,10 @@ function Necrosis:SetBuffSpellAttribute(button)
 		else
 			f:SetAttribute("type", "spell")
 			f:SetAttribute("spell", Necrosis.GetSpellCastName(f.high_of))
-			
-			if f.can_target then
-				f:SetAttribute("unit", "target")
-			else
-			end
+			-- if frameWrapper.can_target then
+			-- 	print("Set target: "..f.high_of)
+			-- 	f:SetAttribute("unit", "target")
+			-- end
 		end
 	end
 end
@@ -245,11 +243,11 @@ function Necrosis:BuffSpellAttribute()
 
 	for index = 1, #Necrosis.Warlock_Lists.buffs, 1 do
 		local v = Necrosis.Warlock_Lists.buffs[index]
-		local f = Necrosis.Warlock_Buttons[v.f_ptr].f
+		local frameWrapper = Necrosis.Warlock_Buttons[v.f_ptr]
 		if Necrosis.IsSpellKnown(v.high_of) -- in spell book
 --		and NecrosisConfig.BuffSpellPosition[index] > 0 -- and requested
 		then
-			Necrosis:SetBuffSpellAttribute(f)
+			Necrosis:SetBuffSpellAttribute(frameWrapper)
 		end
 	end
 end
@@ -532,26 +530,26 @@ function Necrosis:NoCombatAttribute(SoulstoneMode, FirestoneMode, SpellstoneMode
 
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("NoCombatAttribute"
-		.." sps'"..(tostring(NecrosisConfig.ItemSwitchCombat[1]) or "nyl")..'"'
-		.." fs'"..(tostring(NecrosisConfig.ItemSwitchCombat[2]) or "nyl")..'"'
-		.." hs'"..(tostring(NecrosisConfig.ItemSwitchCombat[3]) or "nyl")..'"'
-		.." ss'"..(tostring(NecrosisConfig.ItemSwitchCombat[4]) or "nyl")..'"'
+		.." sps'"..(tostring(BagHelper.Spellstone_Name) or "nyl")..'"'
+		.." fs'"..(tostring(BagHelper.Firestone_Name) or "nyl")..'"'
+		.." hs'"..(tostring(BagHelper.Healthstone_Name) or "nyl")..'"'
+		.." ss'"..(tostring(BagHelper.Soulstone_Name) or "nyl")..'"'
 		)
 	end
 
 	-- Si on connait l'emplacement de la pierre de sort,
 	-- Alors cliquer sur le bouton de pierre de sort l'équipe.
 	local f = _G[Necrosis.Warlock_Buttons.spell_stone.f]
-	if NecrosisConfig.ItemSwitchCombat[1] and f then
+	if BagHelper.Spellstone_Name and f then
 		f:SetAttribute("type1", "macro")
-		f:SetAttribute("macrotext*","/cast "..NecrosisConfig.ItemSwitchCombat[1].."\n/use 16")
+		f:SetAttribute("macrotext*","/cast "..BagHelper.Spellstone_Name.."\n/use 16")
 	end
 	-- Si on connait l'emplacement de la pierre de feu,
 	-- Alors cliquer sur le bouton de pierre de feu l'équipe.
 	local f = _G[Necrosis.Warlock_Buttons.fire_stone.f]
-	if NecrosisConfig.ItemSwitchCombat[2] and f then
+	if BagHelper.Firestone_Name and f then
 		f:SetAttribute("type1", "macro")
-		f:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[2].."\n/use 16")
+		f:SetAttribute("macrotext*", "/cast "..BagHelper.Firestone_Name.."\n/use 16")
 	end
 end
 
@@ -592,10 +590,10 @@ function Necrosis:InCombatAttribute(Pet, Buff, Curse)
 
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("InCombatAttribute"
-		.." sps'"..(tostring(NecrosisConfig.ItemSwitchCombat[1]) or "nyl")..'"'
-		.." fs'"..(tostring(NecrosisConfig.ItemSwitchCombat[2]) or "nyl")..'"'
-		.." hs'"..(tostring(NecrosisConfig.ItemSwitchCombat[3]) or "nyl")..'"'
-		.." ss'"..(tostring(NecrosisConfig.ItemSwitchCombat[4]) or "nyl")..'"'
+		.." sps'"..(tostring(BagHelper.Spellstone_Name) or "nyl")..'"'
+		.." fs'"..(tostring(BagHelper.Firestone_Name) or "nyl")..'"'
+		.." hs'"..(tostring(BagHelper.Healthstone_Name) or "nyl")..'"'
+		.." ss'"..(tostring(BagHelper.Soulstone_Name) or "nyl")..'"'
 		)
 	end
 
@@ -603,27 +601,27 @@ function Necrosis:InCombatAttribute(Pet, Buff, Curse)
 	-- Alors le clic gauche utiliser la pierre
 	local f = Necrosis.Warlock_Buttons.spell_stone.f
 	f = _G[f]
-	if NecrosisConfig.ItemSwitchCombat[1] and f then
+	if BagHelper.Spellstone_Name and f then
 		f:SetAttribute("type1", "macro")
-		f:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[1].."\n/use 16")
+		f:SetAttribute("macrotext*", "/cast "..BagHelper.Spellstone_Name.."\n/use 16")
 	end
 
 	-- Si on connait le nom de la pierre de feu,
 	-- Alors le clic sur le bouton équipera la pierre
 	local f = Necrosis.Warlock_Buttons.fire_stone.f
 	f = _G[f]
-	if NecrosisConfig.ItemSwitchCombat[2] and f then
+	if BagHelper.Firestone_Name and f then
 		f:SetAttribute("type1", "macro")
-		f:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[2].."\n/use 16")
+		f:SetAttribute("macrotext*", "/cast "..BagHelper.Firestone_Name.."\n/use 16")
 	end
 
 	-- Si on connait le nom de la pierre de soin,
 	-- Alors le clic gauche sur le bouton utilisera la pierre
 	local f = Necrosis.Warlock_Buttons.health_stone.f
 	f = _G[f]
-	if NecrosisConfig.ItemSwitchCombat[3] and f then
+	if BagHelper.Healthstone_Name and f then
 		f:SetAttribute("type1", "macro")
-		f:SetAttribute("macrotext1", "/stopcasting \n/use "..NecrosisConfig.ItemSwitchCombat[3])
+		f:SetAttribute("macrotext1", "/stopcasting \n/use "..BagHelper.Healthstone_Name)
 	end
 --[[
 	-- If we know the name of the soul stone,
@@ -653,7 +651,7 @@ function Necrosis:SoulstoneUpdateAttribute(nostone)
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("SoulstoneUpdateAttribute"
 		.." a'"..(tostring(nostone) or "nyl")..'"'
-		.." s'"..(tostring(NecrosisConfig.ItemSwitchCombat[4]))..'"'
+		.." s'"..(tostring(BagHelper.Soulstone_Name))..'"'
 		.." f'"..(tostring(Necrosis.Warlock_Buttons.soul_stone.f))..'"'
 		.." '"..(str)..'"'
 		)
@@ -665,7 +663,6 @@ end
 function Necrosis:HealthstoneUpdateAttribute(nostone)
 	local f = Necrosis.Warlock_Buttons.health_stone.f
 	f = _G[f]
-
 	-- Si le démoniste est en combat, on ne fait rien :)
 	if InCombatLockdown() or not f then
 		return
@@ -674,7 +671,7 @@ function Necrosis:HealthstoneUpdateAttribute(nostone)
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("HealthstoneUpdateAttribute"
 		.." a'"..(tostring(nostone) or "nyl")..'"'
-		.." s'"..(NecrosisConfig.ItemSwitchCombat[3] or "nyl")..'"'
+		.." s'"..(BagHelper.Healthstone_Name or "nyl")..'"'
 		)
 	end
 
@@ -687,7 +684,7 @@ function Necrosis:HealthstoneUpdateAttribute(nostone)
 	end
 
 	f:SetAttribute("type1", "macro")
-	f:SetAttribute("macrotext1", "/stopcasting \n/use "..NecrosisConfig.ItemSwitchCombat[3])
+	f:SetAttribute("macrotext1", "/stopcasting \n/use "..BagHelper.Healthstone_Name)
 	f:SetAttribute("type3", "Trade")
 	f:SetAttribute("ctrl-type1", "Trade")
 	f.Trade = function () self:TradeStone() end
@@ -705,7 +702,7 @@ function Necrosis:SpellstoneUpdateAttribute(nostone)
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("SpellstoneUpdateAttribute"
 		.." a'"..(tostring(nostone) or "nyl")..'"'
-		.." s'"..(NecrosisConfig.ItemSwitchCombat[1] or "nyl")..'"'
+		.." s'"..(BagHelper.Spellstone_Name or "nyl")..'"'
 		)
 	end
 
@@ -718,7 +715,7 @@ function Necrosis:SpellstoneUpdateAttribute(nostone)
 	end
 
 	f:SetAttribute("type1", "item")
-	f:SetAttribute("item1", NecrosisConfig.ItemSwitchCombat[1])
+	f:SetAttribute("item1", BagHelper.Spellstone_Name)
 --	f:SetAttribute("type1", "macro")
 --	f:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[1].."\n/use 16")
 end
@@ -735,7 +732,7 @@ function Necrosis:FirestoneUpdateAttribute(nostone)
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("FirestoneUpdateAttribute"
 		.." a'"..(tostring(nostone) or "nyl")..'"'
-		.." s'"..(NecrosisConfig.ItemSwitchCombat[2] or "nyl")..'"'
+		.." s'"..(BagHelper.Firestone_Name or "nyl")..'"'
 		)
 	end
 
@@ -748,7 +745,7 @@ function Necrosis:FirestoneUpdateAttribute(nostone)
 	end
 
 	f:SetAttribute("type1", "item")
-	f:SetAttribute("item1", NecrosisConfig.ItemSwitchCombat[2])
+	f:SetAttribute("item1", BagHelper.Firestone_Name)
 --	f:SetAttribute("type1", "macro")
 --	f:SetAttribute("macrotext*", "/cast "..NecrosisConfig.ItemSwitchCombat[2].."\n/use 16")
 end

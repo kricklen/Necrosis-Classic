@@ -191,7 +191,7 @@ Local.DefaultConfig = {
 	PetName = {},
 	DemonSummon = true,
 	BanishScale = 100,
-	ItemSwitchCombat = {},
+	-- ItemSwitchCombat = {},
 	DestroyCount = 6,
 	FramePosition = {
 		["NecrosisSpellTimerButton"] = {"CENTER", "UIParent", "CENTER", 100, 300},
@@ -668,15 +668,20 @@ end
 -- Manage the appearing and disappearing effects on the warlock || Permet de gérer les effets apparaissants et disparaissants sur le démoniste
 -- Based on CombatLog || Basé sur le CombatLog
 local function SelfEffect(action, nom)
+	local felsteedName   = Necrosis.Spell[1].Name
+	local dreadsteedName = Necrosis.Spell[2].Name
+
 	if NecrosisConfig.LeftMount then
 		local NomCheval1 = GetSpellInfo(NecrosisConfig.LeftMount)
 	else
-		local NomCheval1 = Necrosis.Warlock_Spells[23161].Name
+		local NomCheval1 = dreadsteedName
+		-- local NomCheval1 = Necrosis.Warlock_Spells[23161].Name
 	end
 	if NecrosisConfig.RightMount then
 		local NomCheval2 = GetSpellInfo(NecrosisConfig.RightMount)
 	else
-		local NomCheval2 = Necrosis.Warlock_Spells[5784].Name
+		local NomCheval2 = felsteedName
+		-- local NomCheval2 = Necrosis.Warlock_Spells[5784].Name
 	end
 
 	local f = _G[Necrosis.Warlock_Buttons.mounts.f]
@@ -684,7 +689,8 @@ local function SelfEffect(action, nom)
 		local fs = _G[Necrosis.Warlock_Buttons.trance.f]
 		local fb = _G[Necrosis.Warlock_Buttons.backlash.f]
 		-- Changing the mount button when the Warlock is disassembled || Changement du bouton de monture quand le Démoniste est démonté
-		if nom == Necrosis.Warlock_Spells[5784].Name or  nom == Necrosis.Warlock_Spells[23161].Name or nom == "NomCheval1" or nom == "NomCheval2" then
+		if nom == felsteedName or nom == dreadsteedName or nom == "NomCheval1" or nom == "NomCheval2" then
+		-- if nom == Necrosis.Warlock_Spells[5784].Name or  nom == Necrosis.Warlock_Spells[23161].Name or nom == "NomCheval1" or nom == "NomCheval2" then
 			Local.BuffActif.Mount = true
 			if f then
 				f:SetNormalTexture(Necrosis.Warlock_Buttons.mounts.high)
@@ -725,7 +731,8 @@ local function SelfEffect(action, nom)
 		end
 	else
 		-- Changing the mount button when the Warlock is disassembled || Changement du bouton de monture quand le Démoniste est démonté
-		if nom == Necrosis.Warlock_Spells[5784].Name or  nom == Necrosis.Warlock_Spells[23161].Name or nom == "NomCheval1" or nom == "NomCheval2" then
+		if nom == felsteedName or nom == dreadsteedName or nom == "NomCheval1" or nom == "NomCheval2" then
+		-- if nom == Necrosis.Warlock_Spells[5784].Name or  nom == Necrosis.Warlock_Spells[23161].Name or nom == "NomCheval1" or nom == "NomCheval2" then
 			Local.BuffActif.Mount = false
 			if f then
 				f:SetNormalTexture(Necrosis.Warlock_Buttons.mounts.norm)
@@ -774,7 +781,7 @@ end
 -- Also change the name of the pet to the replacement of it || Change également le nom du pet au remplacement de celui-ci
 local function ChangeDemon()
 	-- If the new demon is a slave demon, we put a 5 minute timer || Si le nouveau démon est un démon asservi, on place un timer de 5 minutes
-	if (UnitHasEffect("pet", self.Spell[10].Name)) then
+	if (UnitHasEffect("pet", Necrosis.Spell[10].Name)) then
 		if (not Necrosis.CurrentEnv.DemonEnslaved) then
 			Necrosis.CurrentEnv.DemonEnslaved = true
 		end
@@ -783,8 +790,8 @@ local function ChangeDemon()
 		if (Necrosis.CurrentEnv.DemonEnslaved) then
 			Necrosis.CurrentEnv.DemonEnslaved = false
 			
-			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.EnslaveEnd) end
-			self.Chat:_Msg(self.ChatMessage.Information.EnslaveBreak, "USER")
+			if NecrosisConfig.Sound then PlaySoundFile(Necrosis.Sound.EnslaveEnd) end
+			Necrosis.Chat:_Msg(Necrosis.ChatMessage.Information.EnslaveBreak, "USER")
 		end
 	end
 
@@ -796,14 +803,14 @@ local function ChangeDemon()
 		NecrosisConfig.PetName[Necrosis.CurrentEnv.DemonType] = UnitName("pet")
 	end
 
-	for i = 1, #self.Translation.DemonName, 1 do
-		if Necrosis.CurrentEnv.DemonType == self.Translation.DemonName[i] and not (NecrosisConfig.PetName[i] or (UnitName("pet") == UNKNOWNOBJECT)) then
+	for i = 1, #Necrosis.Translation.DemonName, 1 do
+		if Necrosis.CurrentEnv.DemonType == Necrosis.Translation.DemonName[i] and not (NecrosisConfig.PetName[i] or (UnitName("pet") == UNKNOWNOBJECT)) then
 			NecrosisConfig.PetName[i] = UnitName("pet")
 			--self:Localization()
 			break
 		end
 	end
-	self:UpdateMana()
+	Necrosis:UpdateMana()
 
 	return
 end
@@ -919,7 +926,6 @@ end
 
 -- Function started according to the intercepted event || Fonction lancée selon l'événement intercepté
 function Necrosis.OnEvent(self, event, ...)
-
 	local arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9 = ...
 
 	if (event == "PLAYER_ENTERING_WORLD") then
@@ -1137,7 +1143,7 @@ function Necrosis.OnEvent(self, event, ...)
 
 	-- When the warlock changes demon || Quand le démoniste change de démon
 	elseif (event == "UNIT_PET" and arg1 == "player") then
-		Necrosis:ChangeDemon()
+		ChangeDemon()
 
 	-- Reading the combat log || Lecture du journal de combat
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
@@ -1554,14 +1560,15 @@ local function AddCastAndCost(usage)
 	ManaLocalize(Necrosis.GetSpellMana(usage)) 
 end
 local function AddShard()
-	if Local.Soulshard.Count == 0 then
-		GameTooltip:AddLine("|c00FF4444"..Necrosis.TooltipData.Main.Soulshard..Local.Soulshard.Count.."|r")
+	if BagHelper.Soulshard_Count == 0 then
+		GameTooltip:AddLine("|c00FF4444"..Necrosis.TooltipData.Main.Soulshard..BagHelper.Soulshard_Count.."|r")
 	else
-		GameTooltip:AddLine(Necrosis.TooltipData.Main.Soulshard..Local.Soulshard.Count)
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.Soulshard..BagHelper.Soulshard_Count)
 	end
 end
-local function AddDominion(start, duration)
-	if not (start and duration > 0) then
+local function AddDominion()
+	local start,  duration  = Necrosis.Spells:GetFelDominationCooldown()
+	if not (start and duration) then
 		GameTooltip:AddLine(Necrosis.TooltipData.DominationCooldown)
 	end
 end
@@ -1573,17 +1580,17 @@ local function AddMenuTip(Type)
 	end
 end
 local function AddInfernalReagent()
-	if Local.Reagent.Infernal == 0 then
-		GameTooltip:AddLine("|c00FF4444"..Necrosis.TooltipData.Main.InfernalStone..Local.Reagent.Infernal.."|r")
+	if BagHelper.InfernalStone_Count == 0 then
+		GameTooltip:AddLine("|c00FF4444"..Necrosis.TooltipData.Main.InfernalStone..BagHelper.InfernalStone_Count.."|r")
 	else
-		GameTooltip:AddLine(Necrosis.TooltipData.Main.InfernalStone..Local.Reagent.Infernal)
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.InfernalStone..BagHelper.InfernalStone_Count)
 	end
 end
 local function AddDemoniacReagent()
-	if Local.Reagent.Demoniac == 0 then
-		GameTooltip:AddLine("|c00FF4444"..Necrosis.TooltipData.Main.DemoniacStone..Local.Reagent.Demoniac.."|r")
+	if BagHelper.DemonicFigure_Count == 0 then
+		GameTooltip:AddLine("|c00FF4444"..Necrosis.TooltipData.Main.DemoniacStone..BagHelper.DemonicFigure_Count.."|r")
 	else
-		GameTooltip:AddLine(Necrosis.TooltipData.Main.DemoniacStone..Local.Reagent.Demoniac)
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.DemoniacStone..BagHelper.DemonicFigure_Count)
 	end
 end
 
@@ -1639,25 +1646,25 @@ function Necrosis:BuildButtonTooltip(button)
 
 	-- local start,  duration  = Necrosis.Utils.GetSpellCooldown("domination", "spell")
 	-- local start2, duration2  = Necrosis.Utils.GetSpellCooldown("ward", "spell")
-	local start,  duration  = Necrosis.Spells:GetFelDominationCooldown()
-	local start2, duration2 = Necrosis.Spells:GetShadowWardCooldown()
+	-- local start,  duration  = Necrosis.Spells:GetFelDominationCooldown()
+	-- local start2, duration2 = Necrosis.Spells:GetShadowWardCooldown()
 
 	-- Creating help bubbles .... ||Création des bulles d'aides....
 	GameTooltip:SetOwner(button, anchor)
 	GameTooltip:SetText(Necrosis.TooltipData[Type].Label)
 	-- ..... for the main button ||..... pour le bouton principal
 	if (Type == "Main") then
-		GameTooltip:AddLine(Necrosis.TooltipData.Main.Soulshard..Local.Soulshard.Count)
-		GameTooltip:AddLine(Necrosis.TooltipData.Main.InfernalStone..Local.Reagent.Infernal)
-		GameTooltip:AddLine(Necrosis.TooltipData.Main.DemoniacStone..Local.Reagent.Demoniac)
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.Soulshard..BagHelper.Soulshard_Count)
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.InfernalStone..BagHelper.InfernalStone_Count)
+		GameTooltip:AddLine(Necrosis.TooltipData.Main.DemoniacStone..BagHelper.DemonicFigure_Count)
 		local SoulOnHand = false
 		local HealthOnHand = false
 		local SpellOnHand = false
 		local FireOnHand = false
-		if Local.Stone.Soul.OnHand then SoulOnHand = true end
-		if Local.Stone.Health.OnHand then HealthOnHand = true end
-		if Local.Stone.Spell.OnHand then SpellOnHand = true end
-		if Local.Stone.Fire.OnHand then FireOnHand = true end
+		if BagHelper.Soulstone_IsAvailable then SoulOnHand = true end
+		if BagHelper.Healthstone_IsAvailable then HealthOnHand = true end
+		if BagHelper.Spellstone_IsAvailable then SpellOnHand = true end
+		if BagHelper.Firestone_IsAvailable then FireOnHand = true end
 		GameTooltip:AddLine(Necrosis.TooltipData.Main.Soulstone..Necrosis.TooltipData[Type].Stone[SoulOnHand])
 		GameTooltip:AddLine(Necrosis.TooltipData.Main.Healthstone..Necrosis.TooltipData[Type].Stone[HealthOnHand])
 		GameTooltip:AddLine(Necrosis.TooltipData.Main.Spellstone..Necrosis.TooltipData[Type].Stone[SpellOnHand])
@@ -1703,7 +1710,7 @@ function Necrosis:BuildButtonTooltip(button)
 			
 			-- R click - create
 			str = Necrosis.TooltipData[Type].Text[1]
-			if Local.Stone.Soul.OnHand then
+			if BagHelper.Soulstone_IsAvailable then
 				str = color..str.."|r" -- already have one
 			else
 			end
@@ -1750,7 +1757,7 @@ function Necrosis:BuildButtonTooltip(button)
 							GameTooltip:AddLine(itemName)
 						end
 			--]]
-			if  Local.Soulshard.Count > 0 then
+			if  BagHelper.Soulshard_Count > 0 then
 				GameTooltip:AddLine(Necrosis.TooltipData[Type].Ritual)
 			end
 		-- Stone of spell ||Pierre de sort
@@ -1789,7 +1796,8 @@ function Necrosis:BuildButtonTooltip(button)
 		GameTooltip:SetText(Necrosis.TooltipData[Type].Label.."          |CFF808080"..Necrosis.GetSpellCastName("bolt").."|r")
 	-- ..... for other buffs and demons, the mana cost ... ||..... pour les autres buffs et démons, le coût en mana...
 	elseif (Type == "Enslave") then AddCastAndCost("enslave"); AddShard()
-	elseif (Type == "Mount") and Necrosis.Warlock_Spells[23161].InSpellBook then
+	-- elseif (Type == "Mount") and Necrosis.Warlock_Spells[23161].InSpellBook then
+	elseif (Type == "Mount") and Necrosis.CurrentEnv.DreadsteedAvailable then
 		if (NecrosisConfig.LeftMount) then
 			local leftMountName = GetSpellInfo(NecrosisConfig.LeftMount);
 			GameTooltip:AddLine(leftMountName);
@@ -1822,34 +1830,38 @@ function Necrosis:BuildButtonTooltip(button)
 	elseif (Type == "TP")			then AddCastAndCost("summoning"); AddShard()
 	elseif (Type == "SoulLink")		then AddCastAndCost("link")
 	elseif (Type == "ShadowProtection") then AddCastAndCost("ward")
-		if start2 and duration2 > 0 then
-			local seconde = duration2 - ( GetTime() - start2)
-			local affiche
-			affiche = tostring(floor(seconde)).." sec"
-			GameTooltip:AddLine("Cooldown : "..affiche)
+		local start2, duration2 = Necrosis.Spells:GetShadowWardCooldown()
+		if start2 and duration2 then
+			-- local seconde = duration2 - ( GetTime() - start2)
+			-- local affiche
+			-- affiche = tostring(floor(seconde)).." sec"
+			-- GameTooltip:AddLine("Cooldown : "..affiche)
+			GameTooltip:AddLine("Cooldown : "..duration2)
 		end
 	elseif (Type == "Domination") then
-		if start and duration > 0 then
-			local seconde = duration - ( GetTime() - start)
-			local affiche, minute, time
-			if seconde <= 59 then
-				affiche = tostring(floor(seconde)).." sec"
-			else
-				minute = tostring(floor(seconde/60))
-				seconde = mod(seconde, 60)
-				if seconde <= 9 then
-					time = "0"..tostring(floor(seconde))
-				else
-					time = tostring(floor(seconde))
-				end
-				affiche = minute..":"..time
-			end
-			GameTooltip:AddLine("Cooldown : "..affiche)
+		local start,  duration  = Necrosis.Spells:GetFelDominationCooldown()
+		if start and duration then
+			-- local seconde = duration - ( GetTime() - start)
+			-- local affiche, minute, time
+			-- if seconde <= 59 then
+			-- 	affiche = tostring(floor(seconde)).." sec"
+			-- else
+			-- 	minute = tostring(floor(seconde/60))
+			-- 	seconde = mod(seconde, 60)
+			-- 	if seconde <= 9 then
+			-- 		time = "0"..tostring(floor(seconde))
+			-- 	else
+			-- 		time = tostring(floor(seconde))
+			-- 	end
+			-- 	affiche = minute..":"..time
+			-- end
+			-- GameTooltip:AddLine("Cooldown : "..affiche)
+			GameTooltip:AddLine("Cooldown : "..duration)
 		end
-	elseif (Type == "Imp")			then AddCastAndCost("imp"); AddDominion(start, duration)
-	elseif (Type == "Voidwalker")	then AddCastAndCost("voidwalker"); AddShard(); AddDominion(start, duration)
-	elseif (Type == "Succubus")		then AddCastAndCost("succubus"); AddShard(); AddDominion(start, duration)
-	elseif (Type == "Felhunter")	then AddCastAndCost("felhunter"); AddShard(); AddDominion(start, duration)
+	elseif (Type == "Imp")			then AddCastAndCost("imp"); AddDominion()--start, duration)
+	elseif (Type == "Voidwalker")	then AddCastAndCost("voidwalker"); AddShard(); AddDominion()--start, duration)
+	elseif (Type == "Succubus")		then AddCastAndCost("succubus"); AddShard(); AddDominion()--start, duration)
+	elseif (Type == "Felhunter")	then AddCastAndCost("felhunter"); AddShard(); AddDominion()--start, duration)
 	elseif (Type == "Infernal")		then AddCastAndCost("inferno"); AddInfernalReagent()
 	elseif (Type == "Doomguard")	then AddCastAndCost("ritual_doom"); AddDemoniacReagent()
 	elseif (Type == "BuffMenu")		then AddMenuTip(Type)
@@ -1978,15 +1990,15 @@ function Necrosis:UpdateMana()
 		end
 	end
 	-- Coloring of the button in gray if no stone for the invocation || Coloration du bouton en grisé si pas de pierre pour l'invocation
-	if Local.Soulshard.Count == 0 then
+	if BagHelper.Soulshard_Count == 0 then
 		for i = 2, 5, 1 do
 			ManaPet[i] = false
 		end
 	end
-	if Local.Reagent.Infernal == 0 then
+	if BagHelper.InfernalStone_Count == 0 then
 		ManaPet[6] = false
 	end
-	if Local.Reagent.Demoniac == 0 then
+	if BagHelper.DemonicFigure_Count == 0 then
 		ManaPet[7] = false
 	end
 
@@ -2032,7 +2044,7 @@ function Necrosis:UpdateMana()
 	if mana then
 	-- Coloring the button in gray if not enough mana || Coloration du bouton en grisé si pas assez de mana
 		if self.Spell[35].ID then
-			if self.Spell[35].Mana > mana or Local.Soulshard.Count == 0 then
+			if self.Spell[35].Mana > mana or BagHelper.Soulshard_Count == 0 then
 				if not Local.Desatured["Enslave"] then
 					if _G["NecrosisPetMenu9"] then
 						NecrosisPetMenu9:GetNormalTexture():SetDesaturated(1)
@@ -2188,15 +2200,15 @@ function Necrosis:BagExplore(containerId)
 
 	BagHelper:GetStoneCounts()
 
-	Local.Soulshard.Count     = BagHelper.Soulshard_Count
-	Local.Reagent.Infernal    = BagHelper.InfernalStone_Count
-	Local.Reagent.Demoniac    = BagHelper.DemonicFigure_Count
-	Local.Stone.Soul.OnHand   = BagHelper.Soulstone_IsAvailable
-	Local.Stone.Health.OnHand = BagHelper.Healthstone_IsAvailable
-	Local.Stone.Spell.OnHand  = BagHelper.Spellstone_IsAvailable
-	Local.Stone.Fire.OnHand   = BagHelper.Firestone_IsAvailable
+	-- Local.Soulshard.Count     = BagHelper.Soulshard_Count
+	-- Local.Reagent.Infernal    = BagHelper.InfernalStone_Count
+	-- Local.Reagent.Demoniac    = BagHelper.DemonicFigure_Count
+	-- Local.Stone.Soul.OnHand   = BagHelper.Soulstone_IsAvailable
+	-- Local.Stone.Health.OnHand = BagHelper.Healthstone_IsAvailable
+	-- Local.Stone.Spell.OnHand  = BagHelper.Spellstone_IsAvailable
+	-- Local.Stone.Fire.OnHand   = BagHelper.Firestone_IsAvailable
 
-	local AncienCompte = Local.Soulshard.Count
+	local AncienCompte = BagHelper.Soulshard_Count
 
 	-- Destroy extra shards (if enabled) || Si il y a un nombre maximum de fragments à conserver, on enlève les supplémentaires
 	if NecrosisConfig.DestroyShard
@@ -2204,14 +2216,14 @@ function Necrosis:BagExplore(containerId)
 		and NecrosisConfig.DestroyCount > 0
 		then
 			BagHelper:DestroyShards(math.floor(NecrosisConfig.DestroyCount))
-			Local.Soulshard.Count = BagHelper.Soulshard_Count
+			-- Local.Soulshard.Count = BagHelper.Soulshard_Count
 	end
 
 	-- Updtae the main (sphere) button display || Affichage du bouton principal de Necrosis
 	if NecrosisConfig.Circle == "Soulshards" then
-		if (Local.Soulshard.Count <= 32) then
-			if not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor.."\\Shard"..Local.Soulshard.Count) then
-				Local.LastSphereSkin = NecrosisConfig.NecrosisColor.."\\Shard"..Local.Soulshard.Count
+		if (BagHelper.Soulshard_Count <= 32) then
+			if not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor.."\\Shard"..BagHelper.Soulshard_Count) then
+				Local.LastSphereSkin = NecrosisConfig.NecrosisColor.."\\Shard"..BagHelper.Soulshard_Count
 				NecrosisButton:SetNormalTexture(GraphicsHelper:GetTexture(Local.LastSphereSkin))
 			end
 		elseif not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor.."\\Shard32") then
@@ -2220,9 +2232,9 @@ function Necrosis:BagExplore(containerId)
 		end
 	elseif NecrosisConfig.Circle == "RezTimer" and (Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 2) then
 
-		if (Local.Soulshard.Count <= 32) then
-			if not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor:gsub("Turquoise", "Bleu"):gsub("Rose", "Bleu"):gsub("Orange", "Bleu").."\\Shard"..Local.Soulshard.Count) then
-				Local.LastSphereSkin = NecrosisConfig.NecrosisColor:gsub("Turquoise", "Bleu"):gsub("Rose", "Bleu"):gsub("Orange", "Bleu").."\\Shard"..Local.Soulshard.Count
+		if (BagHelper.Soulshard_Count <= 32) then
+			if not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor:gsub("Turquoise", "Bleu"):gsub("Rose", "Bleu"):gsub("Orange", "Bleu").."\\Shard"..BagHelper.Soulshard_Count) then
+				Local.LastSphereSkin = NecrosisConfig.NecrosisColor:gsub("Turquoise", "Bleu"):gsub("Rose", "Bleu"):gsub("Orange", "Bleu").."\\Shard"..BagHelper.Soulshard_Count
 				NecrosisButton:SetNormalTexture(GraphicsHelper:GetTexture(Local.LastSphereSkin))
 			end
 		elseif not (Local.LastSphereSkin == NecrosisConfig.NecrosisColor:gsub("Turquoise", "Bleu"):gsub("Rose", "Bleu"):gsub("Orange", "Bleu").."\\Shard32") then
@@ -2233,12 +2245,12 @@ function Necrosis:BagExplore(containerId)
 
 	if NecrosisConfig.ShowCount then
 		if NecrosisConfig.CountType == "DemonStones" then
-			NecrosisShardCount:SetText(Local.Reagent.Infernal.." / "..Local.Reagent.Demoniac)
+			NecrosisShardCount:SetText(BagHelper.InfernalStone_Count.." / "..BagHelper.DemonicFigure_Count)
 		elseif NecrosisConfig.CountType == "Soulshards" then
-			if Local.Soulshard.Count < 10 then
-				NecrosisShardCount:SetText("0"..Local.Soulshard.Count)
+			if BagHelper.Soulshard_Count < 10 then
+				NecrosisShardCount:SetText("0"..BagHelper.Soulshard_Count)
 			else
-				NecrosisShardCount:SetText(Local.Soulshard.Count)
+				NecrosisShardCount:SetText(BagHelper.Soulshard_Count)
 			end
 		end
 	else
@@ -2256,7 +2268,7 @@ function Necrosis:BagExplore(containerId)
 				CompteMax = CompteMax + bag.capacity
 			end
 		end
-		if Local.Soulshard.Count > AncienCompte and Local.Soulshard.Count == CompteMax then
+		if BagHelper.Soulshard_Count > AncienCompte and BagHelper.Soulshard_Count == CompteMax then
 			if (NecrosisConfig.SoulshardDestroy) then
 				self.Chat:_Msg(self.ChatMessage.Bag.FullPrefix..GetBagName(NecrosisConfig.SoulshardContainer)..self.ChatMessage.Bag.FullDestroySuffix)
 			else
@@ -2316,11 +2328,11 @@ function Necrosis:FindSlot(shardIndex, shardSlot)
 	-- Destory extra shards if the option is enabled || Destruction des fragments en sur-nombre si l'option est activée
 	if (full and NecrosisConfig.SoulshardDestroy) then
 
-		if (math.floor(NecrosisConfig.DestroyCount) < Local.Soulshard.Count) then
+		if (math.floor(NecrosisConfig.DestroyCount) < BagHelper.Soulshard_Count) then
 			PickupContainerItem(shardIndex, shardSlot)
 			if (CursorHasItem()) then
 				DeleteCursorItem()
-				Local.Soulshard.Count = GetItemCount(6265)
+				BagHelper.Soulshard_Count = GetItemCount(6265)
 			end
 		end
 	end
