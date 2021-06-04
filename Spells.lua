@@ -951,178 +951,178 @@ This allows a more flexible scheme and should reduce maintenance and impact if W
 --]]
 Necrosis.Warlock_Buttons = {
 	timer 		= {f = "NecrosisSpellTimerButton", tip = "SpellTimer", menu = "Timer", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\SpellTimerButton-Normal",
-					high = "Interface\\AddOns\\Necrosis\\UI\\SpellTimerButton-Highlight",
-					push = "Interface\\AddOns\\Necrosis\\UI\\SpellTimerButton-Pushed",
+					norm = GraphicsHelper:GetTexture("SpellTimerButton-Normal"),
+					high = GraphicsHelper:GetTexture("SpellTimerButton-Highlight"),
+					push = GraphicsHelper:GetTexture("SpellTimerButton-Pushed"),
 					}, --
 	main 		= {f = "NecrosisButton", tip = "Main", anchor = "ANCHOR_LEFT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Shard",
+					norm = GraphicsHelper:GetTexture("Shard"),
 					}, --
 
 	fire_stone 	= {f = "NecrosisFirestoneButton", tip = "Firestone", anchor = "ANCHOR_LEFT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\FirestoneButton-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\FirestoneButton-03",
+					norm = GraphicsHelper:GetTexture("FirestoneButton-01"),
+					high = GraphicsHelper:GetTexture("FirestoneButton-03"),
 					}, --
 	spell_stone = {f = "NecrosisSpellstoneButton", tip = "Spellstone", anchor = "ANCHOR_LEFT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\SpellstoneButton-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\SpellstoneButton-03",
+					norm = GraphicsHelper:GetTexture("SpellstoneButton-01"),
+					high = GraphicsHelper:GetTexture("SpellstoneButton-03"),
 					}, --
 	health_stone= {f = "NecrosisHealthstoneButton", tip = "Healthstone", anchor = "ANCHOR_LEFT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\HealthstoneButton-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\HealthstoneButton-03",
+					norm = GraphicsHelper:GetTexture("HealthstoneButton-01"),
+					high = GraphicsHelper:GetTexture("HealthstoneButton-03"),
 					}, --
 	hearth_stone= {f = "NecrosisHearthstoneButton", tip = "Hearthstone", anchor = "ANCHOR_LEFT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\INV_Misc_Rune_01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\INV_Misc_Rune_01",
+					norm = GraphicsHelper:GetTexture("INV_Misc_Rune_01"),
+					high = GraphicsHelper:GetTexture("INV_Misc_Rune_01"),
 					}, --
 	soul_stone 	= {f = "NecrosisSoulstoneButton", tip = "Soulstone", anchor = "ANCHOR_LEFT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\SoulstoneButton-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\SoulstoneButton-04",
+					norm = GraphicsHelper:GetTexture("SoulstoneButton-01"),
+					high = GraphicsHelper:GetTexture("SoulstoneButton-04"),
 					}, --
 	mounts 		= {f = "NecrosisMountButton", anchor = "ANCHOR_LEFT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\MountButton-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\MountButton-02",
+					norm = GraphicsHelper:GetTexture("MountButton-01"),
+					high = GraphicsHelper:GetTexture("MountButton-02"),
 					}, --
 
 	buffs 		= {f = "NecrosisBuffMenuButton", tip = "BuffMenu", menu = "Buff",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\BuffMenuButton-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\BuffMenuButton-02",
+					norm = GraphicsHelper:GetTexture("BuffMenuButton-01"),
+					high = GraphicsHelper:GetTexture("BuffMenuButton-02"),
 					}, --
 	pets 		= {f = "NecrosisPetMenuButton", tip = "PetMenu", menu = "Pet",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\PetMenuButton-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\PetMenuButton-02",
+					norm = GraphicsHelper:GetTexture("PetMenuButton-01"),
+					high = GraphicsHelper:GetTexture("PetMenuButton-02"),
 					}, --
 	curses 		= {f = "NecrosisCurseMenuButton", tip = "CurseMenu", menu = "Curse",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\CurseMenuButton-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\CurseMenuButton-02",
+					norm = GraphicsHelper:GetTexture("CurseMenuButton-01"),
+					high = GraphicsHelper:GetTexture("CurseMenuButton-02"),
 					}, --
 
 	armor 		= {f = "NecrosisBuffMenu01", tip = "Armor", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Armor-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Armor-02",
+					norm = GraphicsHelper:GetTexture("Armor-01"),
+					high = GraphicsHelper:GetTexture("Armor-02"),
 					}, --
 	breath 		= {f = "NecrosisBuffMenu02", tip = "Aqua", anchor = "ANCHOR_RIGHT", can_target = true,
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Aqua-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Aqua-02",
+					norm = GraphicsHelper:GetTexture("Aqua-01"),
+					high = GraphicsHelper:GetTexture("Aqua-02"),
 					}, --
 	invis 		= {f = "NecrosisBuffMenu03", tip = "Invisible", anchor = "ANCHOR_RIGHT", can_target = true,
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Invisible-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Invisible-02",
+					norm = GraphicsHelper:GetTexture("Invisible-01"),
+					high = GraphicsHelper:GetTexture("Invisible-02"),
 					}, --
 	eye 		= {f = "NecrosisBuffMenu04", tip = "Kilrogg", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Kilrogg-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Kilrogg-02",
+					norm = GraphicsHelper:GetTexture("Kilrogg-01"),
+					high = GraphicsHelper:GetTexture("Kilrogg-02"),
 					}, --
 	summoning 	= {f = "NecrosisBuffMenu05", tip = "TP", anchor = "ANCHOR_RIGHT", can_target = true,
-					norm = "Interface\\AddOns\\Necrosis\\UI\\TP-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\TP-02",
+					norm = GraphicsHelper:GetTexture("TP-01"),
+					high = GraphicsHelper:GetTexture("TP-02"),
 					}, --
 	link 		= {f = "NecrosisBuffMenu06", tip = "SoulLink", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\SoulLink-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\SoulLink-02",
+					norm = GraphicsHelper:GetTexture("SoulLink-01"),
+					high = GraphicsHelper:GetTexture("SoulLink-02"),
 					}, --
 	ward 		= {f = "NecrosisBuffMenu07", tip = "ShadowProtection", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\ShadowProtection-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\ShadowProtection-02",
+					norm = GraphicsHelper:GetTexture("ShadowProtection-01"),
+					high = GraphicsHelper:GetTexture("ShadowProtection-02"),
 					}, --
 	renforcement= {f = "NecrosisBuffMenu08", tip = "Renforcement", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Renforcement-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Renforcement-02",
+					norm = GraphicsHelper:GetTexture("Renforcement-01"),
+					high = GraphicsHelper:GetTexture("Renforcement-02"),
 					}, --
 	banish 		= {f = "NecrosisBuffMenu09", tip = "Banish", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Banish-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Banish-02",
+					norm = GraphicsHelper:GetTexture("Banish-01"),
+					high = GraphicsHelper:GetTexture("Banish-02"),
 					}, --
 
 	domination 	= {f = "NecrosisPetMenu01", tip = "Domination", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Domination-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Domination-02",
+					norm = GraphicsHelper:GetTexture("Domination-01"),
+					high = GraphicsHelper:GetTexture("Domination-02"),
 					}, --
 	imp 		= {f = "NecrosisPetMenu02", tip = "Imp", anchor = "ANCHOR_RIGHT", pet = true,
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Imp-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Imp-02",
+					norm = GraphicsHelper:GetTexture("Imp-01"),
+					high = GraphicsHelper:GetTexture("Imp-02"),
 					}, --
 	voidwalker 	= {f = "NecrosisPetMenu03", tip = "Voidwalker", anchor = "ANCHOR_RIGHT", pet = true,
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Voidwalker-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Voidwalker-02",
+					norm = GraphicsHelper:GetTexture("Voidwalker-01"),
+					high = GraphicsHelper:GetTexture("Voidwalker-02"),
 					}, --
 	succubus 	= {f = "NecrosisPetMenu04", tip = "Succubus", anchor = "ANCHOR_RIGHT", pet = true,
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Succubus-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Succubus-02",
+					norm = GraphicsHelper:GetTexture("Succubus-01"),
+					high = GraphicsHelper:GetTexture("Succubus-02"),
 					}, --
 	felguard 	= {f = "NecrosisPetMenu05", tip = "Felguard", anchor = "ANCHOR_RIGHT", pet = true,
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Felguard-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Felguard-02",
+					norm = GraphicsHelper:GetTexture("Felguard-01"),
+					high = GraphicsHelper:GetTexture("Felguard-02"),
 					}, --
 	felhunter 	= {f = "NecrosisPetMenu06", tip = "Felhunter", anchor = "ANCHOR_RIGHT", pet = true,
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Felhunter-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Felhunter-02",
+					norm = GraphicsHelper:GetTexture("Felhunter-01"),
+					high = GraphicsHelper:GetTexture("Felhunter-02"),
 					}, --
 	inferno 	= {f = "NecrosisPetMenu07", tip = "Infernal", anchor = "ANCHOR_RIGHT", 
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Infernal-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Infernal-02",
+					norm = GraphicsHelper:GetTexture("Infernal-01"),
+					high = GraphicsHelper:GetTexture("Infernal-02"),
 					}, --
 	rit_of_doom	= {f = "NecrosisPetMenu08", tip = "Doomguard", anchor = "ANCHOR_RIGHT", 
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Doomguard-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Doomguard-02",
+					norm = GraphicsHelper:GetTexture("Doomguard-01"),
+					high = GraphicsHelper:GetTexture("Doomguard-02"),
 					}, --
 	enslave 	= {f = "NecrosisPetMenu09", tip = "Enslave", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Enslave-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Enslave-02",
+					norm = GraphicsHelper:GetTexture("Enslave-01"),
+					high = GraphicsHelper:GetTexture("Enslave-02"),
 					}, --
 	sacrifice 	= {f = "NecrosisPetMenu10", tip = "Sacrifice", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Sacrifice-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Sacrifice-02",
+					norm = GraphicsHelper:GetTexture("Sacrifice-01"),
+					high = GraphicsHelper:GetTexture("Sacrifice-02"),
 					}, --
 
 	weakness 	= {f = "NecrosisCurseMenu01", tip = "Weakness", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Weakness-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Weakness-02",
+					norm = GraphicsHelper:GetTexture("Weakness-01"),
+					high = GraphicsHelper:GetTexture("Weakness-02"),
 					}, --
 	agony 		= {f = "NecrosisCurseMenu02", tip = "Agony", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Agony-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Agony-02",
+					norm = GraphicsHelper:GetTexture("Agony-01"),
+					high = GraphicsHelper:GetTexture("Agony-02"),
 					}, --
 	tongues 	= {f = "NecrosisCurseMenu03", tip = "Tongues", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Tongues-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Tongues-02",
+					norm = GraphicsHelper:GetTexture("Tongues-01"),
+					high = GraphicsHelper:GetTexture("Tongues-02"),
 					}, --
 	exhaustion 	= {f = "NecrosisCurseMenu04", tip = "Exhaust", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Exhaust-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Exhaust-02",
+					norm = GraphicsHelper:GetTexture("Exhaust-01"),
+					high = GraphicsHelper:GetTexture("Exhaust-02"),
 					}, --
 	elements 	= {f = "NecrosisCurseMenu05", tip = "Elements", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Elements-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Elements-02",
+					norm = GraphicsHelper:GetTexture("Elements-01"),
+					high = GraphicsHelper:GetTexture("Elements-02"),
 					}, --
 	doom 		= {f = "NecrosisCurseMenu06", tip = "Doom", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Doom-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Doom-02",
+					norm = GraphicsHelper:GetTexture("Doom-01"),
+					high = GraphicsHelper:GetTexture("Doom-02"),
 					}, --
 	corruption 	= {f = "NecrosisCurseMenu07", tip = "Corruption", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Corruption-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Corruption-02",
+					norm = GraphicsHelper:GetTexture("Corruption-01"),
+					high = GraphicsHelper:GetTexture("Corruption-02"),
 					}, --
 	recklessness= {f = "NecrosisCurseMenu08", tip = "Reckless", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Reckless-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Reckless-02",
+					norm = GraphicsHelper:GetTexture("Reckless-01"),
+					high = GraphicsHelper:GetTexture("Reckless-02"),
 					}, --
 	shadow		= {f = "NecrosisCurseMenu09", tip = "Shadow", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Shadow-01",
-					high = "Interface\\AddOns\\Necrosis\\UI\\Shadow-02",
+					norm = GraphicsHelper:GetTexture("Shadow-01"),
+					high = GraphicsHelper:GetTexture("Shadow-02"),
 					}, --
 
 	trance 		= {f = "NecrosisShadowTranceButton", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\ShadowTrance-Icon",
+					norm = GraphicsHelper:GetTexture("ShadowTrance-Icon"),
 					pos = {"CENTER", "UIParent", "CENTER", 20, 0},}, --
 	backlash 	= {f = "NecrosisBacklashButton", anchor = "ANCHOR_RIGHT",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\Backlash-Icon",
+					norm = GraphicsHelper:GetTexture("Backlash-Icon"),
 					pos = {"CENTER", "UIParent", "CENTER", 60, 0},}, --
 	elemental 	= {f = "NecrosisCreatureAlertButton",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\ElemAlert",
+					norm = GraphicsHelper:GetTexture("ElemAlert"),
 					pos = {"CENTER", "UIParent", "CENTER", -60, 0},}, --
 	anti_fear 	= {f = "NecrosisAntiFearButton",
-					norm = "Interface\\AddOns\\Necrosis\\UI\\AntiFear-01",
+					norm = GraphicsHelper:GetTexture("AntiFear-01"),
 					pos = {"CENTER", "UIParent", "CENTER", -20, 0},}, --
 }
 

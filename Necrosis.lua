@@ -424,7 +424,7 @@ local function ShowAntiFearWarning()
 		if not Local.Warning.Antifear.Actif then
 			Local.Warning.Antifear.Actif = true
 			Necrosis:Msg(Necrosis.ChatMessage.Information.FearProtect, "USER")
-			NecrosisAntiFearButton:SetNormalTexture("Interface\\Addons\\Necrosis\\UI\\AntiFear"..Local.Warning.Antifear.Icon[Actif].."-02")
+			NecrosisAntiFearButton:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear")..Local.Warning.Antifear.Icon[Actif].."-02")
 			if NecrosisConfig.Sound then PlaySoundFile(Necrosis.Sound.Fear) end
 --			ShowUIPanel(NecrosisAntiFearButton)
 			NecrosisAntiFearButton:Show()
@@ -439,7 +439,7 @@ local function ShowAntiFearWarning()
 				Local.Warning.Antifear.Toggle = 1
 			end
 			Local.Warning.Antifear.Blink = GetTime() + 0.4
-			NecrosisAntiFearButton:SetNormalTexture("Interface\\Addons\\Necrosis\\UI\\AntiFear"..Local.Warning.Antifear.Icon[Actif].."-0"..Local.Warning.Antifear.Toggle)
+			NecrosisAntiFearButton:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear")..Local.Warning.Antifear.Icon[Actif].."-0"..Local.Warning.Antifear.Toggle)
 		end
 
 	elseif Local.Warning.Antifear.Actif then	-- No antifear on target, but the button is still visible => gonna hide it
