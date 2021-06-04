@@ -113,6 +113,7 @@ function _mv:Show()
 			20, -40,
 			function(self)
 				NecrosisConfig.SoulshardDestroy = self:GetChecked()
+print("SoulshardDestroy: "..tostring(NecrosisConfig.SoulshardDestroy))
 			end
 		)
 		self.cbDestroyShardsOnFullBag:SetChecked(NecrosisConfig.SoulshardDestroy)
@@ -132,6 +133,7 @@ function _mv:Show()
 			0, -110,
 			function(self)
 				NecrosisConfig.DestroyShard = self:GetChecked()
+print("DestroyShard: "..tostring(NecrosisConfig.DestroyShard))
 				Necrosis:BagExplore()
 				if self:GetChecked() then
 					_mv.slDestroyShardCount:Enable()
@@ -215,7 +217,7 @@ function _mv:Show()
 		self.cbShowHiddenButtons = GraphicsHelper:CreateCheckButton(
 			self.Frame,
 			Necrosis.Config.Misc["Afficher les boutons caches"],
-			0, -240,
+			0, -220,
 			function(self)
 				if (self:GetChecked()) then
 					_mv.slHiddenButtonSize:Enable()
@@ -246,7 +248,7 @@ function _mv:Show()
 			self.Frame, "slHiddenButtonSize",
 			50, 200, 5,
 			15, 150,
-			0, -272
+			0, -252
 		)
 
 		self.slHiddenButtonSize:SetValue(NecrosisConfig.ShadowTranceScale)
@@ -313,6 +315,18 @@ function _mv:Show()
 				end
 			end
 		)
+
+		
+		self.btnClearTimer = GraphicsHelper:CreateButton(
+			self.Frame,
+			"Destroy shards now",
+			-90, -276,
+			function(self)
+				BagHelper:DestroyShards(NecrosisConfig.DestroyCount)
+			end
+		)
+		self.btnClearTimer:SetWidth(200)
+
 
 		if NecrosisConfig.SoulshardSort then
 			-- UIDropDownMenu_EnableDropDown(_mv.ddShardBag)

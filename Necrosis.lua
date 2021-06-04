@@ -313,7 +313,7 @@ function Necrosis:OnLoad(event)
 			-- print("Logged in")
 		end
 
-	elseif (event == "SKILL_LINES_CHANGED") -- and Local.LoggedIn and not weCanStart) then
+	elseif (event == "SKILL_LINES_CHANGED" and Local.LoggedIn)-- and not weCanStart)-- then
 	then
 		-- Skill changed is fired more than once, seems like a more stable
 		-- indicator that tells when the spellbook is ready.
@@ -2211,13 +2211,13 @@ function Necrosis:BagExplore(containerId)
 	local AncienCompte = BagHelper.Soulshard_Count
 
 	-- Destroy extra shards (if enabled) || Si il y a un nombre maximum de fragments à conserver, on enlève les supplémentaires
-	if NecrosisConfig.DestroyShard
-		and NecrosisConfig.DestroyCount
-		and NecrosisConfig.DestroyCount > 0
-		then
-			BagHelper:DestroyShards(math.floor(NecrosisConfig.DestroyCount))
-			-- Local.Soulshard.Count = BagHelper.Soulshard_Count
-	end
+	-- if NecrosisConfig.DestroyShard
+	-- 	and NecrosisConfig.DestroyCount
+	-- 	and NecrosisConfig.DestroyCount > 0
+	-- 	then
+	-- 		BagHelper:DestroyShards(math.floor(NecrosisConfig.DestroyCount))
+	-- 		-- Local.Soulshard.Count = BagHelper.Soulshard_Count
+	-- end
 
 	-- Updtae the main (sphere) button display || Affichage du bouton principal de Necrosis
 	if NecrosisConfig.Circle == "Soulshards" then
