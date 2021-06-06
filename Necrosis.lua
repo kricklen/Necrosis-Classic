@@ -121,7 +121,7 @@ Local.DefaultConfig = {
 	CreatureAlert = true,
 	NecrosisLockServ = true,
 	NecrosisAngle = 180,
-	StonePosition = {1, 2, 3, 4, 5, 6, 7, 8},
+	StonePosition = {1, 2, 3, 4, 5, 6, 7, 8, 9},
 		-- 1 = Firestone
 		-- 2 = Spellstone
 		-- 3 = Healthstone
@@ -130,6 +130,7 @@ Local.DefaultConfig = {
 		-- 6 = Mounts
 		-- 7 = Demon menu
 		-- 8 = Curse menu
+		-- 9 = Destroy Shards
 	CurseSpellPosition = {1, 2, 3, 4, 5, 6, 7},
 		-- 1 = Weakness || Faiblesse
 		-- 2 = Agony || Agonie
@@ -304,7 +305,7 @@ local weCanStart = false
 
 -- Function applied to loading || Fonction appliquée au chargement
 function Necrosis:OnLoad(event)
-	-- print("necrosis onload "..event)
+	print("necrosis onload "..event)
 	if (event == "PLAYER_LOGIN" and not Local.LoggedIn) then
 		-- Logon is fired once, wait for it
 		local _, Class = UnitClass("player")
@@ -319,18 +320,29 @@ function Necrosis:OnLoad(event)
 		-- indicator that tells when the spellbook is ready.
 		-- Call ItemHelper first here, it uses async methods for loading item info
 		-- and we have to wait for the callbacks.
+		-- ItemHelper:RegisterStonesLoadedHandler(
+		-- 	function()
+		-- 		InitializeMyself()
+		-- 		weCanStart = true
+		-- 	end
+		-- )
+		-- ItemHelper:Initialize()
+
+	elseif (event == "SPELLS_CHANGED" and Local.LoggedIn) then --weCanStart) then
+		print("Register StonesLoadedHandler")
 		ItemHelper:RegisterStonesLoadedHandler(
 			function()
 				InitializeMyself()
-				weCanStart = true
+				-- weCanStart = true
+				-- Spells changed fires each time a new spell is learned etc.
+				Necrosis:SpellSetup()
+				Necrosis:ButtonSetup()
 			end
 		)
 		ItemHelper:Initialize()
-
-	elseif (event == "SPELLS_CHANGED" and weCanStart) then
-		-- Spells changed fires each time a new spell is learned etc.
-		Necrosis:SpellSetup()
-		Necrosis:ButtonSetup()
+		-- -- Spells changed fires each time a new spell is learned etc.
+		-- Necrosis:SpellSetup()
+		-- Necrosis:ButtonSetup()
 	end
 end
 
@@ -1775,6 +1787,8 @@ function Necrosis:BuildButtonTooltip(button)
 			end
 			GameTooltip:AddLine(Necrosis.TooltipData[Type].Text[Local.Stone.Fire.Mode])
 		end
+	elseif (Type == "DestroyShards") then
+		GameTooltip:AddLine(Necrosis.TooltipData[Type].Text)
 	-- ..... for the Timers button ||..... pour le bouton des Timers
 	elseif (Type == "SpellTimer") then
 		GameTooltip:AddLine(Necrosis.TooltipData[Type].Text)
@@ -2371,8 +2385,9 @@ function Necrosis:ButtonSetup()
 		end
 		local f = _G[fr]
 		if (Necrosis.IsSpellKnown(v.high_of) 	-- in spell book
-		or v.menu                           -- or on menu of spells
-		or v.item)                          -- or item to use
+		or v.menu                             -- or on menu of spells
+		or v.function_name									  -- Function to call when clicking the button
+		or v.item)                            -- or item to use
 		and NecrosisConfig.StonePosition[index] > 0 -- and requested
 		then
 			if not f then

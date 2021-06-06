@@ -194,6 +194,10 @@ Necrosis.TooltipData = {
 		Label = "|c00FF4444"..L["FIRE_STONE"].."|r",
 		Text = {L["FIRESTONE_TEXT_1"],L["FIRESTONE_TEXT_2"],L["FIRESTONE_TEXT_3"], L["FIRESTONE_TEXT_4"]}
 	},
+	["DestroyShards"] = {
+		Label = "|c00FF99FF".."Destroy Shards".."|r",
+		Text = L["FIRESTONE_TEXT_1"]
+	},
 	["SpellTimer"] = {
 		Label = L["SPELLTIMER_LABEL"],
 		Text = L["SPELLTIMER_TEXT"],

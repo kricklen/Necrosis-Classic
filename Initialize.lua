@@ -97,6 +97,10 @@ function Necrosis:Initialize(Config)
 		self.Chat:_Msg(self.ChatMessage.Interface.UserConfig, "USER")
 	end
 
+	if (NecrosisConfig.StonePosition[9] == nil) then
+		print("Add StonePosition 9")
+		NecrosisConfig.StonePosition[9] = 1
+	end
 	self:CreateWarlockUI()
 
 	local f = Necrosis.Warlock_Buttons.main.f

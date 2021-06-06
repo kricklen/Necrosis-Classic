@@ -48,7 +48,7 @@ Necrosis.Gui.ButtonsView = {
 	Frame = false,
 	Page1 = false,
 	Page2 = false,
-	_ButtonTypes = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu"},
+	_ButtonTypes = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu", "DestroyShards"},
 	_Buttons = {}
 }
 

@@ -155,7 +155,8 @@ local function CreateStoneButton(stone)
 		--.." th'"..tostring(b.high).."'"
 		)
 	end
-
+print("CreateStoneButton: "..tostring(stone.f))
+print("CreateStoneButton high: "..tostring(stone.high))
 	local frame = CreateFrame("Button", b.f, UIParent, "SecureActionButtonTemplate")
 
 	-- Define its attributes || Définition de ses attributs
