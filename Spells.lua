@@ -153,101 +153,125 @@ function Necrosis:SpellLocalize(tooltip)
 	------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	if not tooltip then
 		self.Spell = {
-			[1] = {Name = GetSpellInfo(5784), 	GlobalId = 5784, 	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "mount"}, -- Felsteed
-			[2] = {Name = GetSpellInfo(23161), 	GlobalId = 23161,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "mount"}, -- Dreadsteed
+			[1] = {Name = GetSpellInfo(5784), 	GlobalId = 5784, 	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "mount"}, -- Felsteed
+			[2] = {Name = GetSpellInfo(23161), 	GlobalId = 23161,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "mount"}, -- Dreadsteed
 			-- Pets
-			[3] = {Name = GetSpellInfo(688), 		GlobalId = 688,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "imp", PetId = 416}, -- Imp || Diablotin 
-			[4] = {Name = GetSpellInfo(697),		GlobalId = 697,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "voidwalker", PetId = 1860, reagent = "soul_shard"}, -- Voidwalker || Marcheur
-			[5] = {Name = GetSpellInfo(712),		GlobalId = 712,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "succubus", PetId = 1863, reagent = "soul_shard"}, -- Succubus || Succube
-			[6] = {Name = GetSpellInfo(691),		GlobalId = 691,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "felhunter", PetId = 417, reagent = "soul_shard"}, -- Fellhunter
-			[7] = {Name = GetSpellInfo(30146),	GlobalId = 30146,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "felguard", PetId = 17252, reagent = "soul_shard"}, -- Felguard -- Fellhunter now
-			[8] = {Name = GetSpellInfo(1122),		GlobalId = 1122,	Mana = 50,	Rank = 0,	Length = 600,	Type = 3, Usage = "inferno", reagent = "infernal_stone"}, -- Infernal
+			[3] = {Name = GetSpellInfo(688), 	GlobalId = 688,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "imp", PetId = 416}, -- Imp || Diablotin 
+			[4] = {Name = GetSpellInfo(697),	GlobalId = 697,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "voidwalker", PetId = 1860, reagent = "soul_shard"}, -- Voidwalker || Marcheur
+			[5] = {Name = GetSpellInfo(712),	GlobalId = 712,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "succubus", PetId = 1863, reagent = "soul_shard"}, -- Succubus || Succube
+			[6] = {Name = GetSpellInfo(691),	GlobalId = 691,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "felhunter", PetId = 417, reagent = "soul_shard"}, -- Fellhunter
+			[7] = {Name = GetSpellInfo(30146),	GlobalId = 30146,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "felguard", PetId = 17252, reagent = "soul_shard"}, -- Felguard -- Fellhunter now
+			[8] = {Name = GetSpellInfo(1122),	GlobalId = 1122,	Mana = 50,	Rank = 0,	Duration = 600,	Type = "single", Usage = "inferno", reagent = "infernal_stone"}, -- Infernal
 			-- Banish / Enslave
-			[9]  = {Name = GetSpellInfo(710),		GlobalId = 710,		Mana = 50,	Rank = 0,	Length = 30,	Type = 2, Usage = "banish"}, -- Banish
-			[10] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,	Rank = 0,	Length = 300,	Type = 2, Usage = "enslave"}, -- Enslave
+			[9]  = {Name = GetSpellInfo(710),	GlobalId = 710,		Mana = 50,	Rank = 0,	Duration = 30,	Type = "single", Usage = "banish"}, -- Banish
+			[10] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,	Rank = 0,	Duration = 300,	Type = "single", Usage = "enslave"}, -- Enslave
 
-			[11] = {Name = GetSpellInfo(133),		GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 0,		Type = 1, Usage = "#none#"}, -- UNUSED
-			[12] = {Name = GetSpellInfo(348),		GlobalId = 348,		Mana = 50,	Rank = 0,	Length = 15,	Type = 6, Usage = "immolate"}, -- Immolate
-			[13] = {Name = GetSpellInfo(5782),	GlobalId = 5782,	Mana = 50,	Rank = 0,	Length = 15,	Type = 6, Usage = "fear"}, -- Fear
-			[14] = {Name = GetSpellInfo(172),		GlobalId = 172,		Mana = 50,	Rank = 0,	Length = 18,	Type = 5, Usage = "corruption"}, -- Corruption
-			[15] = {Name = GetSpellInfo(18708),	GlobalId = 18708,	Mana = 50,	Rank = 0,	Length = 180,	Type = 3, Usage = "domination"}, -- Fel Domination || Domination corrompue
-			[16] = {Name = GetSpellInfo(603),		GlobalId = 603,		Mana = 50,	Rank = 0,	Length = 60,	Type = 3, Usage = "doom"}, -- Curse of Doom || Malédiction funeste
-			[17] = {Name = GetSpellInfo(30283),	GlobalId = 30283,	Mana = 50,	Rank = 0,	Length = 20,	Type = 3, Usage = "shadowfury"}, -- NOPE NOT IN Classic, BUT in TBC: Shadowfury || Furie de l'ombre
-			[18] = {Name = GetSpellInfo(6353),	GlobalId = 6353,	Mana = 50,	Rank = 0,	Length = 60,	Type = 3, Usage = "soul_fire"}, -- Soul Fire || Feu de l'âme
-			[19] = {Name = GetSpellInfo(6789),	GlobalId = 6789,	Mana = 50,	Rank = 0,	Length = 120,	Type = 3, Usage = "death_coil"}, -- Death Coil || Voile mortel
-			[20] = {Name = GetSpellInfo(17877),	GlobalId = 17877,	Mana = 50,	Rank = 0,	Length = 15,	Type = 3, Usage = "shadowburn"}, -- Shadowburn || Brûlure de l'ombre
-			[21] = {Name = GetSpellInfo(17962),	GlobalId = 17962,	Mana = 50,	Rank = 0,	Length = 10,	Type = 3, Usage = "conflagration"}, -- Conflagration
+			[11] = {Name = GetSpellInfo(29722),	GlobalId = 29722,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "incinerate"}, -- TBC: Incinerate
+			[12] = {Name = GetSpellInfo(348),	GlobalId = 348,		Mana = 50,	Rank = 0,	Duration = 15,	Type = "debuff", Usage = "immolate"}, -- Immolate
+			[13] = {Name = GetSpellInfo(5782),	GlobalId = 5782,	Mana = 50,	Rank = 0,	Duration = 20,	Type = "debuff", Usage = "fear"}, -- Fear
+			[14] = {Name = GetSpellInfo(172),   GlobalId = 172,		Mana = 50,	Rank = 0,	Duration = 18,	Type = "debuff", Usage = "corruption"}, -- Corruption
+			[15] = {Name = GetSpellInfo(18708),	GlobalId = 18708,	Mana = 50,	Rank = 0,	Duration = 0, 	Type = "single", Usage = "domination"}, -- Fel Domination || Domination corrompue
+			[16] = {Name = GetSpellInfo(603),   GlobalId = 603,		Mana = 50,	Rank = 0,	Duration = 60,	Type = "debuff", Usage = "doom"}, -- Curse of Doom || Malédiction funeste
+			[17] = {Name = GetSpellInfo(30283),	GlobalId = 30283,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "shadowfury"}, -- NOPE NOT IN Classic, BUT in TBC: Shadowfury || Furie de l'ombre
+			[18] = {Name = GetSpellInfo(6353),	GlobalId = 6353,	Mana = 50,	Rank = 0,	Duration = 0, 	Type = nil,      Usage = "soul_fire"}, -- Soul Fire || Feu de l'âme
+			[19] = {Name = GetSpellInfo(6789),	GlobalId = 6789,	Mana = 50,	Rank = 0,	Duration = 3,	Type = "debuff", Usage = "death_coil"}, -- Death Coil || Voile mortel
+			[20] = {Name = GetSpellInfo(17877),	GlobalId = 17877,	Mana = 50,	Rank = 0,	Duration = 5,	Type = "debuff", Usage = "shadowburn"}, -- Shadowburn || Brûlure de l'ombre
+			[21] = {Name = GetSpellInfo(17962),	GlobalId = 17962,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "conflagration"}, -- Conflagration
 			-- Curses
-			[22] = {Name = GetSpellInfo(980),		GlobalId = 980,		Mana = 50,	Rank = 0,	Length = 24,	Type = 4, Usage = "agony"}, -- Curse of Agony || Malédiction Agonie
-			[23] = {Name = GetSpellInfo(702),		GlobalId = 702,		Mana = 50,	Rank = 0,	Length = 120,	Type = 4, Usage = "weakness"}, -- Curse of Weakness || Malédiction Faiblesse
-			[24] = {Name = GetSpellInfo(704),		GlobalId = 704,		Mana = 0 ,  Rank = 0, Length = 0,	  Type = 0, Usage = "recklessness"}, -- Curse of Recklessness - removed in patch 3.1 || Malédiction Témérité || 
-			[25] = {Name = GetSpellInfo(1714),	GlobalId = 1714,	Mana = 50,	Rank = 0,	Length = 30,	Type = 4, Usage = "tongues"}, -- Curse of Tongues || Malédiction Langage
-			[26] = {Name = GetSpellInfo(1490),	GlobalId = 1490,	Mana = 50,	Rank = 0,	Length = 300,	Type = 4, Usage = "elements"}, -- Curse of the Elements || Malédiction Eléments
+			[22] = {Name = GetSpellInfo(980),	GlobalId = 980,		Mana = 50,	Rank = 0,	Duration = 24,	Type = "debuff", Usage = "agony"}, -- Curse of Agony || Malédiction Agonie
+			[23] = {Name = GetSpellInfo(702),	GlobalId = 702,		Mana = 50,	Rank = 0,	Duration = 120,	Type = "debuff", Usage = "weakness"}, -- Curse of Weakness || Malédiction Faiblesse
+			[24] = {Name = GetSpellInfo(704),	GlobalId = 704,		Mana = 0 ,  Rank = 0,   Duration = 120, Type = "debuff", Usage = "recklessness"}, -- Curse of Recklessness - removed in patch 3.1 || Malédiction Témérité || 
+			[25] = {Name = GetSpellInfo(1714),	GlobalId = 1714,	Mana = 50,	Rank = 0,	Duration = 30,	Type = "debuff", Usage = "tongues"}, -- Curse of Tongues || Malédiction Langage
+			[26] = {Name = GetSpellInfo(1490),	GlobalId = 1490,	Mana = 50,	Rank = 0,	Duration = 300,	Type = "debuff", Usage = "elements"}, -- Curse of the Elements || Malédiction Eléments
 
-			[27] = {Name = GetSpellInfo(133),		GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 180,	Type = 3, Usage = "#none#"}, -- NOPE NOT IN Classic  Metamorphosis || Metamorphose
-			[28] = {Name = GetSpellInfo(18265),	GlobalId = 18265,	Mana = 50,	Rank = 0,	Length = 30,	Type = 6, Usage = "siphon_life"}, -- Siphon Life || Syphon de vie
-			[29] = {Name = GetSpellInfo(5484),	GlobalId = 5484,	Mana = 50,	Rank = 0,	Length = 40,	Type = 3, Usage = "howl"}, -- Howl of Terror || Hurlement de terreur
-			[30] = {Name = GetSpellInfo(18540),	GlobalId = 18540,	Mana = 50,	Rank = 0,	Length = 1800,Type = 3, Usage = "rit_of_doom", reagent = "demonic_figurine"}, -- Ritual of Doom || Rituel funeste
-			[31] = {Name = GetSpellInfo(696),		GlobalId = 696,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "armor"}, -- Demon Skin || Peau de démon 
-			[32] = {Name = GetSpellInfo(5697),	GlobalId = 5697,	Mana = 50,	Rank = 0,	Length = 600,	Type = 0, Usage = "breath"}, -- Unending Breath || Respiration interminable
-			[33] = {Name = GetSpellInfo(132),		GlobalId = 132,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "invisible"}, -- Detect Invisibility || Détection de l'invisibilité
-			[34] = {Name = GetSpellInfo(126),		GlobalId = 126,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "eye"}, -- Eye of Kilrogg
-			[35] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "enslave"}, -- Enslave Demon
-			[36] = {Name = GetSpellInfo(706),		GlobalId = 706,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "armor"}, -- Demon Armor || Armure démoniaque
-			[37] = {Name = GetSpellInfo(698),		GlobalId = 698,		Mana = 50,	Rank = 0,	Length = 120,	Type = 3, Usage = "summoning"}, -- Ritual of Summoning || Rituel d'invocation
-			[38] = {Name = GetSpellInfo(19028),	GlobalId = 19028,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "link"}, -- Soul Link || Lien spirituel
-			[39] = {Name = GetSpellInfo(133),		GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 45,	Type = 3, Usage = "#none#"}, -- NOPE NOT IN Classic  Demon Charge || Charge démoniaque
-			[40] = {Name = GetSpellInfo(18223),	GlobalId = 18223,	Mana = 50,	Rank = 0,	Length = 12,	Type = 4, Usage = "exhaustion"}, -- Curse of Exhaustion || Malédiction de fatigue
-			[41] = {Name = GetSpellInfo(1454),	GlobalId = 1454,	Mana = 50,	Rank = 0,	Length = 0,	  Type = 0, Usage = "life_tap"}, -- Life Tap || Connexion
-			[42] = {Name = GetSpellInfo(133),		GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 12,	Type = 2, Usage = "#none#"}, -- NOPE NOT IN Classic  Haunt || Hanter
-			[43] = {Name = GetSpellInfo(6229),	GlobalId = 6229,	Mana = 50,	Rank = 0,	Length = 30,	Type = 0, Usage = "ward"}, -- Shadow Ward || Gardien de l'ombre
-			[44] = {Name = GetSpellInfo(18788),	GlobalId = 18788,	Mana = 50,	Rank = 0,	Length = 60,	Type = 3, Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[45] = {Name = GetSpellInfo(686),		GlobalId = 686,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "bolt"}, -- Shadow Bolt
-			[46] = {Name = GetSpellInfo(30108),	GlobalId = 30108,	Mana = 50,	Rank = 0,	Length = 18,	Type = 6, Usage = "affliction"}, -- NOPE NOT IN Classic, BUT in TBC: Unstable Affliction || Affliction instable
-			[47] = {Name = GetSpellInfo(28176),	GlobalId = 28176,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "armor"}, -- NOPE NOT IN Classic, BUT in TBC: Fel Armor || Gangrarmure
-			[48] = {Name = GetSpellInfo(27243),	GlobalId = 27243,	Mana = 50,	Rank = 0,	Length = 18,	Type = 5, Usage = "seed"}, -- NOPE NOT IN Classic, BUT in TBC: Seed of Corruption || Graine de Corruption
-			[49] = {Name = GetSpellInfo(10771),	GlobalId = 10771,	Mana = 50,	Rank = 0,	Length = 180,	Type = 3, Usage = "shatter"}, -- NOPE NOT IN Classic, BUT in TBC: SoulShatter || Brise âme
-			[50] = {Name = GetSpellInfo(29893),	GlobalId = 29893,	Mana = 50,	Rank = 0,	Length = 300,	Type = 3, Usage = "ritual_souls"}, -- NOPE NOT IN Classic, BUT in TBC: Ritual of Souls || Rituel des âmes
-			[51] = {Name = GetSpellInfo(693),		GlobalId = 693,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "soulstone"}, -- Create Soulstone || Création pierre d'âme
-			[52] = {Name = GetSpellInfo(6201),	GlobalId = 6201,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "healthstone"}, -- Create Healthstone || Création pierre de soin
-			[53] = {Name = GetSpellInfo(2362),	GlobalId = 2362,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "spellstone"}, -- Create Spellstone || Création pierre de sort
-			[54] = {Name = GetSpellInfo(6366),	GlobalId = 6366,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "firestone"}, -- Create Firestone || Création pierre de feu
-			[55] = {Name = GetSpellInfo(18220),	GlobalId = 18220,	Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "pact"}, -- Dark Pact || Pacte noir
-			[56] = {Name = GetSpellInfo(133),		GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 0,		Type = 0, Usage = "#none#"}, -- NOPE NOT IN Classic  Shadow Cleave || Enchainement d'ombre
-			[57] = {Name = GetSpellInfo(133),		GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 30,	Type = 3, Usage = "#none#"}, -- NOPE NOT IN Classic  Immolation Aura || Aura d'immolation
-			[58] = {Name = GetSpellInfo(133),		GlobalId = 133,		Mana = 50,	Rank = 0,	Length = 15,	Type = 3, Usage = "#none#"}, --  NOPE NOT IN Classic Challenging Howl || Hurlement de défi
-			[59] = {Name = GetSpellInfo(133),		GlobalId = 133,		Mana = 50,	Rank = 0, Length = 60,	Type = 3, Usage = "#none#"}, --NOPE NOT IN Classic   Demonic Empowerment || Renforcement démoniaque
-			Firestone = {
+			[27] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 180,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Metamorphosis || Metamorphose
+			[28] = {Name = GetSpellInfo(18265),	GlobalId = 18265,	Mana = 50,	Rank = 0,	Duration = 30,	Type = "debuff", Usage = "siphon_life"}, -- Siphon Life || Syphon de vie
+			[29] = {Name = GetSpellInfo(5484),	GlobalId = 5484,	Mana = 50,	Rank = 0,	Duration = 0, 	Type = nil,      Usage = "howl"}, -- Howl of Terror || Hurlement de terreur
+			[30] = {Name = GetSpellInfo(18540),	GlobalId = 18540,	Mana = 50,	Rank = 0,	Duration = 0,   Type = nil,      Usage = "rit_of_doom", reagent = "demonic_figurine"}, -- Ritual of Doom || Rituel funeste
+			[31] = {Name = GetSpellInfo(696),	GlobalId = 696,		Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "armor"}, -- Demon Skin || Peau de démon 
+			[32] = {Name = GetSpellInfo(5697),	GlobalId = 5697,	Mana = 50,	Rank = 0,	Duration = 600,	Type = "single", Usage = "breath"}, -- Unending Breath || Respiration interminable
+			[33] = {Name = GetSpellInfo(132),	GlobalId = 132,		Mana = 50,	Rank = 0,	Duration = 600,	Type = "single", Usage = "invisible"}, -- Detect Invisibility || Détection de l'invisibilité
+			[34] = {Name = GetSpellInfo(126),	GlobalId = 126,		Mana = 50,	Rank = 0,	Duration = 45,	Type = "single", Usage = "eye"}, -- Eye of Kilrogg
+			[35] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,	Rank = 0,	Duration = 300,	Type = "single", Usage = "enslave"}, -- Enslave Demon
+			[36] = {Name = GetSpellInfo(706),	GlobalId = 706,		Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "armor"}, -- Demon Armor || Armure démoniaque
+			[37] = {Name = GetSpellInfo(698),	GlobalId = 698,		Mana = 50,	Rank = 0,	Duration = 600,	Type = nil,      Usage = "summoning"}, -- Ritual of Summoning || Rituel d'invocation
+			[38] = {Name = GetSpellInfo(19028),	GlobalId = 19028,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "link"}, -- Soul Link || Lien spirituel
+			[39] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 45,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Demon Charge || Charge démoniaque
+			[40] = {Name = GetSpellInfo(18223),	GlobalId = 18223,	Mana = 50,	Rank = 0,	Duration = 12,	Type = "debuff", Usage = "exhaustion"}, -- Curse of Exhaustion || Malédiction de fatigue
+			[41] = {Name = GetSpellInfo(1454),	GlobalId = 1454,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "life_tap"}, -- Life Tap || Connexion
+			[42] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 12,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Haunt || Hanter
+			[43] = {Name = GetSpellInfo(6229),	GlobalId = 6229,	Mana = 50,	Rank = 0,	Duration = 30,	Type = "single", Usage = "ward"}, -- Shadow Ward || Gardien de l'ombre
+			[44] = {Name = GetSpellInfo(18788),	GlobalId = 18788,	Mana = 50,	Rank = 0,	Duration = 0,   Type = nil,      Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[45] = {Name = GetSpellInfo(686),	GlobalId = 686,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "bolt"}, -- Shadow Bolt
+			[46] = {Name = GetSpellInfo(30108),	GlobalId = 30108,	Mana = 50,	Rank = 0,	Duration = 18,	Type = "debuff", Usage = "affliction"}, -- NOPE NOT IN Classic, BUT in TBC: Unstable Affliction || Affliction instable
+			[47] = {Name = GetSpellInfo(28176),	GlobalId = 28176,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "armor"}, -- NOPE NOT IN Classic, BUT in TBC: Fel Armor || Gangrarmure
+			[48] = {Name = GetSpellInfo(27243),	GlobalId = 27243,	Mana = 50,	Rank = 0,	Duration = 18,	Type = "debuff", Usage = "seed"}, -- NOPE NOT IN Classic, BUT in TBC: Seed of Corruption || Graine de Corruption
+			[49] = {Name = GetSpellInfo(29858),	GlobalId = 29858,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "shatter"}, -- NOPE NOT IN Classic, BUT in TBC: SoulShatter || Brise âme
+			[50] = {Name = GetSpellInfo(29893),	GlobalId = 29893,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "ritual_souls"}, -- NOPE NOT IN Classic, BUT in TBC: Ritual of Souls || Rituel des âmes
+			[51] = {Name = GetSpellInfo(693),	GlobalId = 693,		Mana = 50,	Rank = 0,	Duration = 0,   Type = nil,      Usage = "soulstone"}, -- Create Soulstone || Création pierre d'âme
+			[52] = {Name = GetSpellInfo(6201),	GlobalId = 6201,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "healthstone"}, -- Create Healthstone || Création pierre de soin
+			[53] = {Name = GetSpellInfo(2362),	GlobalId = 2362,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "spellstone"}, -- Create Spellstone || Création pierre de sort
+			[54] = {Name = GetSpellInfo(6366),	GlobalId = 6366,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "firestone"}, -- Create Firestone || Création pierre de feu
+			[55] = {Name = GetSpellInfo(18220),	GlobalId = 18220,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "pact"}, -- Dark Pact || Pacte noir
+			[56] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 30,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Shadow Cleave || Enchainement d'ombre
+			[57] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 30,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Immolation Aura || Aura d'immolation
+			[58] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 15,	Type = nil,      Usage = "#none#"}, --  NOPE NOT IN Classic Challenging Howl || Hurlement de défi
+			[59] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,   Duration = 60,	Type = nil,      Usage = "#none#"}, --NOPE NOT IN Classic   Demonic Empowerment || Renforcement démoniaque
+			[60] = {Name = GetSpellInfo(18789),	GlobalId = 18789,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[61] = {Name = GetSpellInfo(18790),	GlobalId = 18790,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[62] = {Name = GetSpellInfo(18791),	GlobalId = 18791,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[63] = {Name = GetSpellInfo(18792),	GlobalId = 18792,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[64] = {Name = GetSpellInfo(35701),	GlobalId = 35701,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			-- Firestone = {
+			-- 	SpellIds = {
+			-- 		6366,  -- Lesser
+			-- 		17951, -- Normal
+			-- 		17952, -- Greater
+			-- 		17953  -- Major
+			-- 	}
+			-- },
+			-- Healthstone = {
+			-- 	SpellIds = {
+			-- 		6202,  -- Minor
+			-- 		6201,  -- Lesser
+			-- 		5699,  -- Normal
+			-- 		11729, -- Greater
+			-- 		11730  -- Major
+			-- 	}
+			-- },
+			-- Soulstone = {
+			-- 	SpellIds = {
+			-- 		693,   -- Minor
+			-- 		20752, -- Lesser
+			-- 		20755, -- Normal
+			-- 		20756, -- Greater
+			-- 		20757  -- Major
+			-- 	}
+			-- },
+			-- Spellstone = {
+			-- 	SpellIds = {
+			-- 		2362,  -- Normal
+			-- 		17727, -- Greater
+			-- 		17728  -- Major
+			-- 	}
+			-- },
+			SoulstoneRez = {
 				SpellIds = {
-					6366,  -- Lesser
-					17951, -- Normal
-					17952, -- Greater
-					17953  -- Major
+					20707, -- Minor
+					20762, -- Lesser
+					20763, -- Normal
+					20764, -- Greater
+					20765, -- Major
+					22116  -- Master
 				}
 			},
-			Healthstone = {
+			DemonicSacrifices = {
 				SpellIds = {
-					6202,  -- Minor
-					6201,  -- Lesser
-					5699,  -- Normal
-					11729, -- Greater
-					11730  -- Major
-				}
-			},
-			Soulstone = {
-				SpellIds = {
-					693,   -- Minor
-					20752, -- Lesser
-					20755, -- Normal
-					20756, -- Greater
-					20757  -- Major
-				}
-			},
-			Spellstone = {
-				SpellIds = {
-					2362,  -- Normal
-					17727, -- Greater
-					17728  -- Major
+					18789, -- Burning Wish (Imp)
+					18790, -- Fel Stamina (Void Walker)
+					18791, -- Touch of Shadow (Succubus)
+					18792, -- Fel Energy (Fel Hunter)
+					35701  -- Touch of Shadow (Fel Guard)
 				}
 			},
 
@@ -255,39 +279,25 @@ function Necrosis:SpellLocalize(tooltip)
 			AuraType = {}
 		}
 
-		MakeSpellIdRanks(self.Spell.Firestone)
-		MakeSpellIdRanks(self.Spell.Healthstone)
-		MakeSpellIdRanks(self.Spell.Soulstone)
-		MakeSpellIdRanks(self.Spell.Spellstone)
+		-- MakeSpellIdRanks(self.Spell.Firestone)
+		-- MakeSpellIdRanks(self.Spell.Healthstone)
+		-- MakeSpellIdRanks(self.Spell.Soulstone)
+		-- MakeSpellIdRanks(self.Spell.Spellstone)
 
-		-- Add durations for each debuff that might be tracked by timers
+		-- These durations are special, either vary by spell rank like banish,  or are no spell, like Demonic Sacrifice.
+		-- All other durations are constant and automatically added by the Duration from the Spell list above.
 		-- Inspired by LibClassicDurations to hard-code it since UnitDebuff(..) API always returns 0
 		-- Affliction
 		AddAuraDuration({172}, 12, "debuff") -- Corruption 1
 		AddAuraDuration({6222}, 15, "debuff") -- Corruption 2
-		AddAuraDuration({6223, 7648, 11671, 11672, 25311}, 18, "debuff") -- Corruption 3-6
-		AddAuraDuration({980, 1014, 6217, 11711, 11712, 11713}, 24, "debuff") -- Curse of Agony 1-6
-		AddAuraDuration({603}, 60, "debuff") -- Curse of Doom
-		AddAuraDuration({704, 7658, 7659, 11717}, 120, "debuff") -- Curse of Recklessness 1-4
-		AddAuraDuration({17862, 17937}, 300, "debuff") -- Curse of Shadow 1-2
-		AddAuraDuration({1714, 11719}, 30, "debuff") -- Curse of Tongues 1-2
-		AddAuraDuration({702, 1108, 6205, 7646, 11707, 11708}, 120, "debuff") -- Curse of Weakness 1-6
-		AddAuraDuration({1490, 11721, 11722}, 300, "debuff") -- Curse of Elements 1-3
-		AddAuraDuration({6789, 17925, 17926}, 3, "debuff") -- Death Coil 1-3
 		AddAuraDuration({5782}, 10, "debuff") -- Fear 1
 		AddAuraDuration({6213}, 15, "debuff") -- Fear 2
-		AddAuraDuration({6215}, 20, "debuff") -- Fear 3
 		AddAuraDuration({5484}, 10, "debuff") -- Howl of Terror 1
-		AddAuraDuration({17928}, 15, "debuff") -- Howl of Terror 2
 		-- Demonology
 		AddAuraDuration({710}, 20, "single") -- Banish 1
-		AddAuraDuration({18647}, 30, "single") -- Banish 2
-		AddAuraDuration({1098, 11725, 11726}, 300, "single") -- Enslave Demon 1-3
-		AddAuraDuration({1122}, 300, "debuff") -- Inferno
+		AddAuraDuration(Necrosis.Spell.DemonicSacrifices.SpellIds, 1800, "single") -- Demonic Sacrifices
 		AddAuraDuration({20707, 20762, 20763, 20764, 20765}, 1800, "soulstone") -- Soulstone Resurrection 1-5
 		-- Destruction
-		AddAuraDuration({348, 707, 1094, 2941, 11665, 11667, 11668, 25309}, 15, "debuff") -- Immolate 1-7
-		AddAuraDuration({17877, 18867, 18868, 18869, 18870, 18871}, 5, "debuff") -- Shadowburn 1-6
 		AddAuraDuration({17794, 17797, 17798, 17799, 17800}, 12, "debuff") -- Shadow Vulnerability
 
 
@@ -424,6 +434,12 @@ local function UpdateSpellIfHigherRank(index, spellRank, spellID, spellNameOrg, 
 		Necrosis.Spell[index].NameOrg = spellNameOrg
 		Necrosis.Spell[index].GlobalId = globalId
 		Necrosis.Spell[index].Mana = Necrosis:GetManaCostForSpell(spellNameOrg)
+		-- Add a duration and type for the specific spellId if it's a debuff etc.
+		if (Necrosis.Spell.AuraDuration[globalId] == nil and
+			Necrosis.Spell[index].Duration > 0)
+		then
+			AddAuraDuration({globalId}, Necrosis.Spell[index].Duration, Necrosis.Spell[index].Type)
+		end
 	end
 end
 
@@ -447,23 +463,24 @@ function Necrosis:SpellSetup()
 
 		local spellNameOrg = spellName
 
-		if (tContains(Necrosis.Spell.Healthstone.SpellIds, globalId)) then
-			-- Healthstone
-			local spellRank = Necrosis.Spell.Healthstone[globalId]
-			UpdateSpellIfHigherRank(52, spellRank, spellID, spellNameOrg, globalId)
-		elseif (tContains(Necrosis.Spell.Soulstone.SpellIds, globalId)) then
-			-- Soulstone
-			local spellRank = Necrosis.Spell.Soulstone[globalId]
-			UpdateSpellIfHigherRank(51, spellRank, spellID, spellNameOrg, globalId)
-		elseif (tContains(Necrosis.Spell.Firestone.SpellIds, globalId)) then
-			-- Firestone
-			local spellRank = Necrosis.Spell.Firestone[globalId]
-			UpdateSpellIfHigherRank(54, spellRank, spellID, spellNameOrg, globalId)
-		elseif (tContains(Necrosis.Spell.Spellstone.SpellIds, globalId)) then
-			-- Spellstone
-			local spellRank = Necrosis.Spell.Spellstone[globalId]
-			UpdateSpellIfHigherRank(53, spellRank, spellID, spellNameOrg, globalId)
-		elseif (subSpellName and subSpellName ~= " " and subSpellName ~= "") then
+		-- if (tContains(Necrosis.Spell.Healthstone.SpellIds, globalId)) then
+		-- 	-- Healthstone
+		-- 	local spellRank = Necrosis.Spell.Healthstone[globalId]
+		-- 	UpdateSpellIfHigherRank(52, spellRank, spellID, spellNameOrg, globalId)
+		-- elseif (tContains(Necrosis.Spell.Soulstone.SpellIds, globalId)) then
+		-- 	-- Soulstone
+		-- 	local spellRank = Necrosis.Spell.Soulstone[globalId]
+		-- 	UpdateSpellIfHigherRank(51, spellRank, spellID, spellNameOrg, globalId)
+		-- elseif (tContains(Necrosis.Spell.Firestone.SpellIds, globalId)) then
+		-- 	-- Firestone
+		-- 	local spellRank = Necrosis.Spell.Firestone[globalId]
+		-- 	UpdateSpellIfHigherRank(54, spellRank, spellID, spellNameOrg, globalId)
+		-- elseif (tContains(Necrosis.Spell.Spellstone.SpellIds, globalId)) then
+		-- 	-- Spellstone
+		-- 	local spellRank = Necrosis.Spell.Spellstone[globalId]
+		-- 	UpdateSpellIfHigherRank(53, spellRank, spellID, spellNameOrg, globalId)
+		-- elseif (subSpellName and subSpellName ~= " " and subSpellName ~= "") then
+		if (subSpellName and subSpellName ~= " " and subSpellName ~= "") then
 			-- For spells with numbered ranks, compare each one || Pour les sorts avec des rangs numérotés, on compare pour chaque sort les rangs 1 à 1
 			-- And preserve the highest rank || Le rang supérieur est conservé
 			local spellRank = Necrosis.Spells:GetRankNumberFromSubName(subSpellName)
@@ -508,18 +525,18 @@ function Necrosis:SpellSetup()
 		end
 	end
 
-	-- Update the spell durations according to their rank || On met à jour la durée de chaque sort en fonction de son rang
-	-- Fear || Peur
-	if (Necrosis.Spell[13].ID and Necrosis.Spell[13].Rank) then
-		Necrosis.Spell[13].Length = tonumber(Necrosis.Spell[13].Rank) * 5 + 5
-	end
+	-- -- Update the spell durations according to their rank || On met à jour la durée de chaque sort en fonction de son rang
+	-- -- Fear || Peur
+	-- if (Necrosis.Spell[13].ID and Necrosis.Spell[13].Rank) then
+	-- 	Necrosis.Spell[13].Length = tonumber(Necrosis.Spell[13].Rank) * 5 + 5
+	-- end
 
-	-- Corruption
-	if (Necrosis.Spell[14].ID and Necrosis.Spell[14].Rank) then
-		if (Necrosis.Spell[14].Rank <= 2) then
-			Necrosis.Spell[14].Length = Necrosis.Spell[14].Rank * 3 + 9
-		end
-	end
+	-- -- Corruption
+	-- if (Necrosis.Spell[14].ID and Necrosis.Spell[14].Rank) then
+	-- 	if (Necrosis.Spell[14].Rank <= 2) then
+	-- 		Necrosis.Spell[14].Length = Necrosis.Spell[14].Rank * 3 + 9
+	-- 	end
+	-- end
 
 	-- WoW 3.0 :  Les montures se retrouvent dans une interface à part
 	-- if GetNumCompanions("MOUNT") > 0 then
@@ -535,18 +552,16 @@ function Necrosis:SpellSetup()
 	-- end
 
 	-- associate the mounts to the sphere button || Association du sort de monture correct au bouton
-	if (Necrosis.Spell[1].ID) then
-		Necrosis.CurrentEnv.FelsteedAvailable = true
-	else
-		Necrosis.CurrentEnv.FelsteedAvailable = false
-	end
-	if (Necrosis.Spell[2].ID) then
-		Necrosis.CurrentEnv.DreadsteedAvailable = true
-	else
-		Necrosis.CurrentEnv.DreadsteedAvailable = false
-	end
-
+	Necrosis.CurrentEnv.FelsteedAvailable = Necrosis.Spell[1].ID ~= nil
+	Necrosis.CurrentEnv.FelsteedName = Necrosis.Spell[1].Name
+	Necrosis.CurrentEnv.DreadsteedAvailable = Necrosis.Spell[2].ID ~= nil
+	Necrosis.CurrentEnv.DreadsteedName = Necrosis.Spell[2].Name
 	Necrosis.CurrentEnv.SteedAvailable = Necrosis.CurrentEnv.FelsteedAvailable or Necrosis.CurrentEnv.DreadsteedAvailable
+	-- Set info about available armor spells for buttons
+	Necrosis.CurrentEnv.DemonArmorAvailable = Necrosis.Spell[36].ID ~= nil
+	Necrosis.CurrentEnv.DemonArmorName = Necrosis.Spell[36].Name
+	Necrosis.CurrentEnv.FelArmorAvailable = Necrosis.Spell[47].ID ~= nil
+	Necrosis.CurrentEnv.FelArmorName = Necrosis.Spell[47].Name
 
 	if (not InCombatLockdown()) then
 		Necrosis:MainButtonAttribute()
@@ -976,14 +991,15 @@ Necrosis.Warlock_Buttons = {
 					high = GraphicsHelper:GetTexture("INV_Misc_Rune_01"),
 					}, --
 	destroy_shards = {f = "NecrosisDestroyShardsButton", tip = "DestroyShards", anchor = "ANCHOR_LEFT",
-					norm = GraphicsHelper:GetTexture("Shard"),
-					high = GraphicsHelper:GetTexture("Shard"),
+					norm = GraphicsHelper:GetTexture("ShardDestroy"),
+					high = GraphicsHelper:GetTexture("ShardDestroy"),
+					func = function() BagHelper:DestroyShards(NecrosisConfig.DestroyCount) end
 					}, --
 	soul_stone 	= {f = "NecrosisSoulstoneButton", tip = "Soulstone", anchor = "ANCHOR_LEFT",
 					norm = GraphicsHelper:GetTexture("SoulstoneButton-01"),
 					high = GraphicsHelper:GetTexture("SoulstoneButton-04"),
 					}, --
-	mounts 		= {f = "NecrosisMountButton", anchor = "ANCHOR_LEFT",
+	mounts 		= {f = "NecrosisMountButton", tip = "Mount", anchor = "ANCHOR_LEFT",
 					norm = GraphicsHelper:GetTexture("MountButton-01"),
 					high = GraphicsHelper:GetTexture("MountButton-02"),
 					}, --

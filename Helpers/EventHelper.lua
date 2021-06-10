@@ -13,6 +13,7 @@ EventHelper = {
         "PLAYER_REGEN_ENABLED",
         "PLAYER_TARGET_CHANGED",
         "PLAYER_UNGHOST",
+        -- "UNIT_AURA",
         "UNIT_HEALTH",
         "UNIT_MANA",
         "UNIT_PET",

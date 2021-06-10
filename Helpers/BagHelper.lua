@@ -189,27 +189,20 @@ function _bh:_FindStones(bag)
 end
 
 function _bh:DestroyShards(maxToKeep)
-	print("DestroyShards: "..tostring(maxToKeep))
-	local shardCountTmp = self.Soulshard_Count
-	-- Kills all shards? Debug!
+	self.Soulshard_Count = GetItemCount(ItemHelper.Soulshard_Item_Id)
 	for i,bag in ipairs(self:GetPlayerBags()) do
-		-- print("Bags: "..tostring(bag.name)..", "..tostring(bag.isSoulBag))
 		-- Skip soul bags
-		-- if (not bag.isSoulBag) then
+		if (not bag.isSoulBag) then
 			-- Iterate over the bag slots
 			for slot = 1,bag.capacity,1 do
 				if (maxToKeep >= self.Soulshard_Count) then
 					break
 				end
 				if (self:TryDestroyShard(bag.id, slot)) then
-					self.Soulshard_Count = GetItemCount(ItemHelper.Soulshard_Item_Id)
+					self.Soulshard_Count = self.Soulshard_Count - 1
 				end
-				-- if (shardCountTmp == self.Soulshard_Count) then
-				-- 	print("Destroy failed")
-				-- 	break
-				-- end
 			end
-		-- end
+		end
 	end
 end
 

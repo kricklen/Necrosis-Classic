@@ -40,7 +40,7 @@ local _G = getfenv(0)
 Necrosis.Gui.MiscView = {
 	Frame = false,
 	cbMoveShards = false,
-	cbDestroyShardsOnFullBag = false,
+	-- cbDestroyShardsOnFullBag = false,
 	ddShardBag = false,
 	lblShardBag = false,
 	
@@ -95,28 +95,28 @@ function _mv:Show()
 			0, -18,
 			function(self)
 				NecrosisConfig.SoulshardSort = self:GetChecked()
-				if NecrosisConfig.SoulshardSort then
-					_mv.cbDestroyShardsOnFullBag:Enable()
-					-- UIDropDownMenu_EnableDropDown(_mv.ddShardBag)
-				else
-					_mv.cbDestroyShardsOnFullBag:Disable()
-					-- UIDropDownMenu_DisableDropDown(_mv.ddShardBag)
-				end
+				-- if NecrosisConfig.SoulshardSort then
+				-- 	_mv.cbDestroyShardsOnFullBag:Enable()
+				-- 	-- UIDropDownMenu_EnableDropDown(_mv.ddShardBag)
+				-- else
+				-- 	_mv.cbDestroyShardsOnFullBag:Disable()
+				-- 	-- UIDropDownMenu_DisableDropDown(_mv.ddShardBag)
+				-- end
 			end
 		)
 		self.cbMoveShards:SetChecked(NecrosisConfig.SoulshardSort)
 
-		-- Destruction des fragments quand le sac est plein
-		self.cbDestroyShardsOnFullBag = GraphicsHelper:CreateCheckButton(
-			self.Frame,
-			Necrosis.Config.Misc["Detruit les fragments si le sac plein"],
-			20, -40,
-			function(self)
-				NecrosisConfig.SoulshardDestroy = self:GetChecked()
-print("SoulshardDestroy: "..tostring(NecrosisConfig.SoulshardDestroy))
-			end
-		)
-		self.cbDestroyShardsOnFullBag:SetChecked(NecrosisConfig.SoulshardDestroy)
+-- 		-- Destruction des fragments quand le sac est plein
+-- 		self.cbDestroyShardsOnFullBag = GraphicsHelper:CreateCheckButton(
+-- 			self.Frame,
+-- 			Necrosis.Config.Misc["Detruit les fragments si le sac plein"],
+-- 			20, -40,
+-- 			function(self)
+-- 				NecrosisConfig.SoulshardDestroy = self:GetChecked()
+-- print("SoulshardDestroy: "..tostring(NecrosisConfig.SoulshardDestroy))
+-- 			end
+-- 		)
+-- 		self.cbDestroyShardsOnFullBag:SetChecked(NecrosisConfig.SoulshardDestroy)
 
 		-- Choose the bag for storing soul shards || Choix du sac à fragments
 		self.ddShardBag, self.lblShardBag = GraphicsHelper:CreateDropDown(
@@ -133,7 +133,6 @@ print("SoulshardDestroy: "..tostring(NecrosisConfig.SoulshardDestroy))
 			0, -110,
 			function(self)
 				NecrosisConfig.DestroyShard = self:GetChecked()
-print("DestroyShard: "..tostring(NecrosisConfig.DestroyShard))
 				Necrosis:BagExplore()
 				if self:GetChecked() then
 					_mv.slDestroyShardCount:Enable()
@@ -316,25 +315,13 @@ print("DestroyShard: "..tostring(NecrosisConfig.DestroyShard))
 			end
 		)
 
-		
-		self.btnClearTimer = GraphicsHelper:CreateButton(
-			self.Frame,
-			"Destroy shards now",
-			-90, -276,
-			function(self)
-				BagHelper:DestroyShards(NecrosisConfig.DestroyCount)
-			end
-		)
-		self.btnClearTimer:SetWidth(200)
-
-
-		if NecrosisConfig.SoulshardSort then
-			-- UIDropDownMenu_EnableDropDown(_mv.ddShardBag)
-			self.cbDestroyShardsOnFullBag:Enable()
-		else
-			-- UIDropDownMenu_DisableDropDown(_mv.ddShardBag)
-			self.cbDestroyShardsOnFullBag:Disable()
-		end
+		-- if NecrosisConfig.SoulshardSort then
+		-- 	-- UIDropDownMenu_EnableDropDown(_mv.ddShardBag)
+		-- 	self.cbDestroyShardsOnFullBag:Enable()
+		-- else
+		-- 	-- UIDropDownMenu_DisableDropDown(_mv.ddShardBag)
+		-- 	self.cbDestroyShardsOnFullBag:Disable()
+		-- end
 	end
 
 	self.Frame:Show()

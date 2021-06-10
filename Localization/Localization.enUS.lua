@@ -253,6 +253,7 @@ function Localization.enUS()
 		"Show Steed button",
 		"Show Demon menu button",
 		"Show Curse menu button",
+		"Show Destroy Shards button",
 	}
 
 	Necrosis.Config.Menus = {

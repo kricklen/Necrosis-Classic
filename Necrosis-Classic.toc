@@ -36,16 +36,6 @@ Helpers\EventHelper.lua
 
 Chat.lua
 
-Locales\Localization.lua
-Locales\Localization.CN.lua
-Locales\Localization.DE.lua
-Locales\Localization.ES.lua
-Locales\Localization.FR.lua
-Locales\Localization.RU.lua
-Locales\Localization.TW.lua
-Locales\Localization.MX.lua
-Dialog.lua
-
 Localization\Functions-fr.lua
 Localization\Functions-en.lua
 Localization\Functions-de.lua
@@ -63,6 +53,17 @@ Localization\Localization.zhTW.lua
 Localization\Localization.ruRU.lua
 
 Localization\Localization.lua
+
+Locales\Localization.lua
+Locales\Localization.CN.lua
+Locales\Localization.DE.lua
+Locales\Localization.ES.lua
+Locales\Localization.FR.lua
+Locales\Localization.RU.lua
+Locales\Localization.TW.lua
+Locales\Localization.MX.lua
+Dialog.lua
+
 
 Initialize.lua
 Spells.lua

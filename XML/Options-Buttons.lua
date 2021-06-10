@@ -87,7 +87,8 @@ function _bv:cbLockButtons_Click()
 			"NecrosisBuffMenuButton",
 			"NecrosisMountButton",
 			"NecrosisPetMenuButton",
-			"NecrosisCurseMenuButton"
+			"NecrosisCurseMenuButton",
+			"NecrosisDestroyShardsButton"
 		}
 		local loc = {-121, -87, -53, -17, 17, 53, 87, 121}
 		for i in ipairs(ButtonName) do
@@ -359,7 +360,7 @@ function _bv:Show()
 		self.cbLockButtons = GraphicsHelper:CreateCheckButton(
 			self.Page1,
 			Necrosis.Config.Buttons["Fixer les boutons autour de la sphere"],
-			0, -210,
+			0, -220,
 			self.cbLockButtons_Click
 		)
 		self.cbLockButtons:SetChecked(NecrosisConfig.NecrosisLockServ)
@@ -367,7 +368,7 @@ function _bv:Show()
 		self.slRotation = GraphicsHelper:CreateSlider(
 			self.Page1, "slRotation",
 			0, 360, 9,
-			15, 250,
+			15, 260,
 			0, -252
 		)
 

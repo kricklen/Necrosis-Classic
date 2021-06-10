@@ -178,9 +178,9 @@ local r_click = 2
 
 -- On associe les malédictions au clic sur le bouton concerné
 function Necrosis:SetBuffSpellAttribute(frameWrapper)
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	local f = _G[frameWrapper.f]
 	if f then
@@ -224,22 +224,31 @@ function Necrosis:SetBuffSpellAttribute(frameWrapper)
 				f:SetAttribute("ctrl-type*", "spell")
 				f:SetAttribute("ctrl-spell*", spellName)
 			end
+		elseif (f.high_of == "armor") then
+			-- Check if we got Fel Armor, which has different effects
+			f:SetAttribute("type1", "spell")
+			f:SetAttribute("spell1", Necrosis.GetSpellCastName(f.high_of))
+			f:SetAttribute("type2", "spell")
+			f:SetAttribute("spell2", Necrosis.GetSpellCastName(f.high_of))
+			if (Necrosis.CurrentEnv.DemonArmorAvailable) then
+				f:SetAttribute("spell1", Necrosis.CurrentEnv.DemonArmorName)
+				f:SetAttribute("spell2", Necrosis.CurrentEnv.DemonArmorName)
+			end
+			if (Necrosis.CurrentEnv.FelArmorAvailable) then
+				f:SetAttribute("spell1", Necrosis.CurrentEnv.FelArmorName)
+			end
 		else
 			f:SetAttribute("type", "spell")
 			f:SetAttribute("spell", Necrosis.GetSpellCastName(f.high_of))
-			-- if frameWrapper.can_target then
-			-- 	print("Set target: "..f.high_of)
-			-- 	f:SetAttribute("unit", "target")
-			-- end
 		end
 	end
 end
 
 -- On associe les buffs au clic sur le bouton concerné
 function Necrosis:BuffSpellAttribute()
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	for index = 1, #Necrosis.Warlock_Lists.buffs, 1 do
 		local v = Necrosis.Warlock_Lists.buffs[index]
@@ -254,9 +263,9 @@ end
 
 -- On associe les démons au clic sur le bouton concerné
 function Necrosis:SetPetSpellAttribute(button)
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	local f = _G[button]
 	if f then
@@ -289,9 +298,9 @@ function Necrosis:SetPetSpellAttribute(button)
 end
 
 function Necrosis:PetSpellAttribute()
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	for index = 1, #Necrosis.Warlock_Lists.pets, 1 do
 		local v = Necrosis.Warlock_Lists.pets[index]
@@ -306,9 +315,9 @@ end
 
 -- On associe les malédictions au clic sur le bouton concerné
 function Necrosis:SetCurseSpellAttribute(button)
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	local f = _G[button]
 	if f then
@@ -328,9 +337,9 @@ function Necrosis:SetCurseSpellAttribute(button)
 end
 
 function Necrosis:CurseSpellAttribute()
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	for i = 1, #Necrosis.Warlock_Lists.curses, 1 do
 		local v = Necrosis.Warlock_Lists.curses[i]
@@ -346,9 +355,9 @@ end
 -- Associating the frames to buttons, and creating stones on right-click.
 -- Association de la monture au bouton, et de la création des pierres sur un clic droit
 function Necrosis:StoneAttribute(Steed)
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("StoneAttribute"
@@ -378,6 +387,15 @@ function Necrosis:StoneAttribute(Steed)
 			f:SetAttribute("spell2", Necrosis.GetSpellCastName("healthstone")) 
 		end
 	end
+
+	-- Destroy Shards button is a new type, with function attached
+	local destroy_shards_button = _G[Necrosis.Warlock_Buttons.destroy_shards.f]
+	if (destroy_shards_button) then
+		destroy_shards_button:SetScript(
+			"OnClick",
+			Necrosis.Warlock_Buttons.destroy_shards.func
+		)
+	end
 	
 	SetSSAttribs(nil, "Icon update")
 
@@ -392,16 +410,13 @@ function Necrosis:StoneAttribute(Steed)
 			local leftMountName = GetSpellInfo(NecrosisConfig.LeftMount)
 			f:SetAttribute("spell1", leftMountName)
 		else
-			local srank1 = self.Spell[1].Rank >= 0 -- Felsteed
-			local srank2 = self.Spell[2].Rank >= 0 -- Dreadsteed
-			local Rank1 = srank1 and self.Spell[1].Name
-			local Rank2 = srank2 and self.Spell[2].Name
-			if Rank2 then
-				f:SetAttribute("spell1", Rank2)
-				f:SetAttribute("spell2", Rank1)
-			else
-				f:SetAttribute("spell*", Rank1)
+			if (Necrosis.CurrentEnv.FelsteedAvailable) then
+				f:SetAttribute("spell1", Necrosis.CurrentEnv.FelsteedName)
+				f:SetAttribute("spell2", Necrosis.CurrentEnv.FelsteedName)
 			end			
+			if (Necrosis.CurrentEnv.DreadsteedAvailable) then
+				f:SetAttribute("spell1", Necrosis.CurrentEnv.DreadsteedName)
+			end
 		end
 		
 		if (NecrosisConfig.RightMount) then
@@ -644,9 +659,9 @@ end
 
 function Necrosis:SoulstoneUpdateAttribute(nostone)
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("SoulstoneUpdateAttribute"
@@ -664,7 +679,8 @@ function Necrosis:HealthstoneUpdateAttribute(nostone)
 	local f = Necrosis.Warlock_Buttons.health_stone.f
 	f = _G[f]
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if InCombatLockdown() or not f then
+	-- if InCombatLockdown() or not f then
+	if not f then
 		return
 	end
 
@@ -695,7 +711,8 @@ function Necrosis:SpellstoneUpdateAttribute(nostone)
 	f = _G[f]
 
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if InCombatLockdown() or not f then
+	-- if InCombatLockdown() or not f then
+	if not f then
 		return
 	end
 
@@ -725,7 +742,8 @@ function Necrosis:FirestoneUpdateAttribute(nostone)
 	f = _G[f]
 
 	-- Si le démoniste est en combat, on ne fait rien :)
-	if InCombatLockdown() or not f then
+	-- if InCombatLockdown() or not f then
+	if not f then
 		return
 	end
 

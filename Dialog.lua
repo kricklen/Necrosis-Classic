@@ -196,7 +196,7 @@ Necrosis.TooltipData = {
 	},
 	["DestroyShards"] = {
 		Label = "|c00FF99FF".."Destroy Shards".."|r",
-		Text = L["FIRESTONE_TEXT_1"]
+		Text = "Click to destroy all soul shards but "
 	},
 	["SpellTimer"] = {
 		Label = L["SPELLTIMER_LABEL"],
@@ -429,6 +429,7 @@ Necrosis.Config.Buttons.Name = {
 	L["SHOW_STEED"],
 	L["SHOW_DEMON"],
 	L["SHOW_CURSE"],
+	"Show Destroy Shards button",
 }
 
 Necrosis.Config.Menus = {
