@@ -233,7 +233,10 @@ local function RemoveTimer(timerData)
 		-- Remove the raid icon from the timer group
 		UpdateRaidIcon(timerData.Group, nil)
 		timerData.Group.Frame:Hide()
-		if (timerData.SpellType ~= "soulstone" and timerData.SpellType ~= "single") then
+		if (timerData.SpellType ~= "soulstone"
+			and timerData.SpellType ~= "single"
+			and timerData.SpellType ~= "self"
+		) then
 			PositionMobTimerGroups()
 		end
 	end
@@ -341,7 +344,7 @@ local function InsertTimer(timerGroup)
 end
 
 local function StartTimer(timerData)
-	-- Timers are split into 3 types: single, soulstone and the rest
+	-- Timers are split into 4 types: single, soulstone, self and debuff
 	-- Single are Banish, Enslave Demon etc.
 	-- Single and soulstone are displayed in the same timer group, banishes etc. on top, soulstones at the bottom
 	-- The rest is displayed in a timer group per mob since it's dots etc.
@@ -425,7 +428,7 @@ function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, tar
 
 	local timerData
 
-	if (spellType == "soulstone" or spellType == "single") then
+	if (spellType == "soulstone" or spellType == "single" or spellType == "self") then
 		-- If we cast soulstone or banish etc., tell our fellow warlocks
 		if (casterGuid == Necrosis.CurrentEnv.PlayerGuid) then
 			if (spellType == "soulstone") then
@@ -654,7 +657,8 @@ function _t:UpdateRaidIcon(unitGuid, iconNumber)
 		for i,timerData in ipairs(_t.SingleFrame.Timers) do
 			if (timerData.TargetGuid == unitGuid
 				and (timerData.SpellType == "soulstone"
-				or timerData.SpellType == "single"))
+				or timerData.SpellType == "single"
+				or timerData.SpellType == "self"))
 			then
 				if (not (timerData.Finished or timerData.Finishing)) then
 					UpdateRaidIcon(timerData, iconNumber)

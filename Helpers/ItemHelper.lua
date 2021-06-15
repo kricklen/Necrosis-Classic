@@ -10,7 +10,8 @@ ItemHelper = {
             1254,  -- Lesser
             13699, -- Normal
             13700, -- Greater
-            13701  -- Major
+            13701, -- Major
+            27250  -- Master
         }
     },
 
@@ -20,7 +21,8 @@ ItemHelper = {
             19007, -- Lesser
             19009, -- Normal
             19011, -- Greater
-            19013  -- Major
+            19013, -- Major
+            27230  -- Master
         }
     },
 
@@ -30,7 +32,8 @@ ItemHelper = {
             16892, -- Lesser
             16893, -- Normal
             16895, -- Greater
-            16896  -- Major
+            16896, -- Major
+            27238  -- Master
         }
     },
 
@@ -38,7 +41,8 @@ ItemHelper = {
         ItemIds = {
             5522,  -- Normal
             13602, -- Greater
-            13603  -- Major
+            13603, -- Major
+            28172  -- Master
         }
     }
 }

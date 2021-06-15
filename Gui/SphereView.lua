@@ -59,7 +59,18 @@ Necrosis.Gui.SphereView = {
 	lblCount = false,
 	ddCount = false,
 	
-	_Spells = {19, 31, 37, 41, 43, 44, 55},
+	_Spells = {
+		19, -- Death Coil
+		31, -- Demon Skin
+		36, -- Demon Armor
+		47, -- Fel Armor
+		37, -- Ritual of Summoning
+		41, -- Life Tap
+		43, -- Shadow Ward
+		44, -- Demonic Sacrifice
+		55, -- Dark Pact
+		46  -- Unstable Affliction
+	},
 	_Skins = {"Rose", "Bleu", "Orange", "Turquoise", "Violet", "666", "X"},
 	_SphereEvents = {"Soulshards", "RezTimer", "Mana", "Health"},
 	_SphereCounts = {"Soulshards", "DemonStones", "RezTimer", "Mana", "Health"},
@@ -120,16 +131,19 @@ end
 -- Fonctions du Dropdown des sorts de la sphère
 function _sv.ddSpells_Init(dd)
 	for i,spellIndex in ipairs(_sv._Spells) do
-		UIDropDownMenu_AddButton({
-			text = Necrosis.Spell[spellIndex].Name,
-			value = spellIndex,
-			checked = false,
-			func = _sv.ddSpells_Click,
-			arg1 = dd
-		})
-		if spellIndex == NecrosisConfig.MainSpell then
-			UIDropDownMenu_SetSelectedValue(dd, spellIndex)
-			UIDropDownMenu_SetText(dd, Necrosis.Spell[spellIndex].Name)
+		-- Only add spells that are known
+		if (Necrosis.Spell[spellIndex].Rank >= 0) then
+			UIDropDownMenu_AddButton({
+				text = Necrosis.Spell[spellIndex].Name,
+				value = spellIndex,
+				checked = false,
+				func = _sv.ddSpells_Click,
+				arg1 = dd
+			})
+			if spellIndex == NecrosisConfig.MainSpell then
+				UIDropDownMenu_SetSelectedValue(dd, spellIndex)
+				UIDropDownMenu_SetText(dd, Necrosis.Spell[spellIndex].Name)
+			end
 		end
 	end
 end

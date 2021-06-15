@@ -170,7 +170,7 @@ function Necrosis:SpellLocalize(tooltip)
 			[12] = {Name = GetSpellInfo(348),	GlobalId = 348,		Mana = 50,	Rank = 0,	Duration = 15,	Type = "debuff", Usage = "immolate"}, -- Immolate
 			[13] = {Name = GetSpellInfo(5782),	GlobalId = 5782,	Mana = 50,	Rank = 0,	Duration = 20,	Type = "debuff", Usage = "fear"}, -- Fear
 			[14] = {Name = GetSpellInfo(172),   GlobalId = 172,		Mana = 50,	Rank = 0,	Duration = 18,	Type = "debuff", Usage = "corruption"}, -- Corruption
-			[15] = {Name = GetSpellInfo(18708),	GlobalId = 18708,	Mana = 50,	Rank = 0,	Duration = 0, 	Type = "single", Usage = "domination"}, -- Fel Domination || Domination corrompue
+			[15] = {Name = GetSpellInfo(18708),	GlobalId = 18708,	Mana = 50,	Rank = 0,	Duration = 0, 	Type = "self",   Usage = "domination"}, -- Fel Domination || Domination corrompue
 			[16] = {Name = GetSpellInfo(603),   GlobalId = 603,		Mana = 50,	Rank = 0,	Duration = 60,	Type = "debuff", Usage = "doom"}, -- Curse of Doom || Malédiction funeste
 			[17] = {Name = GetSpellInfo(30283),	GlobalId = 30283,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "shadowfury"}, -- NOPE NOT IN Classic, BUT in TBC: Shadowfury || Furie de l'ombre
 			[18] = {Name = GetSpellInfo(6353),	GlobalId = 6353,	Mana = 50,	Rank = 0,	Duration = 0, 	Type = nil,      Usage = "soul_fire"}, -- Soul Fire || Feu de l'âme
@@ -188,13 +188,13 @@ function Necrosis:SpellLocalize(tooltip)
 			[28] = {Name = GetSpellInfo(18265),	GlobalId = 18265,	Mana = 50,	Rank = 0,	Duration = 30,	Type = "debuff", Usage = "siphon_life"}, -- Siphon Life || Syphon de vie
 			[29] = {Name = GetSpellInfo(5484),	GlobalId = 5484,	Mana = 50,	Rank = 0,	Duration = 0, 	Type = nil,      Usage = "howl"}, -- Howl of Terror || Hurlement de terreur
 			[30] = {Name = GetSpellInfo(18540),	GlobalId = 18540,	Mana = 50,	Rank = 0,	Duration = 0,   Type = nil,      Usage = "rit_of_doom", reagent = "demonic_figurine"}, -- Ritual of Doom || Rituel funeste
-			[31] = {Name = GetSpellInfo(696),	GlobalId = 696,		Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "armor"}, -- Demon Skin || Peau de démon 
+			[31] = {Name = GetSpellInfo(696),	GlobalId = 696,		Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "armor"}, -- Demon Skin || Peau de démon 
 			[32] = {Name = GetSpellInfo(5697),	GlobalId = 5697,	Mana = 50,	Rank = 0,	Duration = 600,	Type = "single", Usage = "breath"}, -- Unending Breath || Respiration interminable
 			[33] = {Name = GetSpellInfo(132),	GlobalId = 132,		Mana = 50,	Rank = 0,	Duration = 600,	Type = "single", Usage = "invisible"}, -- Detect Invisibility || Détection de l'invisibilité
 			[34] = {Name = GetSpellInfo(126),	GlobalId = 126,		Mana = 50,	Rank = 0,	Duration = 45,	Type = "single", Usage = "eye"}, -- Eye of Kilrogg
 			[35] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,	Rank = 0,	Duration = 300,	Type = "single", Usage = "enslave"}, -- Enslave Demon
-			[36] = {Name = GetSpellInfo(706),	GlobalId = 706,		Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "armor"}, -- Demon Armor || Armure démoniaque
-			[37] = {Name = GetSpellInfo(698),	GlobalId = 698,		Mana = 50,	Rank = 0,	Duration = 600,	Type = nil,      Usage = "summoning"}, -- Ritual of Summoning || Rituel d'invocation
+			[36] = {Name = GetSpellInfo(706),	GlobalId = 706,		Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "armor"}, -- Demon Armor || Armure démoniaque
+			[37] = {Name = GetSpellInfo(698),	GlobalId = 698,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "summoning"}, -- Ritual of Summoning || Rituel d'invocation
 			[38] = {Name = GetSpellInfo(19028),	GlobalId = 19028,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "link"}, -- Soul Link || Lien spirituel
 			[39] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 45,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Demon Charge || Charge démoniaque
 			[40] = {Name = GetSpellInfo(18223),	GlobalId = 18223,	Mana = 50,	Rank = 0,	Duration = 12,	Type = "debuff", Usage = "exhaustion"}, -- Curse of Exhaustion || Malédiction de fatigue
@@ -204,7 +204,7 @@ function Necrosis:SpellLocalize(tooltip)
 			[44] = {Name = GetSpellInfo(18788),	GlobalId = 18788,	Mana = 50,	Rank = 0,	Duration = 0,   Type = nil,      Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
 			[45] = {Name = GetSpellInfo(686),	GlobalId = 686,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "bolt"}, -- Shadow Bolt
 			[46] = {Name = GetSpellInfo(30108),	GlobalId = 30108,	Mana = 50,	Rank = 0,	Duration = 18,	Type = "debuff", Usage = "affliction"}, -- NOPE NOT IN Classic, BUT in TBC: Unstable Affliction || Affliction instable
-			[47] = {Name = GetSpellInfo(28176),	GlobalId = 28176,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "armor"}, -- NOPE NOT IN Classic, BUT in TBC: Fel Armor || Gangrarmure
+			[47] = {Name = GetSpellInfo(28176),	GlobalId = 28176,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "armor"}, -- NOPE NOT IN Classic, BUT in TBC: Fel Armor || Gangrarmure
 			[48] = {Name = GetSpellInfo(27243),	GlobalId = 27243,	Mana = 50,	Rank = 0,	Duration = 18,	Type = "debuff", Usage = "seed"}, -- NOPE NOT IN Classic, BUT in TBC: Seed of Corruption || Graine de Corruption
 			[49] = {Name = GetSpellInfo(29858),	GlobalId = 29858,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "shatter"}, -- NOPE NOT IN Classic, BUT in TBC: SoulShatter || Brise âme
 			[50] = {Name = GetSpellInfo(29893),	GlobalId = 29893,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "ritual_souls"}, -- NOPE NOT IN Classic, BUT in TBC: Ritual of Souls || Rituel des âmes
@@ -217,44 +217,12 @@ function Necrosis:SpellLocalize(tooltip)
 			[57] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 30,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Immolation Aura || Aura d'immolation
 			[58] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 15,	Type = nil,      Usage = "#none#"}, --  NOPE NOT IN Classic Challenging Howl || Hurlement de défi
 			[59] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,   Duration = 60,	Type = nil,      Usage = "#none#"}, --NOPE NOT IN Classic   Demonic Empowerment || Renforcement démoniaque
-			[60] = {Name = GetSpellInfo(18789),	GlobalId = 18789,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[61] = {Name = GetSpellInfo(18790),	GlobalId = 18790,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[62] = {Name = GetSpellInfo(18791),	GlobalId = 18791,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[63] = {Name = GetSpellInfo(18792),	GlobalId = 18792,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[64] = {Name = GetSpellInfo(35701),	GlobalId = 35701,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "single", Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			-- Firestone = {
-			-- 	SpellIds = {
-			-- 		6366,  -- Lesser
-			-- 		17951, -- Normal
-			-- 		17952, -- Greater
-			-- 		17953  -- Major
-			-- 	}
-			-- },
-			-- Healthstone = {
-			-- 	SpellIds = {
-			-- 		6202,  -- Minor
-			-- 		6201,  -- Lesser
-			-- 		5699,  -- Normal
-			-- 		11729, -- Greater
-			-- 		11730  -- Major
-			-- 	}
-			-- },
-			-- Soulstone = {
-			-- 	SpellIds = {
-			-- 		693,   -- Minor
-			-- 		20752, -- Lesser
-			-- 		20755, -- Normal
-			-- 		20756, -- Greater
-			-- 		20757  -- Major
-			-- 	}
-			-- },
-			-- Spellstone = {
-			-- 	SpellIds = {
-			-- 		2362,  -- Normal
-			-- 		17727, -- Greater
-			-- 		17728  -- Major
-			-- 	}
-			-- },
+			[60] = {Name = GetSpellInfo(18789),	GlobalId = 18789,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[61] = {Name = GetSpellInfo(18790),	GlobalId = 18790,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[62] = {Name = GetSpellInfo(18791),	GlobalId = 18791,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[63] = {Name = GetSpellInfo(18792),	GlobalId = 18792,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[64] = {Name = GetSpellInfo(35701),	GlobalId = 35701,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+
 			SoulstoneRez = {
 				SpellIds = {
 					20707, -- Minor
@@ -279,11 +247,6 @@ function Necrosis:SpellLocalize(tooltip)
 			AuraType = {}
 		}
 
-		-- MakeSpellIdRanks(self.Spell.Firestone)
-		-- MakeSpellIdRanks(self.Spell.Healthstone)
-		-- MakeSpellIdRanks(self.Spell.Soulstone)
-		-- MakeSpellIdRanks(self.Spell.Spellstone)
-
 		-- These durations are special, either vary by spell rank like banish,  or are no spell, like Demonic Sacrifice.
 		-- All other durations are constant and automatically added by the Duration from the Spell list above.
 		-- Inspired by LibClassicDurations to hard-code it since UnitDebuff(..) API always returns 0
@@ -299,114 +262,7 @@ function Necrosis:SpellLocalize(tooltip)
 		AddAuraDuration({20707, 20762, 20763, 20764, 20765}, 1800, "soulstone") -- Soulstone Resurrection 1-5
 		-- Destruction
 		AddAuraDuration({17794, 17797, 17798, 17799, 17800}, 12, "debuff") -- Shadow Vulnerability
-
-
-		-- Type 0 = Pas de Timer || no timer
-		-- Type 1 = Timer permanent principal || Standing main timer
-		-- Type 2 = Timer permanent || main timer
-		-- Type 3 = Timer de cooldown || cooldown timer
-		-- Type 4 = Timer de malédiction || curse timer
-		-- Type 5 = Timer de corruption || corruption timer
-		-- Type 6 = Timer de combat || combat timer
 	end
-	
-	-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	-- -- Relocalisation des Tooltips
-	-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
-	-- -- stones || Pierres
-	-- local buttonTooltip = new("array",
-	-- 	"Soulstone",
-	-- 	"Healthstone",
-	-- 	"Spellstone",
-	-- 	"Firestone"
-	-- )
-	-- local colorCode = new("array",
-	-- 	"|c00FF99FF", "|c0066FF33", "|c0099CCFF", "|c00FF4444"
-	-- )
-	-- for i, button in ipairs(buttonTooltip) do
-	-- 	if not self.TooltipData[button] then
-	-- 		self.TooltipData[button] = {}
-	-- 	end
-	-- 	self.TooltipData[button].Label = colorCode[i]..self.Translation.Item[button].."|r"
-	-- end
-	-- del(buttonTooltip)
-	-- del(colorCode)
-	
-	-- -- Buffs
-	-- local buttonTooltip = new("array",
-	-- 	"Domination",
-	-- 	"Enslave",
-	-- 	"Armor",
-	-- 	"FelArmor",
-	-- 	"Invisible",
-	-- 	"Aqua",
-	-- 	"Kilrogg",
-	-- 	"Banish",
-	-- 	"TP",
-	-- 	"RoS",
-	-- 	"SoulLink",
-	-- 	"ShadowProtection",
-	-- 	"Renforcement"
-	-- )
-	-- local buttonName = new("array",
-	-- 	15, 35, 31, 47, 33, 32, 34, 9, 37, 50, 38, 43, 59
-	-- )
-	-- for i, button in ipairs(buttonTooltip) do
-	-- 	if not self.TooltipData[button] then
-	-- 		self.TooltipData[button] = {}
-	-- 	end
-	-- 	self.TooltipData[button].Label = "|c00FFFFFF"..self.Spell[buttonName[i]].Name.."|r"
-	-- end
-	-- del(buttonTooltip)
-	-- del(colorCode)
-	-- del(buttonName)
-
-	-- -- Demons
-	-- local buttonTooltip = new("array",
-	-- 	"Sacrifice",
-	-- 	"Charge",
-	-- 	"Enchainement",
-	-- 	"Immolation",
-	-- 	"Defi",
-	-- 	"Renforcement",
-	-- 	"Enslave"
-	-- )
-	-- local buttonName = new("array",
-	-- 	44, 39, 56, 57, 58, 59, 35
-	-- )
-	-- for i, button in ipairs(buttonTooltip) do
-	-- 	if not self.TooltipData[button] then
-	-- 		self.TooltipData[button] = {}
-	-- 	end
-	-- 	self.TooltipData[button].Label = "|c00FFFFFF"..self.Spell[buttonName[i]].Name.."|r"
-	-- end
-	-- del(buttonTooltip)
-	-- del(colorCode)
-	-- del(buttonName)
-	
-	-- -- Curses || Malédiction
-	-- local buttonTooltip = new("array",
-	-- 	"Weakness",
-	-- 	"Agony",
-	-- 	"Tongues",
-	-- 	"Exhaust",
-	-- 	"Elements",
-	-- 	"Doom",
-	-- 	"Corruption"
-	-- )
-	-- local buttonName = new("array",
-	-- 	23, 22, 25, 40, 26, 16, 14
-	-- )
-	-- for i, button in ipairs(buttonTooltip) do
-	-- 	if not self.TooltipData[button] then
-	-- 		self.TooltipData[button] = {}
-	-- 	end
-	-- 	self.TooltipData[button].Label = "|c00FFFFFF"..self.Spell[buttonName[i]].Name.."|r"
-
-	-- end
-	-- del(buttonTooltip)
-	-- del(colorCode)
-	-- del(buttonName)
 end
 
 -- https://github.com/WeakAuras/WeakAuras2/wiki/Useful-Snippets
@@ -463,23 +319,6 @@ function Necrosis:SpellSetup()
 
 		local spellNameOrg = spellName
 
-		-- if (tContains(Necrosis.Spell.Healthstone.SpellIds, globalId)) then
-		-- 	-- Healthstone
-		-- 	local spellRank = Necrosis.Spell.Healthstone[globalId]
-		-- 	UpdateSpellIfHigherRank(52, spellRank, spellID, spellNameOrg, globalId)
-		-- elseif (tContains(Necrosis.Spell.Soulstone.SpellIds, globalId)) then
-		-- 	-- Soulstone
-		-- 	local spellRank = Necrosis.Spell.Soulstone[globalId]
-		-- 	UpdateSpellIfHigherRank(51, spellRank, spellID, spellNameOrg, globalId)
-		-- elseif (tContains(Necrosis.Spell.Firestone.SpellIds, globalId)) then
-		-- 	-- Firestone
-		-- 	local spellRank = Necrosis.Spell.Firestone[globalId]
-		-- 	UpdateSpellIfHigherRank(54, spellRank, spellID, spellNameOrg, globalId)
-		-- elseif (tContains(Necrosis.Spell.Spellstone.SpellIds, globalId)) then
-		-- 	-- Spellstone
-		-- 	local spellRank = Necrosis.Spell.Spellstone[globalId]
-		-- 	UpdateSpellIfHigherRank(53, spellRank, spellID, spellNameOrg, globalId)
-		-- elseif (subSpellName and subSpellName ~= " " and subSpellName ~= "") then
 		if (subSpellName and subSpellName ~= " " and subSpellName ~= "") then
 			-- For spells with numbered ranks, compare each one || Pour les sorts avec des rangs numérotés, on compare pour chaque sort les rangs 1 à 1
 			-- And preserve the highest rank || Le rang supérieur est conservé
@@ -524,32 +363,6 @@ function Necrosis:SpellSetup()
 			end
 		end
 	end
-
-	-- -- Update the spell durations according to their rank || On met à jour la durée de chaque sort en fonction de son rang
-	-- -- Fear || Peur
-	-- if (Necrosis.Spell[13].ID and Necrosis.Spell[13].Rank) then
-	-- 	Necrosis.Spell[13].Length = tonumber(Necrosis.Spell[13].Rank) * 5 + 5
-	-- end
-
-	-- -- Corruption
-	-- if (Necrosis.Spell[14].ID and Necrosis.Spell[14].Rank) then
-	-- 	if (Necrosis.Spell[14].Rank <= 2) then
-	-- 		Necrosis.Spell[14].Length = Necrosis.Spell[14].Rank * 3 + 9
-	-- 	end
-	-- end
-
-	-- WoW 3.0 :  Les montures se retrouvent dans une interface à part
-	-- if GetNumCompanions("MOUNT") > 0 then
-	-- 	for i = 1, GetNumCompanions("MOUNT"), 1 do
-	-- 		local _, NomCheval, SpellCheval = Necrosis:GetCompanionInfo("MOUNT", i)
-	-- 		if NomCheval == Necrosis.Spell[1].Name then
-	-- 			Necrosis.Spell[1].ID = SpellCheval
-	-- 		end
-	-- 		if NomCheval == Necrosis.Spell[2].Name then
-	-- 			Necrosis.Spell[2].ID = SpellCheval
-	-- 		end
-	-- 	end
-	-- end
 
 	-- associate the mounts to the sphere button || Association du sort de monture correct au bouton
 	Necrosis.CurrentEnv.FelsteedAvailable = Necrosis.Spell[1].ID ~= nil

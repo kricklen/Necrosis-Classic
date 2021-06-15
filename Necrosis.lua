@@ -902,11 +902,16 @@ function Necrosis:OnUpdate(elapsed)--something,
 end
 
 
-local function AddSpellTimer(spellName)
+local function AddSpellTimer(spellId)
 	if (NecrosisConfig.EnableTimerBars) then
-		local spellData = Necrosis.CurrentEnv.SpellCast[spellName]
+		local spellData = Necrosis.CurrentEnv.SpellCast[spellId]
 		if (spellData) then
-			if (not spellData.TargetGuid or not spellData.TargetName) then
+			if (not spellData.TargetGuid
+				or not spellData.TargetName
+				or spellData.SpellType == "self"
+				or spellData.TargetIsDead
+				or (spellData.SpellType == "single" and spellData.TargetIsEnemy))
+			then
 				-- If target is empty the spell (likely soustone etc.) hits ourself
 				spellData.TargetGuid = Necrosis.CurrentEnv.PlayerGuid
 				spellData.TargetName = Necrosis.CurrentEnv.PlayerName
@@ -928,7 +933,7 @@ local function AddSpellTimer(spellName)
 					Necrosis.CurrentEnv.PlayerName,
 					spellData.TargetGuid, spellData.TargetName, 0, destIconNumber,
 					spellData.SpellId,
-					spellName,
+					spellData.Name,
 					spellData.Duration,
 					Necrosis.Spell.AuraType[spellData.SpellId]
 				)
@@ -1012,6 +1017,40 @@ function Necrosis.OnEvent(self, event, ...)
 		Local.Desatured = {}
 		Local.Dead = false
 
+	-- When the warlock begins to cast a spell, we intercept the spell's name || Quand le démoniste commence à incanter un sort, on intercepte le nom de celui-ci
+	-- We also save the name of the target of the spell as well as its level || On sauve également le nom de la cible du sort ainsi que son niveau
+	elseif (event == "UNIT_SPELLCAST_SENT" and arg1 == "player")
+	then
+		-- arg1 = unit
+		-- arg2 = targetName
+		-- arg3 = castGUID
+		-- arg4 = spellID
+
+		-- print('spellcast send : arg 1 =   ' .. tostring(arg1) )
+		-- print('spellcast send : arg 2 =   ' .. tostring(arg2) )
+		-- print('spellcast send : arg 3 =   ' .. tostring(arg3) )
+		-- print('spellcast send : arg 4 =   ' .. tostring(arg4) )
+		-- print('spellcast send : arg 5 =   ' .. tostring(arg5) )
+		-- print('spellcast send : arg 6 =   ' .. tostring(arg6) )
+
+		local spellData = {
+			SpellId = arg4,
+			Name = GetSpellInfo(arg4),
+			Duration = Necrosis.Spell.AuraDuration[arg4],
+			SpellType = Necrosis.Spell.AuraType[arg4],
+			TargetName = UnitName("target"),
+			TargetGuid = UnitGUID("target"),
+			TargetIsDead = UnitIsDead("target"),
+			TargetIsEnemy = UnitIsEnemy("player", "target")
+		}
+		-- Check if timers are enabled
+		if (NecrosisConfig.EnableTimerBars) then
+			if (Necrosis.Spell.AuraDuration[arg4]) then
+				Necrosis.CurrentEnv.SpellCast[arg4] = spellData
+			end
+		end
+		Necrosis.Chat:BeforeSpellCast(spellData)
+
 	-- Successful spell casting management || Gestion de l'incantation des sorts réussie
 	elseif (event == "UNIT_SPELLCAST_SUCCEEDED" and arg1 == "player")
 	then
@@ -1021,44 +1060,9 @@ function Necrosis.OnEvent(self, event, ...)
 		-- The event SPELL_AURA_REFRESH is not raised when we have no target,
 		-- f.e. when casting Unending Breath on ourselves.
 		-- So try to add a timer here as well.
-		local spellName = GetSpellInfo(arg3)
-		AddSpellTimer(spellName)
-		Necrosis.CurrentEnv.SpellCast[spellName] = nil
+		AddSpellTimer(arg3)
+		Necrosis.CurrentEnv.SpellCast[arg3] = nil
 		Necrosis.Chat:AfterSpellCast()
-
-	-- When the warlock begins to cast a spell, we intercept the spell's name || Quand le démoniste commence à incanter un sort, on intercepte le nom de celui-ci
-	-- We also save the name of the target of the spell as well as its level || On sauve également le nom de la cible du sort ainsi que son niveau
-	elseif (event == "UNIT_SPELLCAST_SENT" and arg1 == "player")
-	then
-		-- arg1 = unit
-		-- arg2 = targetName
-		-- arg3 = castGUID
-		-- arg4 = spellID
-		-- print("SENT: "..tostring(arg2)..", "..tostring(arg3)..", "..tostring(arg4))
-
-		local spellName = GetSpellInfo(arg4)
-		local spellData = {
-			SpellId = arg4,
-			Name = spellName,
-			Duration = Necrosis.Spell.AuraDuration[arg4],
-			TargetName = arg2,
-			TargetGuid = UnitGUID("target")
-		}
-		-- Check if timers are enabled
-		if (NecrosisConfig.EnableTimerBars) then
-			if (Necrosis.Spell.AuraDuration[arg4]) then
-				Necrosis.CurrentEnv.SpellCast[spellName] = spellData
-			end
-		end
-
-		-- print('spellcast send : arg 1 =   ' .. tostring(arg1) )
-		-- print('spellcast send : arg 2 =   ' .. tostring(arg2) )
-		-- print('spellcast send : arg 3 =   ' .. tostring(arg3) )
-		-- print('spellcast send : arg 4 =   ' .. tostring(arg4) )
-		-- print('spellcast send : arg 5 =   ' .. tostring(arg5) )
-		-- print('spellcast send : arg 6 =   ' .. tostring(arg6) )
-
-		Necrosis.Chat:BeforeSpellCast(spellData)
 
 	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
 	elseif ((event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == "player")
@@ -1066,7 +1070,7 @@ function Necrosis.OnEvent(self, event, ...)
 		-- arg1: unit (player etc)
 		-- arg2: castGUID
 		-- arg3: spellID
-		Necrosis.CurrentEnv.SpellCast[arg2] = nil
+		Necrosis.CurrentEnv.SpellCast[arg3] = nil
 		Necrosis.Chat:ClearMessages()
 
 	-- Flag if a Trade window is open, so you can automatically trade the healing stones || Flag si une fenetre de Trade est ouverte, afin de pouvoir trader automatiquement les pierres de soin
@@ -1221,28 +1225,30 @@ function Necrosis:OnCombatLogEvent(event, ...)
 		end
 
 		if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid) then
-			if (not Necrosis.CurrentEnv.SpellCast[spellName]
+			if (not Necrosis.CurrentEnv.SpellCast[spellId]
 				and Necrosis.Spell.AuraDuration[spellId])
 			then
-				Necrosis.CurrentEnv.SpellCast[spellName] = {
+				Necrosis.CurrentEnv.SpellCast[spellId] = {
 					SpellId = spellId,
 					Name = spellName,
 					Duration = Necrosis.Spell.AuraDuration[spellId],
+					SpellType = Necrosis.Spell.AuraType[SpellId],
 					TargetName = destName,
-					TargetGuid = destGUID
+					TargetGuid = destGUID,
+					TargetIsDead = UnitIsDead("target"),
+					TargetIsEnemy = UnitIsEnemy("player", "target")
 				}
 			end
-	
-			AddSpellTimer(spellName)
-			Necrosis.CurrentEnv.SpellCast[spellName] = nil
+			AddSpellTimer(spellId)
+			Necrosis.CurrentEnv.SpellCast[spellId] = nil
 		end
 
 	elseif (subevent == "SPELL_AURA_REFRESH"
 		and sourceGUID == Necrosis.CurrentEnv.PlayerGuid
 		and destGUID == UnitGUID("target"))
 	then
-		AddSpellTimer(spellName)
-		Necrosis.CurrentEnv.SpellCast[spellName] = nil
+		AddSpellTimer(spellId)
+		Necrosis.CurrentEnv.SpellCast[spellId] = nil
 
 	-- Detection of the end of Shadow Trance and Contrecoup || Détection de la fin de la transe de l'ombre et de Contrecoup
 	elseif (subevent == "SPELL_AURA_REMOVED")
@@ -1280,7 +1286,7 @@ function Necrosis:OnCombatLogEvent(event, ...)
 	then
 print("Necrosis - Spell resisted: "..tostring(spellName))
 
-		Necrosis.CurrentEnv.SpellCast[spellName] = nil
+		Necrosis.CurrentEnv.SpellCast[spellId] = nil
 	
 		if NecrosisConfig.AntiFearAlert
 			and (spellName == Necrosis.Spell[13].Name or spellName == Necrosis.Spell[19].Name)
