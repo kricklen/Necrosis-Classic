@@ -63,6 +63,7 @@ function _chat:BeforeSpellCast(spellData)
 		-- Chat messages have been disabled
 		return nil
 	end
+
 	-- messages to be posted while summoning a mount
 	if (spellData.Name == Necrosis.Spell[1].Name or spellData.Name == Necrosis.Spell[2].Name) then
 		if NecrosisConfig.SteedSummon then
@@ -75,7 +76,8 @@ function _chat:BeforeSpellCast(spellData)
 		end
 	-- messages to be posted while casting 'Soulstone' on a friendly target
 	elseif tContains(Necrosis.Spell.SoulstoneRez.SpellIds, spellData.SpellId)
-			and not (spellData.TargetName == Necrosis.CurrentEnv.PlayerName)
+			and spellData.TargetName ~= nil
+			and spellData.TargetName ~= Necrosis.CurrentEnv.PlayerName
 	then
 		_chat:CastSoulstone(spellData.TargetName)
 	-- messages to be posted while casting 'Ritual of Summoning'

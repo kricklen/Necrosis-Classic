@@ -212,6 +212,9 @@ Necrosis.TooltipData = {
 	["Banish"] = {
 		Text = L["BANISH_TEXT"]
 	},
+	["Shatter"] = {
+		Label = "Soul Shatter"
+	},
 	["Imp"] = {
 		Label = "" --L["IMP_LABEL"]
 	},

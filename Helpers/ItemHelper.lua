@@ -11,7 +11,7 @@ ItemHelper = {
             13699, -- Normal
             13700, -- Greater
             13701, -- Major
-            27250  -- Master
+            22128  -- Master
         }
     },
 
@@ -22,7 +22,7 @@ ItemHelper = {
             19009, -- Normal
             19011, -- Greater
             19013, -- Major
-            27230  -- Master
+            22105  -- Master
         }
     },
 
@@ -33,7 +33,7 @@ ItemHelper = {
             16893, -- Normal
             16895, -- Greater
             16896, -- Major
-            27238  -- Master
+            22116  -- Master
         }
     },
 
@@ -42,7 +42,7 @@ ItemHelper = {
             5522,  -- Normal
             13602, -- Greater
             13603, -- Major
-            28172  -- Master
+            22646  -- Master
         }
     }
 }

@@ -1045,7 +1045,7 @@ function Necrosis.OnEvent(self, event, ...)
 		}
 		-- Check if timers are enabled
 		if (NecrosisConfig.EnableTimerBars) then
-			if (Necrosis.Spell.AuraDuration[arg4]) then
+			if (spellData.Duration ~= nil) then
 				Necrosis.CurrentEnv.SpellCast[arg4] = spellData
 			end
 		end
@@ -1064,7 +1064,7 @@ function Necrosis.OnEvent(self, event, ...)
 		Necrosis.CurrentEnv.SpellCast[arg3] = nil
 		Necrosis.Chat:AfterSpellCast()
 
-	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
+		-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
 	elseif ((event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == "player")
 	then
 		-- arg1: unit (player etc)
@@ -1368,7 +1368,10 @@ local function ManaLocalize(mana)
 end
 local function AddCastAndCost(usage)
 	GameTooltip:AddLine(Necrosis.GetSpellCastName(usage))
-	ManaLocalize(Necrosis.GetSpellMana(usage)) 
+	local manaCost = Necrosis.GetSpellMana(usage)
+	if (manaCost) then
+		ManaLocalize(Necrosis.GetSpellMana(usage))
+	end
 end
 local function AddShard()
 	if BagHelper.Soulshard_Count == 0 then
@@ -1610,8 +1613,6 @@ function Necrosis:BuildButtonTooltip(button)
 		GameTooltip:SetText(Necrosis.TooltipData[Type].Label.."          |CFF808080"..Necrosis.GetSpellCastName("bolt").."|r")
 	-- ..... for other buffs and demons, the mana cost ... ||..... pour les autres buffs et démons, le coût en mana...
 	elseif (Type == "Enslave") then AddCastAndCost("enslave"); AddShard()
-	-- elseif (Type == "Mount") and Necrosis.Warlock_Spells[23161].InSpellBook then
-	-- elseif (Type == "Mount") and Necrosis.CurrentEnv.IsDreadsteedAvailable then
 	elseif (Type == "Mount") then
 		local left = nil
 		local right = nil
@@ -1628,18 +1629,6 @@ function Necrosis:BuildButtonTooltip(button)
 		if (right) then
 			GameTooltip:AddLine(right);
 		end
-		-- if (NecrosisConfig.LeftMount) then
-		-- 	local leftMountName = GetSpellInfo(NecrosisConfig.LeftMount);
-		-- 	GameTooltip:AddLine(leftMountName);
-		-- else
-		-- 	--use tooltip for default mounts
-		-- 	GameTooltip:AddLine(Necrosis.TooltipData[Type].Text);
-		-- end
-		-- if (NecrosisConfig.RightMount) then
-		-- 	local rightMountName = GetSpellInfo(NecrosisConfig.RightMount)
-		-- 	GameTooltip:AddLine(rightMountName);
-		-- end
-
 	elseif (Type == "Armor") then
 		-- Check for Fel and Demon Armor
 		local left = nil
@@ -1671,6 +1660,9 @@ function Necrosis:BuildButtonTooltip(button)
 		if Necrosis.GetSpellRank("banish") == 2 then
 			GameTooltip:AddLine(Necrosis.TooltipData[Type].Text) -- R click rank 1
 		end
+	elseif (Type == "Shatter") 		then
+		AddCastAndCost("shatter")
+		AddShard()
 	elseif (Type == "Weakness")		then AddCastAndCost("weakness")
 	elseif (Type == "Agony")		then AddCastAndCost("agony")
 	elseif (Type == "Tongues")		then AddCastAndCost("tongues")
@@ -1684,30 +1676,11 @@ function Necrosis:BuildButtonTooltip(button)
 	elseif (Type == "ShadowProtection") then AddCastAndCost("ward")
 		local start2, duration2 = Necrosis.Spells:GetShadowWardCooldown()
 		if start2 and duration2 then
-			-- local seconde = duration2 - ( GetTime() - start2)
-			-- local affiche
-			-- affiche = tostring(floor(seconde)).." sec"
-			-- GameTooltip:AddLine("Cooldown : "..affiche)
 			GameTooltip:AddLine("Cooldown : "..duration2)
 		end
 	elseif (Type == "Domination") then
 		local start,  duration  = Necrosis.Spells:GetFelDominationCooldown()
 		if start and duration then
-			-- local seconde = duration - ( GetTime() - start)
-			-- local affiche, minute, time
-			-- if seconde <= 59 then
-			-- 	affiche = tostring(floor(seconde)).." sec"
-			-- else
-			-- 	minute = tostring(floor(seconde/60))
-			-- 	seconde = mod(seconde, 60)
-			-- 	if seconde <= 9 then
-			-- 		time = "0"..tostring(floor(seconde))
-			-- 	else
-			-- 		time = tostring(floor(seconde))
-			-- 	end
-			-- 	affiche = minute..":"..time
-			-- end
-			-- GameTooltip:AddLine("Cooldown : "..affiche)
 			GameTooltip:AddLine("Cooldown : "..duration)
 		end
 	elseif (Type == "Imp")			then AddCastAndCost("imp"); AddDominion()--start, duration)

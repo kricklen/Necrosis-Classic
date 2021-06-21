@@ -463,7 +463,6 @@ function Necrosis:MainButtonAttribute()
 		end
 	end
 
-	-- local main_cast = Necrosis.GetSpellCastName(NecrosisConfig.MainSpell) --Necrosis:GetSpellName(NecrosisConfig.MainSpell)
 	local main_cast = Necrosis.Spell[NecrosisConfig.MainSpell].NameOrg
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("MainButtonAttribute"

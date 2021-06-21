@@ -82,29 +82,33 @@ Necrosis.Spells = {}
 
 local _sp = Necrosis.Spells
 
+function _sp:GetSoulShatterCooldown()
+	return self:GetSpellCooldownTime(Necrosis.Spell[49].GlobalId)
+end
+
 function _sp:GetFelDominationCooldown()
-	return self:GetSpellCooldownTime(Necrosis.Spell[15].ID)
+	return self:GetSpellCooldownTime(Necrosis.Spell[15].GlobalId)
 end
 
 function _sp:GetShadowWardCooldown()
-	return self:GetSpellCooldownTime(Necrosis.Spell[43].ID)
+	return self:GetSpellCooldownTime(Necrosis.Spell[43].GlobalId)
 end
 
 function _sp:GetRitualOfSoulsCooldown()
-	return self:GetSpellCooldownTime(Necrosis.Spell[50].ID)
+	return self:GetSpellCooldownTime(Necrosis.Spell[50].GlobalId)
 end
 
-function _sp:GetSpellCooldownTime(spellBookId)
-	local secs = self:GetSpellCooldownInSecs(spellBookId)
+function _sp:GetSpellCooldownTime(spellId)
+	local secs = self:GetSpellCooldownInSecs(spellId)
 	return (secs > 0), Necrosis.Timers:GetFormattedTime(secs)
 end
 
-function _sp:GetSpellCooldownInSecs(spellBookId)
-	if not spellBookId then
+function _sp:GetSpellCooldownInSecs(spellId)
+	if not spellId then
 		-- Some spells may not be available
 		return 0
 	end
-	local startTime, duration, enable = GetSpellCooldown(spellBookId, BOOKTYPE_SPELL)
+	local startTime, duration, enable = GetSpellCooldown(spellId)
 	if enable == 0 then
 		return 0
 	end
@@ -119,8 +123,6 @@ function _sp:GetRankNumberFromSubName(subName)
 	local _, _, rank = subName:find("(%d+)")
 	if rank then
 		return tonumber(rank)
-	elseif (subName == "Summon") then -- Eye of Kilrogg, Fel Steed etc. now have Summon subtitle
-		return 0
 	end
 	return nil
 end
@@ -223,6 +225,7 @@ function Necrosis:SpellLocalize(tooltip)
 			[63] = {Name = GetSpellInfo(18792),	GlobalId = 18792,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
 			[64] = {Name = GetSpellInfo(35701),	GlobalId = 35701,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
 
+			-- See https://tbc.wowhead.com/spell=20707/soulstone-resurrection
 			SoulstoneRez = {
 				SpellIds = {
 					20707, -- Minor
@@ -230,7 +233,7 @@ function Necrosis:SpellLocalize(tooltip)
 					20763, -- Normal
 					20764, -- Greater
 					20765, -- Major
-					22116  -- Master
+					27239  -- Master
 				}
 			},
 			DemonicSacrifices = {
@@ -259,7 +262,7 @@ function Necrosis:SpellLocalize(tooltip)
 		-- Demonology
 		AddAuraDuration({710}, 20, "single") -- Banish 1
 		AddAuraDuration(Necrosis.Spell.DemonicSacrifices.SpellIds, 1800, "single") -- Demonic Sacrifices
-		AddAuraDuration({20707, 20762, 20763, 20764, 20765}, 1800, "soulstone") -- Soulstone Resurrection 1-5
+		AddAuraDuration(Necrosis.Spell.SoulstoneRez.SpellIds, 1800, "soulstone") -- Soulstone Resurrection 1-5
 		-- Destruction
 		AddAuraDuration({17794, 17797, 17798, 17799, 17800}, 12, "debuff") -- Shadow Vulnerability
 	end
@@ -274,7 +277,8 @@ function Necrosis:GetManaCostForSpell(spellID)
 		return false
 	end
 	return table.foreach(costTable,
-		function(k,v)  
+		function(k,v)
+			-- print("Cost: "..tostring(spellID)..", "..tostring(v.type)..", "..tostring(v.name))
 			if (v.name  == "MANA") then
 				return v.cost;
 			end 
@@ -289,7 +293,7 @@ local function UpdateSpellIfHigherRank(index, spellRank, spellID, spellNameOrg, 
 		Necrosis.Spell[index].Rank = spellRank
 		Necrosis.Spell[index].NameOrg = spellNameOrg
 		Necrosis.Spell[index].GlobalId = globalId
-		Necrosis.Spell[index].Mana = Necrosis:GetManaCostForSpell(spellNameOrg)
+		Necrosis.Spell[index].Mana = Necrosis:GetManaCostForSpell(globalId)
 		-- Add a duration and type for the specific spellId if it's a debuff etc.
 		if (Necrosis.Spell.AuraDuration[globalId] == nil and
 			Necrosis.Spell[index].Duration > 0)
@@ -318,8 +322,7 @@ function Necrosis:SpellSetup()
 		end
 
 		local spellNameOrg = spellName
-
-		if (subSpellName and subSpellName ~= " " and subSpellName ~= "") then
+		if (subSpellName and subSpellName ~= " " and subSpellName ~= "" and subSpellName ~= "Summon") then
 			-- For spells with numbered ranks, compare each one || Pour les sorts avec des rangs numérotés, on compare pour chaque sort les rangs 1 à 1
 			-- And preserve the highest rank || Le rang supérieur est conservé
 			local spellRank = Necrosis.Spells:GetRankNumberFromSubName(subSpellName)
@@ -331,7 +334,6 @@ function Necrosis:SpellSetup()
 						break
 					end
 				end
-			else
 			end
 		else
 			-- The spell has no subSpellName, like Ritual of Summoning or
@@ -866,6 +868,10 @@ Necrosis.Warlock_Buttons = {
 					norm = GraphicsHelper:GetTexture("Banish-01"),
 					high = GraphicsHelper:GetTexture("Banish-02"),
 					}, --
+	shatter 	= {f = "NecrosisBuffMenu10", tip = "Shatter", anchor = "ANCHOR_RIGHT",
+					norm = GraphicsHelper:GetTexture("PetMenuButton-01"),
+					high = GraphicsHelper:GetTexture("PetMenuButton-02"),
+					}, --
 
 	domination 	= {f = "NecrosisPetMenu01", tip = "Domination", anchor = "ANCHOR_RIGHT",
 					norm = GraphicsHelper:GetTexture("Domination-01"),
@@ -994,19 +1000,20 @@ Necrosis.Warlock_Lists = {
 		[6] = {f_ptr = "link", high_of = "link", },
 		[7] = {f_ptr = "ward", high_of = "ward", },
 		[8] = {f_ptr = "banish", high_of = "banish", },
+		[9] = {f_ptr = "shatter", high_of = "shatter", },
 	},
 -- 			15, 3, 4, 5, 6, 8, 30, 35, 44, 59
 	["pets"] = { -- 2 types: summon pet and (buff or temporary) pet
-		[1] = {f_ptr = "domination", high_of = "domination",},
-		[2] = {f_ptr = "imp", high_of = "imp", s_type = "summon", },
-		[3] = {f_ptr = "voidwalker", high_of = "voidwalker", },
-		[4] = {f_ptr = "succubus", high_of = "succubus", },
-		[5] = {f_ptr = "felhunter", high_of = "felhunter", },
-		-- [6] = {f_ptr = "felguard", high_of = "felguard", },
-		[6] = {f_ptr = "inferno", high_of = "inferno", },
-		[7] = {f_ptr = "rit_of_doom", high_of = "rit_of_doom", },
-		[8] = {f_ptr = "enslave", high_of = "enslave", },
-		[9] = {f_ptr = "sacrifice", high_of = "sacrifice", },
+		[1]  = {f_ptr = "domination", high_of = "domination",},
+		[2]  = {f_ptr = "imp", high_of = "imp", s_type = "summon", },
+		[3]  = {f_ptr = "voidwalker", high_of = "voidwalker", },
+		[4]  = {f_ptr = "succubus", high_of = "succubus", },
+		[5]  = {f_ptr = "felhunter", high_of = "felhunter", },
+		[6]  = {f_ptr = "felguard", high_of = "felguard", },
+		[7]  = {f_ptr = "inferno", high_of = "inferno", },
+		[8]  = {f_ptr = "rit_of_doom", high_of = "rit_of_doom", },
+		[9]  = {f_ptr = "enslave", high_of = "enslave", },
+		[10] = {f_ptr = "sacrifice", high_of = "sacrifice", },
 	},
 -- 23, -- Curse of weakness 22, -- Curse of agony 25, -- Curse of tongues 40, -- Curse of exhaustion 26, -- Curse of the elements 16, -- Curse of doom 14 -- Corruption
 	["curses"] = {
