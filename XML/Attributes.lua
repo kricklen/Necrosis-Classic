@@ -70,9 +70,9 @@ _G["DEFAULT_CHAT_FRAME"]:AddMessage(">>>"
 end
 -- On crée les menus sécurisés pour les différents sorts Buff / Démon / Malédictions
 function Necrosis:MenuAttribute(menu)
-	if InCombatLockdown() then
-		return
-	end
+	-- if InCombatLockdown() then
+	-- 	return
+	-- end
 
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("MenuAttribute"

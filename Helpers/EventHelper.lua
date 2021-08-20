@@ -83,6 +83,7 @@ end
 
 -- Process messages from other warlocks in the raid or party
 function _eh:ProcessAddonMessage(text)
+    print("ProcessAddonMessage: "..tostring(text))
     local split_cmd = split(text, "~")
     -- print("command: "..tostring(split_cmd[1])..", "..tostring(split_cmd[2]))
 

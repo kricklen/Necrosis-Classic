@@ -203,7 +203,7 @@ function Necrosis:SpellLocalize(tooltip)
 			[41] = {Name = GetSpellInfo(1454),	GlobalId = 1454,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "life_tap"}, -- Life Tap || Connexion
 			[42] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 12,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Haunt || Hanter
 			[43] = {Name = GetSpellInfo(6229),	GlobalId = 6229,	Mana = 50,	Rank = 0,	Duration = 30,	Type = "single", Usage = "ward"}, -- Shadow Ward || Gardien de l'ombre
-			[44] = {Name = GetSpellInfo(18788),	GlobalId = 18788,	Mana = 50,	Rank = 0,	Duration = 0,   Type = nil,      Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			[44] = {Name = GetSpellInfo(18788),	GlobalId = 18788,	Mana = 50,	Rank = 0,	Duration = 1800,Type = nil,      Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
 			[45] = {Name = GetSpellInfo(686),	GlobalId = 686,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "bolt"}, -- Shadow Bolt
 			[46] = {Name = GetSpellInfo(30108),	GlobalId = 30108,	Mana = 50,	Rank = 0,	Duration = 18,	Type = "debuff", Usage = "affliction"}, -- NOPE NOT IN Classic, BUT in TBC: Unstable Affliction || Affliction instable
 			[47] = {Name = GetSpellInfo(28176),	GlobalId = 28176,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "armor"}, -- NOPE NOT IN Classic, BUT in TBC: Fel Armor || Gangrarmure
@@ -219,11 +219,11 @@ function Necrosis:SpellLocalize(tooltip)
 			[57] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 30,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Immolation Aura || Aura d'immolation
 			[58] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 15,	Type = nil,      Usage = "#none#"}, --  NOPE NOT IN Classic Challenging Howl || Hurlement de défi
 			[59] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,   Duration = 60,	Type = nil,      Usage = "#none#"}, --NOPE NOT IN Classic   Demonic Empowerment || Renforcement démoniaque
-			[60] = {Name = GetSpellInfo(18789),	GlobalId = 18789,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[61] = {Name = GetSpellInfo(18790),	GlobalId = 18790,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[62] = {Name = GetSpellInfo(18791),	GlobalId = 18791,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[63] = {Name = GetSpellInfo(18792),	GlobalId = 18792,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
-			[64] = {Name = GetSpellInfo(35701),	GlobalId = 35701,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			-- [60] = {Name = GetSpellInfo(18789),	GlobalId = 18789,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			-- [61] = {Name = GetSpellInfo(18790),	GlobalId = 18790,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			-- [62] = {Name = GetSpellInfo(18791),	GlobalId = 18791,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			-- [63] = {Name = GetSpellInfo(18792),	GlobalId = 18792,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
+			-- [64] = {Name = GetSpellInfo(35701),	GlobalId = 35701,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
 
 			-- See https://tbc.wowhead.com/spell=20707/soulstone-resurrection
 			SoulstoneRez = {
@@ -250,7 +250,7 @@ function Necrosis:SpellLocalize(tooltip)
 			AuraType = {}
 		}
 
-		-- These durations are special, either vary by spell rank like banish,  or are no spell, like Demonic Sacrifice.
+		-- These durations are special, either vary by spell rank like banish, or are no spell, like Demonic Sacrifice.
 		-- All other durations are constant and automatically added by the Duration from the Spell list above.
 		-- Inspired by LibClassicDurations to hard-code it since UnitDebuff(..) API always returns 0
 		-- Affliction
@@ -261,7 +261,7 @@ function Necrosis:SpellLocalize(tooltip)
 		AddAuraDuration({5484}, 10, "debuff") -- Howl of Terror 1
 		-- Demonology
 		AddAuraDuration({710}, 20, "single") -- Banish 1
-		AddAuraDuration(Necrosis.Spell.DemonicSacrifices.SpellIds, 1800, "single") -- Demonic Sacrifices
+		AddAuraDuration(Necrosis.Spell.DemonicSacrifices.SpellIds, 1800, "self") -- Demonic Sacrifices
 		AddAuraDuration(Necrosis.Spell.SoulstoneRez.SpellIds, 1800, "soulstone") -- Soulstone Resurrection 1-5
 		-- Destruction
 		AddAuraDuration({17794, 17797, 17798, 17799, 17800}, 12, "debuff") -- Shadow Vulnerability

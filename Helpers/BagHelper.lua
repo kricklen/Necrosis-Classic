@@ -6,7 +6,6 @@ BagHelper = {
 	Soulstone_IsAvailable = false,
 	Soulstone_Rank = 0,
 	Soulstone_Name = nil,
-	Soulstone_BagId = nil,
 
 	Healthstone_IsAvailable = false,
 	Healthstone_Rank = 0,
@@ -17,16 +16,12 @@ BagHelper = {
 	Firestone_IsAvailable = false,
 	Firestone_Rank = 0,
 	Firestone_Name = nil,
-	Firestone_BagId = nil,
 
 	Spellstone_IsAvailable = false,
 	Spellstone_Rank = 0,
 	Spellstone_Name = nil,
-	Spellstone_BagId = nil,
 
 	Hearthstone_IsAvailable = false,
-	Hearthstone_BagId = nil,
-	Hearthstone_SlotId = nil
 }
 
 local _bh = BagHelper
@@ -37,7 +32,7 @@ function _bh:GetPlayerBags()
 		local bagName = GetBagName(i)
 		if (bagName) then
 			local bagSlots = GetContainerNumSlots(i)
-			local _, _, _, _, _, _, itemSubType = GetItemInfo(bagName)
+			local itemType, itemSubType, _, _, _, _, classID, subclassID = select(6, GetItemInfo(bagName))
 			table.insert(
 				bagsArray,
 				{
@@ -45,7 +40,8 @@ function _bh:GetPlayerBags()
 					name = bagName,
 					type = itemSubType,
 					capacity = bagSlots,
-					isSoulBag = (itemSubType == "Soul Bag")
+					isBag = (subclassID == 0), -- This is a normal bag, not profession specific
+					isSoulBag = (subclassID == 1)
 				}
 			)
 		end
@@ -68,55 +64,26 @@ function _bh:BagExplore(bagId)
 	then
 		return
 	end
-	local bagsArray = self:GetPlayerBags()
 
-	if (not bagId) then
-		self.Soulstone_IsAvailable = false
-		self.Soulstone_Rank = 0
-		self.Soulstone_Name = nil
-		self.Healthstone_IsAvailable = false
-		self.Healthstone_Rank = 0
-		self.Healthstone_Name = nil
-		self.Firestone_IsAvailable = false
-		self.Firestone_Rank = 0
-		self.Firestone_Name = nil
-		self.Spellstone_IsAvailable = false
-		self.Spellstone_Rank = 0
-		self.Spellstone_Name = nil
-		self.Hearthstone_IsAvailable = false
-		-- Search all bags || Parcours des sacs
-		for i,bag in ipairs(bagsArray) do
+	self.Soulstone_IsAvailable = false
+	self.Soulstone_Rank = 0
+	self.Soulstone_Name = nil
+	self.Healthstone_IsAvailable = false
+	self.Healthstone_Rank = 0
+	self.Healthstone_Name = nil
+	self.Firestone_IsAvailable = false
+	self.Firestone_Rank = 0
+	self.Firestone_Name = nil
+	self.Spellstone_IsAvailable = false
+	self.Spellstone_Rank = 0
+	self.Spellstone_Name = nil
+	self.Hearthstone_IsAvailable = false
+
+	-- Search all bags || Parcours des sacs
+	local bagsArray = self:GetPlayerBags()
+	for i,bag in ipairs(bagsArray) do
+		if (bag.isBag) then
 			self:_FindStones(bag)
-		end
-	else
-		if (self.Soulstone_BagId == bagId) then
-			self.Soulstone_IsAvailable = false
-			self.Soulstone_Rank = 0
-			self.Soulstone_Name = nil
-		end
-		if (self.Healthstone_BagId == bagId) then
-			self.Healthstone_IsAvailable = false
-			self.Healthstone_Rank = 0
-			self.Healthstone_Name = nil
-		end
-		if (self.Firestone_BagId == bagId) then
-			self.Firestone_IsAvailable = false
-			self.Firestone_Rank = 0
-			self.Firestone_Name = nil
-		end
-		if (self.Spellstone_BagId == bagId) then
-			self.Spellstone_IsAvailable = false
-			self.Spellstone_Rank = 0
-			self.Spellstone_Name = nil
-		end
-		if (self.Hearthstone_BagId == bagId) then
-			self.Hearthstone_IsAvailable = false
-		end
-		-- Search the bag that updated
-		for i,bag in ipairs(bagsArray) do
-			if (bagId == bag.id) then
-				self:_FindStones(bag)
-			end
 		end
 	end
 end
@@ -135,9 +102,7 @@ function _bh:_FindStones(bag)
 				then
 					self.Soulstone_IsAvailable = true
 					self.Soulstone_Rank = ItemHelper.Soulstone[itemId].Rank
-					self.Soulstone_BagId = bag.id
 					self.Soulstone_Name = ItemHelper.Soulstone[itemId].Name
-					-- NecrosisConfig.ItemSwitchCombat[4] = ItemHelper.Soulstone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:SoulstoneUpdateAttribute()
 
@@ -150,7 +115,6 @@ function _bh:_FindStones(bag)
 					self.Healthstone_BagId = bag.id
 					self.Healthstone_SlotId = slot
 					self.Healthstone_Name = ItemHelper.Healthstone[itemId].Name
-					-- NecrosisConfig.ItemSwitchCombat[3] = ItemHelper.Healthstone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:HealthstoneUpdateAttribute()
 
@@ -160,9 +124,7 @@ function _bh:_FindStones(bag)
 				then
 					self.Spellstone_IsAvailable = true
 					self.Spellstone_Rank = ItemHelper.Spellstone[itemId].Rank
-					self.Spellstone_BagId = bag.id
 					self.Spellstone_Name = ItemHelper.Spellstone[itemId].Name
-					-- NecrosisConfig.ItemSwitchCombat[1] = ItemHelper.Spellstone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:SpellstoneUpdateAttribute()
 
@@ -172,16 +134,13 @@ function _bh:_FindStones(bag)
 				then
 					self.Firestone_IsAvailable = true
 					self.Firestone_Rank = ItemHelper.Firestone[itemId].Rank
-					self.Firestone_BagId = bag.id
 					self.Firestone_Name = ItemHelper.Firestone[itemId].Name
-					-- NecrosisConfig.ItemSwitchCombat[2] = ItemHelper.Firestone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
 					Necrosis:FirestoneUpdateAttribute()
 
 				-- Check if its a hearthstone || et enfin la pierre de foyer
 				elseif (ItemHelper:IsHearthstone(itemId)) then
 					self.Hearthstone_IsAvailable = true
-					self.Hearthstone_BagId = bag.id
 				end
 			end
 		end

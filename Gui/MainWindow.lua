@@ -196,6 +196,8 @@ function _mw:Show()
 
 		-- Register handler to update texts when language changes
 		EventHelper:RegisterLanguageChangedHandler(_mw.UpdateTexts)
+		-- Make it closable by hitting escape
+		tinsert(UISpecialFrames, self.Frame:GetName())
 	end
 
 	self.Frame:Show()

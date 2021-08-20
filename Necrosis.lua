@@ -905,12 +905,12 @@ end
 local function AddSpellTimer(spellId)
 	if (NecrosisConfig.EnableTimerBars) then
 		local spellData = Necrosis.CurrentEnv.SpellCast[spellId]
-		if (spellData) then
+		if (spellData and spellData.SpellType) then
 			if (not spellData.TargetGuid
 				or not spellData.TargetName
 				or spellData.SpellType == "self"
 				or spellData.TargetIsDead
-				or (spellData.SpellType == "single" and spellData.TargetIsEnemy))
+				or (spellData.SpellType == "single" and not spellData.TargetIsFriend))
 			then
 				-- If target is empty the spell (likely soustone etc.) hits ourself
 				spellData.TargetGuid = Necrosis.CurrentEnv.PlayerGuid
@@ -935,7 +935,7 @@ local function AddSpellTimer(spellId)
 					spellData.SpellId,
 					spellData.Name,
 					spellData.Duration,
-					Necrosis.Spell.AuraType[spellData.SpellId]
+					spellData.SpellType
 				)
 			end
 		end
@@ -1041,7 +1041,7 @@ function Necrosis.OnEvent(self, event, ...)
 			TargetName = UnitName("target"),
 			TargetGuid = UnitGUID("target"),
 			TargetIsDead = UnitIsDead("target"),
-			TargetIsEnemy = UnitIsEnemy("player", "target")
+			TargetIsFriend = UnitIsFriend("player", "target")
 		}
 		-- Check if timers are enabled
 		if (NecrosisConfig.EnableTimerBars) then
@@ -1060,11 +1060,12 @@ function Necrosis.OnEvent(self, event, ...)
 		-- The event SPELL_AURA_REFRESH is not raised when we have no target,
 		-- f.e. when casting Unending Breath on ourselves.
 		-- So try to add a timer here as well.
+print("Spell success: "..tostring(arg3))
 		AddSpellTimer(arg3)
 		Necrosis.CurrentEnv.SpellCast[arg3] = nil
 		Necrosis.Chat:AfterSpellCast()
 
-		-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
+	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
 	elseif ((event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED") and arg1 == "player")
 	then
 		-- arg1: unit (player etc)
@@ -1225,20 +1226,23 @@ function Necrosis:OnCombatLogEvent(event, ...)
 		end
 
 		if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid) then
-			if (not Necrosis.CurrentEnv.SpellCast[spellId]
-				and Necrosis.Spell.AuraDuration[spellId])
+			-- The DS effects are not casted, only applied.
+			-- Add the corresponding buff as spell timer.
+			if (Necrosis.CurrentEnv.SpellCast[18788] -- DS casted
+				and tContains(Necrosis.Spell.DemonicSacrifices.SpellIds, spellId))
 			then
 				Necrosis.CurrentEnv.SpellCast[spellId] = {
 					SpellId = spellId,
 					Name = spellName,
 					Duration = Necrosis.Spell.AuraDuration[spellId],
-					SpellType = Necrosis.Spell.AuraType[SpellId],
+					SpellType = Necrosis.Spell.AuraType[spellId],
 					TargetName = destName,
 					TargetGuid = destGUID,
-					TargetIsDead = UnitIsDead("target"),
-					TargetIsEnemy = UnitIsEnemy("player", "target")
+					TargetIsDead = false,
+					TargetIsFriend = true
 				}
 			end
+
 			AddSpellTimer(spellId)
 			Necrosis.CurrentEnv.SpellCast[spellId] = nil
 		end
@@ -1284,7 +1288,7 @@ function Necrosis:OnCombatLogEvent(event, ...)
 			and sourceGUID == Necrosis.CurrentEnv.PlayerGuid
 			and destGUID == UnitGUID("target"))
 	then
-print("Necrosis - Spell resisted: "..tostring(spellName))
+print("Necrosis - Spell resisted: "..tostring(spellName)..", "..tostring(Necrosis.CurrentEnv.SpellCast[spellId]))
 
 		Necrosis.CurrentEnv.SpellCast[spellId] = nil
 	
