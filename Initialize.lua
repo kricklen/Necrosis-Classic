@@ -83,6 +83,71 @@ local function ApplyLocalization()
 	end
 end
 
+local function setupMenu()
+	Necrosis:CreateMenu()
+	Necrosis:ButtonSetup()
+
+	-- On règle la taille de la pierre et des boutons suivant les réglages du SavedVariables
+	NecrosisButton:SetScale(NecrosisConfig.NecrosisButtonScale/100)
+	NecrosisShadowTranceButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
+	NecrosisBacklashButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
+	NecrosisAntiFearButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
+	NecrosisCreatureAlertButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
+	-- -- On définit l'affichage des Timers Graphiques à gauche ou à droite du bouton
+	-- if _G["NecrosisTimerFrame0"] then
+	-- 	NecrosisTimerFrame0:ClearAllPoints()
+	-- 	NecrosisTimerFrame0:SetPoint(
+	-- 		NecrosisConfig.SpellTimerJust,
+	-- 		NecrosisSpellTimerButton,
+	-- 		"CENTER",
+	-- 		NecrosisConfig.SpellTimerPos * 20,
+	-- 		0
+	-- 	)
+	-- end
+	-- -- On définit l'affichage des Timers Textes à gauche ou à droite du bouton
+	-- if _G["NecrosisListSpells"] then
+	-- 	NecrosisListSpells:ClearAllPoints()
+	-- 	NecrosisListSpells:SetJustifyH(NecrosisConfig.SpellTimerJust)
+	-- 	NecrosisListSpells:SetPoint(
+	-- 		"TOP"..NecrosisConfig.SpellTimerJust,
+	-- 		"NecrosisSpellTimerButton",
+	-- 		"CENTER",
+	-- 		NecrosisConfig.SpellTimerPos * 23,
+	-- 		5
+	-- 	)
+	-- end
+
+	-- --On affiche ou on cache le bouton, d'ailleurs !
+	-- if not NecrosisConfig.ShowSpellTimers then
+	-- 	NecrosisSpellTimerButton:Hide()
+	-- end
+	
+	-- Le Shard est-il verrouillé sur l'interface ?
+	if NecrosisConfig.NoDragAll then
+		Necrosis:NoDrag()
+		NecrosisButton:RegisterForDrag("")
+		-- NecrosisSpellTimerButton:RegisterForDrag("")
+	else
+		Necrosis:Drag()
+		NecrosisButton:RegisterForDrag("LeftButton")
+		-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+	end
+
+	-- Inventaire des pierres et des fragments possedés par le Démoniste
+	Necrosis:BagExplore()
+
+	-- Si la sphere doit indiquer la vie ou la mana, on y va
+	Necrosis:UpdateHealth()
+	Necrosis:UpdateMana()
+
+	-- On vérifie que les fragments sont dans le sac défini par le Démoniste
+	if NecrosisConfig.SoulshardSort then
+		Necrosis:SoulshardSwitch("CHECK")
+	end
+
+	EventHelper:UnregisterOnCombatStopHandler(setupMenu)
+end
+
 function Necrosis:Initialize(Config)
 	CheckGroupStatus()
 	ApplyLocalization()
@@ -135,8 +200,16 @@ function Necrosis:Initialize(Config)
 	-- Création de la liste des sorts disponibles
 	self:SpellLocalize()
 	self:SpellSetup()
-	self:CreateMenu()
-	self:ButtonSetup()
+	if (EventHelper:IsCombatLocked()) then
+		print("Combat locked")
+		EventHelper:RegisterOnCombatStopHandler(setupMenu)
+	else
+		setupMenu()
+		-- self:CreateMenu()
+		-- self:ButtonSetup()
+	end
+	
+	Necrosis.Timers:Initialize()
 
 	local successfulRequest = C_ChatInfo.RegisterAddonMessagePrefix(Necrosis.CurrentEnv.ChatPrefix)
 	-- print("request chat: "..tostring(successfulRequest))
@@ -144,68 +217,7 @@ function Necrosis:Initialize(Config)
     -- Enregistrement de la commande console
 	SlashCmdList["NecrosisCommand"] = Necrosis.SlashHandler
 	SLASH_NecrosisCommand1 = "/necrosis"
-
-	-- On règle la taille de la pierre et des boutons suivant les réglages du SavedVariables
-	NecrosisButton:SetScale(NecrosisConfig.NecrosisButtonScale/100)
-	NecrosisShadowTranceButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
-	NecrosisBacklashButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
-	NecrosisAntiFearButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
-	NecrosisCreatureAlertButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
-	-- On définit l'affichage des Timers Graphiques à gauche ou à droite du bouton
-	if _G["NecrosisTimerFrame0"] then
-		NecrosisTimerFrame0:ClearAllPoints()
-		NecrosisTimerFrame0:SetPoint(
-			NecrosisConfig.SpellTimerJust,
-			NecrosisSpellTimerButton,
-			"CENTER",
-			NecrosisConfig.SpellTimerPos * 20,
-			0
-		)
-	end
-	-- On définit l'affichage des Timers Textes à gauche ou à droite du bouton
-	if _G["NecrosisListSpells"] then
-		NecrosisListSpells:ClearAllPoints()
-		NecrosisListSpells:SetJustifyH(NecrosisConfig.SpellTimerJust)
-		NecrosisListSpells:SetPoint(
-			"TOP"..NecrosisConfig.SpellTimerJust,
-			"NecrosisSpellTimerButton",
-			"CENTER",
-			NecrosisConfig.SpellTimerPos * 23,
-			5
-		)
-	end
-
-	--On affiche ou on cache le bouton, d'ailleurs !
-	if not NecrosisConfig.ShowSpellTimers then
-		NecrosisSpellTimerButton:Hide()
-	end
-	
-	-- Le Shard est-il verrouillé sur l'interface ?
-	if NecrosisConfig.NoDragAll then
-		self:NoDrag()
-		NecrosisButton:RegisterForDrag("")
-		NecrosisSpellTimerButton:RegisterForDrag("")
-	else
-		self:Drag()
-		NecrosisButton:RegisterForDrag("LeftButton")
-		NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
-	end
-
-	-- Inventaire des pierres et des fragments possedés par le Démoniste
-	self:BagExplore()
-
-	-- Si la sphere doit indiquer la vie ou la mana, on y va
-	Necrosis:UpdateHealth()
-	Necrosis:UpdateMana()
-
-	-- On vérifie que les fragments sont dans le sac défini par le Démoniste
-	if NecrosisConfig.SoulshardSort then
-		self:SoulshardSwitch("CHECK")
-	end
-	
-	Necrosis.Timers:Initialize()
 end
-
 
 ------------------------------------------------------------------------------------------------------
 -- FUNCTION RUNNING CONSOLE CONTROL / FONCTION GERANT LA COMMANDE CONSOLE /NECRO

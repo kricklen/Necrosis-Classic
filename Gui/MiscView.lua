@@ -198,14 +198,14 @@ function _mv:Show()
 				if (self:GetChecked()) then
 					Necrosis:NoDrag()
 					NecrosisButton:RegisterForDrag("")
-					NecrosisSpellTimerButton:RegisterForDrag("")
+					-- NecrosisSpellTimerButton:RegisterForDrag("")
 					NecrosisConfig.NoDragAll = true
 				else
 					if not NecrosisConfig.NecrosisLockServ then
 						Necrosis:Drag()
 					end
 					NecrosisButton:RegisterForDrag("LeftButton")
-					NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+					-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
 					NecrosisConfig.NoDragAll = false
 				end
 			end

@@ -165,7 +165,7 @@ function Necrosis:SpellLocalize(tooltip)
 			[7] = {Name = GetSpellInfo(30146),	GlobalId = 30146,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "felguard", PetId = 17252, reagent = "soul_shard"}, -- Felguard -- Fellhunter now
 			[8] = {Name = GetSpellInfo(1122),	GlobalId = 1122,	Mana = 50,	Rank = 0,	Duration = 600,	Type = "single", Usage = "inferno", reagent = "infernal_stone"}, -- Infernal
 			-- Banish / Enslave
-			[9]  = {Name = GetSpellInfo(710),	GlobalId = 710,		Mana = 50,	Rank = 0,	Duration = 30,	Type = "single", Usage = "banish"}, -- Banish
+			[9]  = {Name = GetSpellInfo(710),	GlobalId = 710,		Mana = 50,	Rank = 0,	Duration = 30,	Type = "debuff", Usage = "banish"}, -- Banish
 			[10] = {Name = GetSpellInfo(1098),	GlobalId = 1098,	Mana = 50,	Rank = 0,	Duration = 300,	Type = "single", Usage = "enslave"}, -- Enslave
 
 			[11] = {Name = GetSpellInfo(29722),	GlobalId = 29722,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "incinerate"}, -- TBC: Incinerate
@@ -208,7 +208,7 @@ function Necrosis:SpellLocalize(tooltip)
 			[46] = {Name = GetSpellInfo(30108),	GlobalId = 30108,	Mana = 50,	Rank = 0,	Duration = 18,	Type = "debuff", Usage = "affliction"}, -- NOPE NOT IN Classic, BUT in TBC: Unstable Affliction || Affliction instable
 			[47] = {Name = GetSpellInfo(28176),	GlobalId = 28176,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "armor"}, -- NOPE NOT IN Classic, BUT in TBC: Fel Armor || Gangrarmure
 			[48] = {Name = GetSpellInfo(27243),	GlobalId = 27243,	Mana = 50,	Rank = 0,	Duration = 18,	Type = "debuff", Usage = "seed"}, -- NOPE NOT IN Classic, BUT in TBC: Seed of Corruption || Graine de Corruption
-			[49] = {Name = GetSpellInfo(29858),	GlobalId = 29858,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "shatter"}, -- NOPE NOT IN Classic, BUT in TBC: SoulShatter || Brise âme
+			[49] = {Name = GetSpellInfo(29858),	GlobalId = 29858,	Mana = 50,	Rank = 0,	Duration = 300,	Type = "self",   Usage = "shatter"}, -- NOPE NOT IN Classic, BUT in TBC: SoulShatter || Brise âme
 			[50] = {Name = GetSpellInfo(29893),	GlobalId = 29893,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "ritual_souls"}, -- NOPE NOT IN Classic, BUT in TBC: Ritual of Souls || Rituel des âmes
 			[51] = {Name = GetSpellInfo(693),	GlobalId = 693,		Mana = 50,	Rank = 0,	Duration = 0,   Type = nil,      Usage = "soulstone"}, -- Create Soulstone || Création pierre d'âme
 			[52] = {Name = GetSpellInfo(6201),	GlobalId = 6201,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "healthstone"}, -- Create Healthstone || Création pierre de soin
@@ -219,6 +219,7 @@ function Necrosis:SpellLocalize(tooltip)
 			[57] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 30,	Type = nil,      Usage = "#none#"}, -- NOPE NOT IN Classic  Immolation Aura || Aura d'immolation
 			[58] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,	Duration = 15,	Type = nil,      Usage = "#none#"}, --  NOPE NOT IN Classic Challenging Howl || Hurlement de défi
 			[59] = {Name = GetSpellInfo(133),	GlobalId = 133,		Mana = 50,	Rank = 0,   Duration = 60,	Type = nil,      Usage = "#none#"}, --NOPE NOT IN Classic   Demonic Empowerment || Renforcement démoniaque
+			-- These aren't needed here, since they're not in the spellbook
 			-- [60] = {Name = GetSpellInfo(18789),	GlobalId = 18789,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
 			-- [61] = {Name = GetSpellInfo(18790),	GlobalId = 18790,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
 			-- [62] = {Name = GetSpellInfo(18791),	GlobalId = 18791,	Mana = 50,	Rank = 0,	Duration = 1800,Type = "self",   Usage = "sacrifice"}, -- Demonic Sacrifice || Sacrifice démoniaque 
@@ -780,11 +781,11 @@ The intention is to use the index to reference the frames rather than coding ind
 This allows a more flexible scheme and should reduce maintenance and impact if WoW Classic changes over time.
 --]]
 Necrosis.Warlock_Buttons = {
-	timer 		= {f = "NecrosisSpellTimerButton", tip = "SpellTimer", menu = "Timer", anchor = "ANCHOR_RIGHT",
-					norm = GraphicsHelper:GetTexture("SpellTimerButton-Normal"),
-					high = GraphicsHelper:GetTexture("SpellTimerButton-Highlight"),
-					push = GraphicsHelper:GetTexture("SpellTimerButton-Pushed"),
-					}, --
+	-- timer 		= {f = "NecrosisSpellTimerButton", tip = "SpellTimer", menu = "Timer", anchor = "ANCHOR_RIGHT",
+	-- 				norm = GraphicsHelper:GetTexture("SpellTimerButton-Normal"),
+	-- 				high = GraphicsHelper:GetTexture("SpellTimerButton-Highlight"),
+	-- 				push = GraphicsHelper:GetTexture("SpellTimerButton-Pushed"),
+	-- 				}, --
 	main 		= {f = "NecrosisButton", tip = "Main", anchor = "ANCHOR_LEFT",
 					norm = GraphicsHelper:GetTexture("Shard"),
 					}, --

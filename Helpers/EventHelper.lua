@@ -20,6 +20,7 @@ EventHelper = {
         "UNIT_SPELLCAST_FAILED",
         "UNIT_SPELLCAST_INTERRUPTED",
         "UNIT_SPELLCAST_SENT",
+        "UNIT_SPELLCAST_START",
         "UNIT_SPELLCAST_SUCCEEDED",
         "SKILL_LINES_CHANGED",
         "SPELLS_CHANGED",
@@ -153,7 +154,7 @@ end
 
 function _eh:UnregisterOnCombatStopHandler(handler)
     local idx = table.indexOf(_onCombatStopHandlers, handler)
-    if (idx > 0) then
+    if (idx and idx > 0) then
         table.remove(_onCombatStopHandlers, idx)
     end
 end
@@ -163,4 +164,8 @@ function _eh:OnCombatStop()
     for i,handler in ipairs(_onCombatStopHandlers) do
         handler()
     end
+end
+
+function _eh:IsCombatLocked()
+    return InCombatLockdown()
 end

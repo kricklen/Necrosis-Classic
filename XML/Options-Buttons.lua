@@ -74,7 +74,7 @@ function _bv:cbLockButtons_Click()
 		Necrosis:NoDrag()
 		if not NecrosisConfig.NoDragAll then
 			NecrosisButton:RegisterForDrag("LeftButton")
-			NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+			-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
 		end
 	else
 		NecrosisConfig.NecrosisLockServ = false
@@ -106,7 +106,7 @@ function _bv:cbLockButtons_Click()
 		Necrosis:Drag()
 		NecrosisConfig.NoDragAll = false
 		NecrosisButton:RegisterForDrag("LeftButton")
-		NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+		-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
 	end
 end
 

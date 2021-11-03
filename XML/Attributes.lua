@@ -425,16 +425,16 @@ function Necrosis:StoneAttribute(Steed)
 		end
 	end
 
-	local f = Necrosis.Warlock_Buttons.timer.f
-	f = _G[f]
-	if f then
-		-- hearthstone || Pour la pierre de foyer
-		f:SetAttribute("unit1", "target")
-		f:SetAttribute("type1", "macro")
-		f:SetAttribute("macrotext", "/focus")
-		f:SetAttribute("type2", "item")
-		f:SetAttribute("item", self.Translation.Item.Hearthstone)
-	end
+	-- local f = Necrosis.Warlock_Buttons.timer.f
+	-- f = _G[f]
+	-- if f then
+	-- 	-- hearthstone || Pour la pierre de foyer
+	-- 	f:SetAttribute("unit1", "target")
+	-- 	f:SetAttribute("type1", "macro")
+	-- 	f:SetAttribute("macrotext", "/focus")
+	-- 	f:SetAttribute("type2", "item")
+	-- 	f:SetAttribute("item", self.Translation.Item.Hearthstone)
+	-- end
 ---[[
 	local f = Necrosis.Warlock_Buttons.hearth_stone.f
 	f = _G[f]

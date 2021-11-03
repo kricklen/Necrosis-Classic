@@ -300,6 +300,25 @@ end
 
 local weCanStart = false
 
+local function init123()
+	if (weCanStart) then
+		Necrosis:SpellSetup()
+		Necrosis:ButtonSetup()
+	else
+		ItemHelper:RegisterStonesLoadedHandler(
+			function()
+				InitializeMyself()
+				weCanStart = true
+				-- Spells changed fires each time a new spell is learned etc.
+				Necrosis:SpellSetup()
+				Necrosis:ButtonSetup()
+			end
+		)
+		ItemHelper:Initialize()
+	end
+	EventHelper:UnregisterOnCombatStopHandler(init123)
+end
+
 -- Function applied to loading || Fonction appliquée au chargement
 function Necrosis:OnLoad(event)
 	if (event == "PLAYER_LOGIN" and not Local.LoggedIn) then
@@ -325,20 +344,10 @@ function Necrosis:OnLoad(event)
 		-- ItemHelper:Initialize()
 
 	elseif (event == "SPELLS_CHANGED" and Local.LoggedIn) then --weCanStart) then
-		if (weCanStart) then
-			Necrosis:SpellSetup()
-			Necrosis:ButtonSetup()
+		if (EventHelper:IsCombatLocked()) then
+			EventHelper:RegisterOnCombatStopHandler(init123)
 		else
-			ItemHelper:RegisterStonesLoadedHandler(
-				function()
-					InitializeMyself()
-					weCanStart = true
-					-- Spells changed fires each time a new spell is learned etc.
-					Necrosis:SpellSetup()
-					Necrosis:ButtonSetup()
-				end
-			)
-			ItemHelper:Initialize()
+			init123()
 		end
 		-- -- Spells changed fires each time a new spell is learned etc.
 		-- Necrosis:SpellSetup()
@@ -667,12 +676,12 @@ local function UpdateIcons()
 	-- end
 	
 
-	local hsCooldown = ItemHelper:GetHearthstoneCooldown()
-	if hsCooldown then
-		NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(1)
-	else
-		NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(nil)
-	end
+	-- local hsCooldown = ItemHelper:GetHearthstoneCooldown()
+	-- if hsCooldown then
+	-- 	NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(1)
+	-- else
+	-- 	NecrosisSpellTimerButton:GetNormalTexture():SetDesaturated(nil)
+	-- end
 end
 	
 
@@ -902,9 +911,17 @@ function Necrosis:OnUpdate(elapsed)--something,
 end
 
 
-local function AddSpellTimer(spellId)
+local function AddSpellTimer(spellData)
 	if (NecrosisConfig.EnableTimerBars) then
-		local spellData = Necrosis.CurrentEnv.SpellCast[spellId]
+		-- local spellData = Necrosis.CurrentEnv.SpellCast[spellId]
+-- print("AddSpellTimer:"
+-- .."\n "..tostring(spellData.SpellId)
+-- .."\n "..tostring(spellData.SpellType)
+-- .."\n "..tostring(spellData.Duration)
+-- .."\n "..tostring(spellData.Name)
+-- .."\n "..tostring(spellData.TargetGuid)
+-- .."\n "..tostring(spellData.TargetName)
+-- )
 		if (spellData and spellData.SpellType) then
 			if (not spellData.TargetGuid
 				or not spellData.TargetName
@@ -916,7 +933,6 @@ local function AddSpellTimer(spellId)
 				spellData.TargetGuid = Necrosis.CurrentEnv.PlayerGuid
 				spellData.TargetName = Necrosis.CurrentEnv.PlayerName
 			end
-
 			-- Capture the icon of the spell target
 			local destIconNumber = GetRaidTargetIndex("target")
 			-- Try to update an existing timer first
@@ -939,6 +955,17 @@ local function AddSpellTimer(spellId)
 				)
 			end
 		end
+	end
+end
+
+local function AddDeBuffTimer(spellId, auraType, spellData)
+	-- The DS effects are not casted, only applied.
+	-- Add the corresponding buff as spell timer.
+	if ((Necrosis.CurrentEnv.SpellCast["CastGuid"] -- We casted something
+		 and tContains(Necrosis.Spell.DemonicSacrifices.SpellIds, spellId)) -- We casted DS
+		or auraType == "DEBUFF")
+	then
+		AddSpellTimer(spellData)
 	end
 end
 
@@ -1034,6 +1061,7 @@ function Necrosis.OnEvent(self, event, ...)
 		-- print('spellcast send : arg 6 =   ' .. tostring(arg6) )
 
 		local spellData = {
+			CastGuid = arg3,
 			SpellId = arg4,
 			Name = GetSpellInfo(arg4),
 			Duration = Necrosis.Spell.AuraDuration[arg4],
@@ -1043,10 +1071,11 @@ function Necrosis.OnEvent(self, event, ...)
 			TargetIsDead = UnitIsDead("target"),
 			TargetIsFriend = UnitIsFriend("player", "target")
 		}
+		Necrosis.CurrentEnv.SpellCast["CastGuid"] = arg3
 		-- Check if timers are enabled
 		if (NecrosisConfig.EnableTimerBars) then
 			if (spellData.Duration ~= nil) then
-				Necrosis.CurrentEnv.SpellCast[arg4] = spellData
+				Necrosis.CurrentEnv.SpellCast[arg3] = spellData
 			end
 		end
 		Necrosis.Chat:BeforeSpellCast(spellData)
@@ -1060,9 +1089,18 @@ function Necrosis.OnEvent(self, event, ...)
 		-- The event SPELL_AURA_REFRESH is not raised when we have no target,
 		-- f.e. when casting Unending Breath on ourselves.
 		-- So try to add a timer here as well.
-print("Spell success: "..tostring(arg3))
-		AddSpellTimer(arg3)
-		Necrosis.CurrentEnv.SpellCast[arg3] = nil
+		if (Necrosis.CurrentEnv.SpellCast[arg2]) then
+			if (Necrosis.CurrentEnv.SpellCast[arg2].SpellType ~= "debuff") then
+				-- print("Debuff success: "..tostring(arg3))
+			-- else --if (Necrosis.CurrentEnv.SpellCast[arg3].CastGuid)
+				-- print("Spell success: "..tostring(arg3))
+				-- AddSpellTimer(arg3)
+-- print("Success: "..tostring(arg3)..", "..tostring(Necrosis.CurrentEnv.SpellCast[arg2]))
+				AddSpellTimer(Necrosis.CurrentEnv.SpellCast[arg2])
+				Necrosis.CurrentEnv.SpellCast[arg2] = nil
+			end
+		end
+		Necrosis.CurrentEnv.SpellCast["CastGuid"] = nil
 		Necrosis.Chat:AfterSpellCast()
 
 	-- When the warlock stops his incantation, we release the name of it || Quand le démoniste stoppe son incantation, on relache le nom de celui-ci
@@ -1071,7 +1109,8 @@ print("Spell success: "..tostring(arg3))
 		-- arg1: unit (player etc)
 		-- arg2: castGUID
 		-- arg3: spellID
-		Necrosis.CurrentEnv.SpellCast[arg3] = nil
+		Necrosis.CurrentEnv.SpellCast[arg2] = nil
+		Necrosis.CurrentEnv.SpellCast["CastGuid"] = nil
 		Necrosis.Chat:ClearMessages()
 
 	-- Flag if a Trade window is open, so you can automatically trade the healing stones || Flag si une fenetre de Trade est ouverte, afin de pouvoir trader automatiquement les pierres de soin
@@ -1226,33 +1265,31 @@ function Necrosis:OnCombatLogEvent(event, ...)
 		end
 
 		if (sourceGUID == Necrosis.CurrentEnv.PlayerGuid) then
-			-- The DS effects are not casted, only applied.
-			-- Add the corresponding buff as spell timer.
-			if (Necrosis.CurrentEnv.SpellCast[18788] -- DS casted
-				and tContains(Necrosis.Spell.DemonicSacrifices.SpellIds, spellId))
-			then
-				Necrosis.CurrentEnv.SpellCast[spellId] = {
-					SpellId = spellId,
-					Name = spellName,
-					Duration = Necrosis.Spell.AuraDuration[spellId],
-					SpellType = Necrosis.Spell.AuraType[spellId],
-					TargetName = destName,
-					TargetGuid = destGUID,
-					TargetIsDead = false,
-					TargetIsFriend = true
-				}
-			end
-
-			AddSpellTimer(spellId)
-			Necrosis.CurrentEnv.SpellCast[spellId] = nil
+			AddDeBuffTimer(spellId, auraType, {
+				SpellId = spellId,
+				Name = spellName,
+				Duration = Necrosis.Spell.AuraDuration[spellId],
+				SpellType = Necrosis.Spell.AuraType[spellId],
+				TargetName = destName,
+				TargetGuid = destGUID,
+				TargetIsDead = false,
+				TargetIsFriend = true
+			})
 		end
 
 	elseif (subevent == "SPELL_AURA_REFRESH"
-		and sourceGUID == Necrosis.CurrentEnv.PlayerGuid
-		and destGUID == UnitGUID("target"))
+		and sourceGUID == Necrosis.CurrentEnv.PlayerGuid)
 	then
-		AddSpellTimer(spellId)
-		Necrosis.CurrentEnv.SpellCast[spellId] = nil
+		AddDeBuffTimer(spellId, auraType, {
+			SpellId = spellId,
+			Name = spellName,
+			Duration = Necrosis.Spell.AuraDuration[spellId],
+			SpellType = Necrosis.Spell.AuraType[spellId],
+			TargetName = destName,
+			TargetGuid = destGUID,
+			TargetIsDead = false,
+			TargetIsFriend = true
+		})
 
 	-- Detection of the end of Shadow Trance and Contrecoup || Détection de la fin de la transe de l'ombre et de Contrecoup
 	elseif (subevent == "SPELL_AURA_REMOVED")
@@ -1288,9 +1325,14 @@ function Necrosis:OnCombatLogEvent(event, ...)
 			and sourceGUID == Necrosis.CurrentEnv.PlayerGuid
 			and destGUID == UnitGUID("target"))
 	then
-print("Necrosis - Spell resisted: "..tostring(spellName)..", "..tostring(Necrosis.CurrentEnv.SpellCast[spellId]))
+		local castGuid = Necrosis.CurrentEnv.SpellCast["CastGuid"]
+print("Necrosis - Spell resisted: "..tostring(spellName))
 
-		Necrosis.CurrentEnv.SpellCast[spellId] = nil
+		-- Necrosis.CurrentEnv.SpellCast[spellId] = nil
+		if (castGuid) then
+			Necrosis.CurrentEnv.SpellCast[castGuid] = nil
+		end
+		Necrosis.CurrentEnv.SpellCast["CastGuid"] = nil
 	
 		if NecrosisConfig.AntiFearAlert
 			and (spellName == Necrosis.Spell[13].Name or spellName == Necrosis.Spell[19].Name)
@@ -2209,27 +2251,29 @@ function Necrosis:ButtonSetup()
 				f = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons[v.f_ptr])
 				Necrosis:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
 			end
-			f:ClearAllPoints()
+			if (not EventHelper:IsCombatLocked()) then
+				f:ClearAllPoints()
 ---[[
-			if NecrosisConfig.NecrosisLockServ then
-				f:SetPoint(
-					"CENTER", fm, "CENTER",
-					((dist) * cos(NecrosisConfig.NecrosisAngle - indexScale)),
-					((dist) * sin(NecrosisConfig.NecrosisAngle - indexScale))
-				)
-				indexScale = indexScale + 36
-			else
+				if NecrosisConfig.NecrosisLockServ then
+					f:SetPoint(
+						"CENTER", fm, "CENTER",
+						((dist) * cos(NecrosisConfig.NecrosisAngle - indexScale)),
+						((dist) * sin(NecrosisConfig.NecrosisAngle - indexScale))
+					)
+					indexScale = indexScale + 36
+				else
 --]]
-				f:SetPoint(
-					NecrosisConfig.FramePosition[fr][1],
-					NecrosisConfig.FramePosition[fr][2],
-					NecrosisConfig.FramePosition[fr][3],
-					NecrosisConfig.FramePosition[fr][4],
-					NecrosisConfig.FramePosition[fr][5]
-				)
+					f:SetPoint(
+						NecrosisConfig.FramePosition[fr][1],
+						NecrosisConfig.FramePosition[fr][2],
+						NecrosisConfig.FramePosition[fr][3],
+						NecrosisConfig.FramePosition[fr][4],
+						NecrosisConfig.FramePosition[fr][5]
+					)
+				end
+				f:Show()
+				f:SetScale(NBRScale)
 			end
-			f:Show()
-			f:SetScale(NBRScale)
 		else
 			if f then
 				f:Hide()
@@ -2427,15 +2471,18 @@ end
 
 
 local function HideList(list, parent)
-	for i, v in pairs(list) do
-		menuVariable = _G[Necrosis.Warlock_Buttons[v.f_ptr].f]
-		if menuVariable then
-			menuVariable:Hide()
-			menuVariable:ClearAllPoints()
-			menuVariable:SetPoint("CENTER", parent, "CENTER", 3000, 3000)
+	if (not EventHelper:IsCombatLocked()) then
+		for i, v in pairs(list) do
+			menuVariable = _G[Necrosis.Warlock_Buttons[v.f_ptr].f]
+			if menuVariable then
+				menuVariable:Hide()
+				menuVariable:ClearAllPoints()
+				menuVariable:SetPoint("CENTER", parent, "CENTER", 3000, 3000)
+			end
 		end
 	end
 end
+
 -- Rebuild the menus at mod startup or when the spellbook changes || A chaque changement du livre des sorts, au démarrage du mod, ainsi qu'au changement de sens du menu on reconstruit les menus des sorts
 function Necrosis:CreateMenu()
 	Local.Menu.Pet = setmetatable({}, metatable)
@@ -2663,7 +2710,7 @@ end
 function Necrosis:Recall()
 	local ui = new("array",
 		"NecrosisButton",
-		"NecrosisSpellTimerButton",
+		-- "NecrosisSpellTimerButton",
 		"NecrosisAntiFearButton",
 		"NecrosisCreatureAlertButton",
 		"NecrosisBacklashButton",
@@ -2689,76 +2736,76 @@ function Necrosis:Recall()
 end
 
 -- Display the timers on the left or right || Fonction permettant le renversement des timers sur la gauche / la droite
-function Necrosis:SymetrieTimer(bool)
-	local num
-	if bool then
-		NecrosisConfig.SpellTimerPos = -1
-		NecrosisConfig.SpellTimerJust = "RIGHT"
-		num = 1
-		while _G["NecrosisTimerFrame"..num.."OutText"] do
-			_G["NecrosisTimerFrame"..num.."OutText"]:ClearAllPoints()
-			_G["NecrosisTimerFrame"..num.."OutText"]:SetPoint(
-				"RIGHT",
-				_G["NecrosisTimerFrame"..num],
-				"LEFT",
-				-5, 1
-			)
-			_G["NecrosisTimerFrame"..num.."OutText"]:SetJustifyH("RIGHT")
-			num = num + 1
-		end
-	else
-		NecrosisConfig.SpellTimerPos = 1
-		NecrosisConfig.SpellTimerJust = "LEFT"
-		num = 1
-		while _G["NecrosisTimerFrame"..num.."OutText"] do
-			_G["NecrosisTimerFrame"..num.."OutText"]:ClearAllPoints()
-			_G["NecrosisTimerFrame"..num.."OutText"]:SetPoint(
-				"LEFT",
-				_G["NecrosisTimerFrame"..num],
-				"RIGHT",
-				5, 1
-			)
-			_G["NecrosisTimerFrame"..num.."OutText"]:SetJustifyH("LEFT")
-			num = num + 1
--- print("Necrosis:SymetrieTimer: "..tostring(_G["NecrosisTimerFrame"..num.."OutText"]:GetTop()))
-		end
-	end
-	if _G["NecrosisTimerFrame0"] then
-		NecrosisTimerFrame0:ClearAllPoints()
-		NecrosisTimerFrame0:SetPoint(
-			NecrosisConfig.SpellTimerJust,
-			NecrosisSpellTimerButton,
-			"CENTER",
-			NecrosisConfig.SpellTimerPos * 20, 0
-		)
-	end
-	if _G["NecrosisListSpells"] then
-		NecrosisListSpells:ClearAllPoints()
-		NecrosisListSpells:SetJustifyH(NecrosisConfig.SpellTimerJust)
-		NecrosisListSpells:SetPoint(
-			"TOP"..NecrosisConfig.SpellTimerJust,
-			NecrosisSpellTimerButton,
-			"CENTER",
-			NecrosisConfig.SpellTimerPos * 23, 10
-		)
-	end
-end
+-- function Necrosis:SymetrieTimer(bool)
+-- 	local num
+-- 	if bool then
+-- 		NecrosisConfig.SpellTimerPos = -1
+-- 		NecrosisConfig.SpellTimerJust = "RIGHT"
+-- 		num = 1
+-- 		while _G["NecrosisTimerFrame"..num.."OutText"] do
+-- 			_G["NecrosisTimerFrame"..num.."OutText"]:ClearAllPoints()
+-- 			_G["NecrosisTimerFrame"..num.."OutText"]:SetPoint(
+-- 				"RIGHT",
+-- 				_G["NecrosisTimerFrame"..num],
+-- 				"LEFT",
+-- 				-5, 1
+-- 			)
+-- 			_G["NecrosisTimerFrame"..num.."OutText"]:SetJustifyH("RIGHT")
+-- 			num = num + 1
+-- 		end
+-- 	else
+-- 		NecrosisConfig.SpellTimerPos = 1
+-- 		NecrosisConfig.SpellTimerJust = "LEFT"
+-- 		num = 1
+-- 		while _G["NecrosisTimerFrame"..num.."OutText"] do
+-- 			_G["NecrosisTimerFrame"..num.."OutText"]:ClearAllPoints()
+-- 			_G["NecrosisTimerFrame"..num.."OutText"]:SetPoint(
+-- 				"LEFT",
+-- 				_G["NecrosisTimerFrame"..num],
+-- 				"RIGHT",
+-- 				5, 1
+-- 			)
+-- 			_G["NecrosisTimerFrame"..num.."OutText"]:SetJustifyH("LEFT")
+-- 			num = num + 1
+-- -- print("Necrosis:SymetrieTimer: "..tostring(_G["NecrosisTimerFrame"..num.."OutText"]:GetTop()))
+-- 		end
+-- 	end
+-- 	if _G["NecrosisTimerFrame0"] then
+-- 		NecrosisTimerFrame0:ClearAllPoints()
+-- 		NecrosisTimerFrame0:SetPoint(
+-- 			NecrosisConfig.SpellTimerJust,
+-- 			NecrosisSpellTimerButton,
+-- 			"CENTER",
+-- 			NecrosisConfig.SpellTimerPos * 20, 0
+-- 		)
+-- 	end
+-- 	if _G["NecrosisListSpells"] then
+-- 		NecrosisListSpells:ClearAllPoints()
+-- 		NecrosisListSpells:SetJustifyH(NecrosisConfig.SpellTimerJust)
+-- 		NecrosisListSpells:SetPoint(
+-- 			"TOP"..NecrosisConfig.SpellTimerJust,
+-- 			NecrosisSpellTimerButton,
+-- 			"CENTER",
+-- 			NecrosisConfig.SpellTimerPos * 23, 10
+-- 		)
+-- 	end
+-- end
 
-function NecrosisTimer(nom, duree)
-	local Cible = UnitName("target")
-	local Niveau = UnitLevel("target")
-	local Guid = UnitGUID("target")
-	local truc = 6
-	if not Cible then
-		Cible = ""
-		truc = 2
-	end
-	if not Niveau then
-		Niveau = ""
-	end
+-- function NecrosisTimer(nom, duree)
+-- 	local Cible = UnitName("target")
+-- 	local Niveau = UnitLevel("target")
+-- 	local Guid = UnitGUID("target")
+-- 	local truc = 6
+-- 	if not Cible then
+-- 		Cible = ""
+-- 		truc = 2
+-- 	end
+-- 	if not Niveau then
+-- 		Niveau = ""
+-- 	end
 
-	Local.TimerManagement = NecrosisTimerX(nom, duree, truc, Cible, Niveau, Local.TimerManagement,Guid)
-end
+-- 	Local.TimerManagement = NecrosisTimerX(nom, duree, truc, Cible, Niveau, Local.TimerManagement,Guid)
+-- end
 
 function Necrosis:SetOfxy(menu)
 	if menu == "Buff" and _G["NecrosisBuffMenuButton"] then

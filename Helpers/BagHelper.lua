@@ -9,6 +9,7 @@ BagHelper = {
 
 	Healthstone_IsAvailable = false,
 	Healthstone_Rank = 0,
+	Healthstone_ItemId = 0,
 	Healthstone_Name = nil,
 	Healthstone_BagId = nil,
 	Healthstone_SlotId = nil,
@@ -70,6 +71,7 @@ function _bh:BagExplore(bagId)
 	self.Soulstone_Name = nil
 	self.Healthstone_IsAvailable = false
 	self.Healthstone_Rank = 0
+	self.Healthstone_ItemId = 0
 	self.Healthstone_Name = nil
 	self.Firestone_IsAvailable = false
 	self.Firestone_Rank = 0
@@ -108,10 +110,12 @@ function _bh:_FindStones(bag)
 
 				-- Check if its a healthstone and of higher rank than the current one
 				elseif (ItemHelper:IsHealthstone(itemId)
-					and self.Healthstone_Rank < ItemHelper.Healthstone[itemId].Rank)
+					and self.Healthstone_Rank <= ItemHelper.Healthstone[itemId].Rank
+					and self.Healthstone_ItemId < itemId) -- Check if there is a 0, 1 or 2x improved healthstone
 				then
 					self.Healthstone_IsAvailable = true
 					self.Healthstone_Rank = ItemHelper.Healthstone[itemId].Rank
+					self.Healthstone_ItemId = itemId
 					self.Healthstone_BagId = bag.id
 					self.Healthstone_SlotId = slot
 					self.Healthstone_Name = ItemHelper.Healthstone[itemId].Name

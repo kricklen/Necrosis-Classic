@@ -15,83 +15,83 @@ end
 -- ANCHOR FOR THE GRAPHICS/TEXT TIMER || ANCRES DES TIMERS GRAPHIQUES ET TEXTUELS
 ------------------------------------------------------------------------------------------------------
 
-function Necrosis:CreateTimerAnchor()
-	local ft = _G[Necrosis.Warlock_Buttons.timer.f]
-	if NecrosisConfig.TimerType == 1 then
-		-- Create the graphical timer frame || Création de l'ancre invisible des timers graphiques
-		local f = _G["NecrosisTimerFrame0"]
-		if not f then
-			f = CreateFrame("Frame", "NecrosisTimerFrame0", UIParent)
-			f:SetWidth(150)
-			f:SetHeight(10)
-			f:Show()
-			f:ClearAllPoints()
-			f:SetPoint("LEFT", ft, "CENTER", 50, 0)
-		end
-	elseif NecrosisConfig.TimerType == 2 then
-		-- Create the text timer || Création de la liste des Timers Textes
-		local FontString = _G["NecrosisListSpells"]
-		if not FontString then
-			FontString = ft:CreateFontString(
-				"NecrosisListSpells", nil, "GameFontNormalSmall"
-			)
-		end
-
-		-- Define the attributes || Définition de ses attributs
-		FontString:SetJustifyH("LEFT")
-		FontString:SetPoint("LEFT", ft, "LEFT", 23, 0)
-		FontString:SetTextColor(1, 1, 1)
-	end
-end
+-- function Necrosis:CreateTimerAnchor()
+-- 	local ft = _G[Necrosis.Warlock_Buttons.timer.f]
+-- 	if NecrosisConfig.TimerType == 1 then
+-- 		-- Create the graphical timer frame || Création de l'ancre invisible des timers graphiques
+-- 		local f = _G["NecrosisTimerFrame0"]
+-- 		if not f then
+-- 			f = CreateFrame("Frame", "NecrosisTimerFrame0", UIParent)
+-- 			f:SetWidth(150)
+-- 			f:SetHeight(10)
+-- 			f:Show()
+-- 			f:ClearAllPoints()
+-- 			f:SetPoint("LEFT", ft, "CENTER", 50, 0)
+-- 		end
+-- 	elseif NecrosisConfig.TimerType == 2 then
+-- 		-- Create the text timer || Création de la liste des Timers Textes
+-- 		local FontString = _G["NecrosisListSpells"]
+-- 		if not FontString then
+-- 			FontString = ft:CreateFontString(
+-- 				"NecrosisListSpells", nil, "GameFontNormalSmall"
+-- 			)
+-- 		end
+-- 		-- Define the attributes || Définition de ses attributs
+-- 		FontString:SetJustifyH("LEFT")
+-- 		FontString:SetPoint("LEFT", ft, "LEFT", 23, 0)
+-- 		FontString:SetTextColor(1, 1, 1)
+-- 	end
+-- end
 
 function Necrosis:CreateWarlockUI()
 ------------------------------------------------------------------------------------------------------
 -- TIMER BUTTON || BOUTON DU TIMER DES SORTS
 ------------------------------------------------------------------------------------------------------
 
-	-- Create the timer button || Création du bouton de Timer des sorts
-	local f = Necrosis.Warlock_Buttons.timer.f
-	local frame = nil
-	frame = _G[f]
-	if not frame then
-		frame = CreateFrame("Button", f, UIParent, "SecureActionButtonTemplate")
-	end
+	-- -- Create the timer button || Création du bouton de Timer des sorts
+	-- local f = Necrosis.Warlock_Buttons.timer.f
+	-- local frame = nil
+	-- frame = _G[f]
+	-- if not frame then
+	-- 	frame = CreateFrame("Button", f, UIParent, "SecureActionButtonTemplate")
+	-- end
 
-	-- Define its attributes || Définition de ses attributs
-	frame:SetFrameStrata("MEDIUM")
-	frame:SetMovable(true)
-	frame:EnableMouse(true)
-	frame:SetWidth(34)
-	frame:SetHeight(34)
-	frame:SetNormalTexture(GraphicsHelper:GetTexture("SpellTimerButton-Normal"))
-	frame:SetPushedTexture(GraphicsHelper:GetTexture("SpellTimerButton-Pushed"))
-	frame:SetHighlightTexture(GraphicsHelper:GetTexture("SpellTimerButton-Highlight"))
-	frame:RegisterForClicks("AnyUp")
+-- 	-- Define its attributes || Définition de ses attributs
+-- 	frame:SetFrameStrata("MEDIUM")
+-- 	frame:SetMovable(true)
+-- 	frame:EnableMouse(true)
+-- 	frame:SetWidth(34)
+-- 	frame:SetHeight(34)
+-- 	frame:SetNormalTexture(GraphicsHelper:GetTexture("SpellTimerButton-Normal"))
+-- 	frame:SetPushedTexture(GraphicsHelper:GetTexture("SpellTimerButton-Pushed"))
+-- 	frame:SetHighlightTexture(GraphicsHelper:GetTexture("SpellTimerButton-Highlight"))
+-- 	frame:RegisterForClicks("AnyUp")
 
-	-- Create the timer anchor || Création des ancres des timers
-	self:CreateTimerAnchor()
-	-- Edit the scripts associated with the button || Edition des scripts associés au bouton
-	frame:SetScript("OnLoad", function(self)
-		self:RegisterForDrag("LeftButton")
-		self:RegisterForClicks("RightButtonUp")
-	end)
-	frame:SetScript("OnEnter", function(self) Necrosis:BuildButtonTooltip(self) end)
---	frame:SetScript("OnEnter", function(self) Necrosis:BuildTooltip(self, "SpellTimer", "ANCHOR_RIGHT", "Timer") end)
-	frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
-	frame:SetScript("OnMouseUp", function(self) Necrosis:OnDragStop(self) end)
-	frame:SetScript("OnDragStart", function(self) Necrosis:OnDragStart(self) end)
-	frame:SetScript("OnDragStop",  function(self) Necrosis:OnDragStop(self) end)
+-- 	-- Create the timer anchor || Création des ancres des timers
+-- 	self:CreateTimerAnchor()
 
-	-- Place the button window at its saved location || Placement de la fenêtre à l'endroit sauvegardé ou à l'emplacement par défaut
-	frame:ClearAllPoints()
-	frame:SetPoint(
-		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][1],
-		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][2],
-		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][3],
-		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][4],
-		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][5]
-	)
-	frame:Show()
+-- 	-- Edit the scripts associated with the button || Edition des scripts associés au bouton
+-- 	frame:SetScript("OnLoad", function(self)
+-- 		self:RegisterForDrag("LeftButton")
+-- 		self:RegisterForClicks("RightButtonUp")
+-- 	end)
+-- 	frame:SetScript("OnEnter", function(self) Necrosis:BuildButtonTooltip(self) end)
+-- --	frame:SetScript("OnEnter", function(self) Necrosis:BuildTooltip(self, "SpellTimer", "ANCHOR_RIGHT", "Timer") end)
+-- 	frame:SetScript("OnLeave", function() GameTooltip:Hide() end)
+-- 	frame:SetScript("OnMouseUp", function(self) Necrosis:OnDragStop(self) end)
+-- 	frame:SetScript("OnDragStart", function(self) Necrosis:OnDragStart(self) end)
+-- 	frame:SetScript("OnDragStop",  function(self) Necrosis:OnDragStop(self) end)
+
+-- 	-- Place the button window at its saved location || Placement de la fenêtre à l'endroit sauvegardé ou à l'emplacement par défaut
+-- 	frame:ClearAllPoints()
+-- 	frame:SetPoint(
+-- 		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][1],
+-- 		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][2],
+-- 		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][3],
+-- 		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][4],
+-- 		NecrosisConfig.FramePosition["NecrosisSpellTimerButton"][5]
+-- 	)
+-- 	frame:Show()
 
 
 ------------------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ function Necrosis:CreateWarlockUI()
 ------------------------------------------------------------------------------------------------------
 
 	-- Create the main Necrosis button  || Création du bouton principal de Necrosis
-	frame = nil
+	local frame = nil
 	frame = _G["NecrosisButton"]
 	if not frame then
 		frame = CreateFrame("Button", "NecrosisButton", UIParent, "SecureActionButtonTemplate")
