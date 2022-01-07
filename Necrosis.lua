@@ -296,28 +296,20 @@ local function InitializeMyself()
 	-- Detecting the type of demon present at the connection || Détection du Type de démon présent à la connexion
 	Necrosis.CurrentEnv.DemonType = UnitCreatureFamily("pet")
 	Necrosis.Chat:_Msg("Initialized", "USER")
+	-- _G["NecrosisButton"]:Show()
 end
 
-local weCanStart = false
-
-local function init123()
-	if (weCanStart) then
-		Necrosis:SpellSetup()
-		Necrosis:ButtonSetup()
-	else
-		ItemHelper:RegisterStonesLoadedHandler(
-			function()
-				InitializeMyself()
-				weCanStart = true
-				-- Spells changed fires each time a new spell is learned etc.
-				Necrosis:SpellSetup()
-				Necrosis:ButtonSetup()
-			end
-		)
-		ItemHelper:Initialize()
-	end
-	EventHelper:UnregisterOnCombatStopHandler(init123)
+local function InitWhenOutOfCombat()
+	ItemHelper:RegisterStonesLoadedHandler(
+		function()
+			InitializeMyself()
+		end
+	)
+	ItemHelper:Initialize()
+	EventHelper:UnregisterOnCombatStopHandler(InitWhenOutOfCombat)
 end
+
+local initialized = false
 
 -- Function applied to loading || Fonction appliquée au chargement
 function Necrosis:OnLoad(event)
@@ -326,35 +318,22 @@ function Necrosis:OnLoad(event)
 		local _, Class = UnitClass("player")
 		if (Class == "WARLOCK") then
 			Local.LoggedIn = true
-			-- print("Logged in")
 		end
-
-	elseif (event == "SKILL_LINES_CHANGED" and Local.LoggedIn)-- and not weCanStart)-- then
-	then
-		-- Skill changed is fired more than once, seems like a more stable
-		-- indicator that tells when the spellbook is ready.
-		-- Call ItemHelper first here, it uses async methods for loading item info
-		-- and we have to wait for the callbacks.
-		-- ItemHelper:RegisterStonesLoadedHandler(
-		-- 	function()
-		-- 		InitializeMyself()
-		-- 		weCanStart = true
-		-- 	end
-		-- )
-		-- ItemHelper:Initialize()
-
-	elseif (event == "SPELLS_CHANGED" and Local.LoggedIn) then --weCanStart) then
+	elseif (event == "SPELLS_CHANGED" and Local.LoggedIn and not initialized) then
+		-- Init only once upon login
+		initialized = true
 		if (EventHelper:IsCombatLocked()) then
-			EventHelper:RegisterOnCombatStopHandler(init123)
+			EventHelper:RegisterOnCombatStopHandler(InitWhenOutOfCombat)
 		else
-			init123()
+			InitWhenOutOfCombat()
 		end
-		-- -- Spells changed fires each time a new spell is learned etc.
-		-- Necrosis:SpellSetup()
-		-- Necrosis:ButtonSetup()
+	elseif (event == "PLAYER_REGEN_ENABLED" and Local.LoggedIn) then
+		-- This is required to finish initialization if we log on and
+		-- combat is active.
+		EventHelper.OnCombatStop()
+		Local.PlayerInCombat = false
 	end
 end
-
 
 
 -- Function to check the presence of a buff on the unit.
@@ -561,7 +540,7 @@ local function UpdateIcons()
 		and BagHelper.Soulstone_Name
 		and (Local.Stone.Soul.Mode == 1 or Local.Stone.Soul.Mode == 3))
 	then
-		self:SoulstoneUpdateAttribute("NoStone")
+		ButtonHelper:SoulstoneUpdateAttribute("NoStone")
 	end
 
 	-- Display of the mode icon || Affichage de l'icone liée au mode
@@ -581,7 +560,7 @@ local function UpdateIcons()
 	if (not BagHelper.Healthstone_IsAvailable) then
 		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
 		if (Necrosis.Spell[52].ID and BagHelper.Healthstone_Name) then
-			self:HealthstoneUpdateAttribute("NoStone")
+			ButtonHelper:HealthstoneUpdateAttribute("NoStone")
 		end
 	end
 
@@ -625,7 +604,7 @@ local function UpdateIcons()
 		end
 		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
 		if (Necrosis.Spell[53].ID and BagHelper.Spellstone_Name) then
-			self:SpellstoneUpdateAttribute("NoStone")
+			ButtonHelper:SpellstoneUpdateAttribute("NoStone")
 		end
 	end
 
@@ -661,7 +640,7 @@ local function UpdateIcons()
 		end
 		-- If out of combat and we can create a stone, we associate the left button to create a stone. || Si hors combat et qu'on peut créer une pierre, on associe le bouton gauche à créer une pierre.
 		if (Necrosis.Spell[54].ID and BagHelper.Firestone_Name) then
-			self:FirestoneUpdateAttribute("NoStone")
+			ButtonHelper:FirestoneUpdateAttribute("NoStone")
 		end
 	end
 
@@ -788,14 +767,14 @@ local function SelfEffect(action, nom)
 	return
 end
 
-local function SatList(list, val)
-	for i, v in pairs(list) do
-		menuVariable = _G[Necrosis.Warlock_Buttons[v.f_ptr].f]
-		if menuVariable then
-			menuVariable:GetNormalTexture():SetDesaturated(val)
-		end
-	end
-end
+-- local function SatList(list, val)
+-- 	for i, v in pairs(list) do
+-- 		local menuVariable = _G[Necrosis.Warlock_Buttons[v.f_ptr].f]
+-- 		if menuVariable then
+-- 			menuVariable:GetNormalTexture():SetDesaturated(val)
+-- 		end
+-- 	end
+-- end
 
 -- Event : UNIT_PET
 -- Allows the servo to be timed, as well as to prevent for servo breaks || Permet de timer les asservissements, ainsi que de prévenir pour les ruptures d'asservissement
@@ -1152,20 +1131,17 @@ function Necrosis.OnEvent(self, event, ...)
 	-- If the Warlock learns a new spell / spell, we get the new spells list || Si le Démoniste apprend un nouveau sort / rang de sort, on récupère la nouvelle liste des sorts
 	-- If the Warlock learns a new buff or summon spell, the buttons are recreated || Si le Démoniste apprend un nouveau sort de buff ou d'invocation, on recrée les boutons
 	elseif (event == "LEARNED_SPELL_IN_TAB" or event == "SPELLS_CHANGED") then
-	-- print("LEARNED_SPELL_IN_TAB")
 		Necrosis:SpellSetup()
-		Necrosis:CreateMenu()
-		Necrosis:ButtonSetup()
+		if (Necrosis.Spells.SpellsChanged) then
+			Necrosis:CreateMenu()
+			Necrosis:ButtonSetup()
+		end
 
 	-- At the end of the fight, we stop reporting Twilight || A la fin du combat, on arrête de signaler le Crépuscule
 	-- We remove the spell timers and the names of mobs || On enlève les timers de sorts ainsi que les noms des mobs
 	elseif (event == "PLAYER_REGEN_ENABLED") then
-
-		EventHelper.OnCombatStop()
-		
-		Local.PlayerInCombat = false
-		-- Local.TimerManagement = Necrosis:RetraitTimerCombat(Local.TimerManagement)
-
+		-- EventHelper.OnCombatStop()
+		-- Local.PlayerInCombat = false
 		-- We are redefining the attributes of spell buttons in a situational way || On redéfinit les attributs des boutons de sorts de manière situationnelle
 		Necrosis:NoCombatAttribute(Local.Menu.Pet, Local.Menu.Buff, Local.Menu.Curse)
 		UpdateIcons()
@@ -2215,7 +2191,6 @@ end
 
 -- Display or Hide buttons depending on spell availability || Affiche ou masque les boutons de sort à chaque nouveau sort appris
 function Necrosis:ButtonSetup()
--- print("Necrosis:ButtonSetup")
 	local NBRScale = (100 + (NecrosisConfig.NecrosisButtonScale - 85)) / 100
 	local dist = 35 * NBRScale
 	dist = dist
@@ -2226,8 +2201,7 @@ function Necrosis:ButtonSetup()
 
 ---[==[
 	if Necrosis.Debug.buttons then
-		_G["DEFAULT_CHAT_FRAME"]:AddMessage("ButtonSetup === Begin"
-		)
+		_G["DEFAULT_CHAT_FRAME"]:AddMessage("ButtonSetup === Begin")
 	end
 	local fm = Necrosis.Warlock_Buttons.main.f
 	local indexScale = -36
@@ -2236,14 +2210,12 @@ function Necrosis:ButtonSetup()
 		local fr = Necrosis.Warlock_Buttons[v.f_ptr].f
 
 		if Necrosis.Debug.buttons then
-			_G["DEFAULT_CHAT_FRAME"]:AddMessage("ButtonSetup"
-			.." '"..tostring(fr)
-			)
+			_G["DEFAULT_CHAT_FRAME"]:AddMessage("ButtonSetup".." '"..tostring(fr))
 		end
 		local f = _G[fr]
-		if (Necrosis.IsSpellKnown(v.high_of) 	-- in spell book
+		if (Necrosis.IsSpellKnown(v.high_of) 	  -- in spell book
 			or v.menu                             -- or on menu of spells
-			or v.function_name									  -- Function to call when clicking the button
+			or v.function_name					  -- Function to call when clicking the button
 			or v.item)                            -- or item to use
 			and NecrosisConfig.StonePosition[index] > 0 -- and requested
 		then
@@ -2251,7 +2223,7 @@ function Necrosis:ButtonSetup()
 				f = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons[v.f_ptr])
 				Necrosis:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
 			end
-			if (not EventHelper:IsCombatLocked()) then
+			-- if (not EventHelper:IsCombatLocked()) then
 				f:ClearAllPoints()
 ---[[
 				if NecrosisConfig.NecrosisLockServ then
@@ -2271,9 +2243,9 @@ function Necrosis:ButtonSetup()
 						NecrosisConfig.FramePosition[fr][5]
 					)
 				end
-				f:Show()
 				f:SetScale(NBRScale)
-			end
+				-- f:Show()
+			-- end
 		else
 			if f then
 				f:Hide()
@@ -2287,117 +2259,10 @@ function Necrosis:ButtonSetup()
 --]==]
 end
 
--- TODO: Unused function?
--- Extract an attribute from a spell || Fonction d'extraction d'attribut de sort
--- F(Type=string, string, int) -> Spell=table
--- function Necrosis:FindSpellAttribute(Type, attribute, array)
--- 	for index=1, #self.Spell, 1 do
--- 		if self.Spell[index][Type]:find(attribute) then return self.Spell[index][array] end
--- 	end
--- 	return nil
--- end
 
 ------------------------------------------------------------------------------------------------------
 -- MISCELLANEOUS FUNCTIONS || FONCTIONS DIVERSES
 ------------------------------------------------------------------------------------------------------
-
--- -- Function to check the presence of a debuff on the unit || Fonction pour savoir si une unité subit un effet
--- -- F(string, string)->bool
--- function Necrosis:UnitHasEffect(unit, effect)
--- 	local index = 1
--- 	while UnitDebuff(unit, index) do
--- 		self:MoneyToggle()
--- 		NecrosisTooltip:SetUnitDebuff(unit, index)
--- 		local DebuffName = tostring(NecrosisTooltipTextLeft1:GetText())
---    		if DebuffName:find(effect) then
--- 			return true
--- 		end
--- 		index = index + 1
--- 	end
--- 	return false
--- end
-
--- -- Function to check the presence of a buff on the unit.
--- -- Strictly identical to UnitHasEffect, but as WoW distinguishes Buff and DeBuff, so we have to.
--- function Necrosis:UnitHasBuff(unit, effect)
--- 	local index = 1
--- 	while UnitBuff(unit, index) do
--- 	-- Here we'll cheat a little. checking a buff or debuff return the internal spell name, and not the name we give at start
--- 		-- So we use an API widget that will use the internal name to return the known name.
--- 		-- For example, the "Curse of Agony" spell is internaly known as "Spell_Shadow_CurseOfSargeras". Much easier to use the first one than the internal one.
--- 		self:MoneyToggle()
--- 		NecrosisTooltip:SetUnitBuff(unit, index)
--- 		local BuffName = tostring(NecrosisTooltipTextLeft1:GetText())
---    		if BuffName:find(effect) then
--- 			return true
--- 		end
--- 		index = index + 1
--- 	end
--- 	return false
--- end
-
-
--- -- Display the antifear button / warning || Affiche ou cache le bouton de détection de la peur suivant la cible.
--- function Necrosis:ShowAntiFearWarning()
--- 	local Actif = false -- Must be False, or a number from 1 to Local.Warning.Antifear.Icon[] max element.
-
--- 	-- Checking if we have a target. Any fear need a target to be casted on
--- 	if UnitExists("target") and UnitCanAttack("player", "target") and not UnitIsDead("target") then
--- 		-- Checking if the target has natural immunity (only NPC target)
--- 		if not UnitIsPlayer("target") and ( UnitCreatureType("target") == self.Unit.Undead or UnitCreatureType("target") == "Mechanical" ) then
--- 			Actif = 2 -- Immun
--- 		end
--- 		-- We'll start to parse the target buffs, as his class doesn't give him natural permanent immunity
--- 		if not Actif then
--- 			for index=1, #self.AntiFear.Buff, 1 do
--- 				if self:UnitHasBuff("target",self.AntiFear.Buff[index]) then
--- 					Actif = 3 -- Prot
--- 					break
--- 				end
--- 			end
-
--- 			-- No buff found, let's try the debuffs
--- 			for index=1, #self.AntiFear.Debuff, 1 do
--- 				if self:UnitHasEffect("target",self.AntiFear.Debuff[index]) then
--- 					Actif = 3 -- Prot
--- 					break
--- 				end
--- 			end
--- 		end
-
--- 		-- An immunity has been detected before, but we still don't know why => show the button anyway
--- 		if Local.Warning.Antifear.Immune and not Actif then
--- 			Actif = 1
--- 		end
--- 	end
-
--- 	if Actif then
--- 		-- Antifear button is currently not visible, we have to change that
--- 		if not Local.Warning.Antifear.Actif then
--- 			Local.Warning.Antifear.Actif = true
--- 			self.Chat:_Msg(self.ChatMessage.Information.FearProtect, "USER")
--- 			NecrosisAntiFearButton:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear"..Local.Warning.Antifear.Icon[Actif].."-02"))
--- 			if NecrosisConfig.Sound then PlaySoundFile(self.Sound.Fear) end
--- 			ShowUIPanel(NecrosisAntiFearButton)
--- 			Local.Warning.Antifear.Blink = GetTime() + 0.6
--- 			Local.Warning.Antifear.Toggle = 2
-
--- 		-- Timer to make the button blink
--- 		elseif GetTime() >= Local.Warning.Antifear.Blink then
--- 			if Local.Warning.Antifear.Toggle == 1 then
--- 				Local.Warning.Antifear.Toggle = 2
--- 			else
--- 				Local.Warning.Antifear.Toggle = 1
--- 			end
--- 			Local.Warning.Antifear.Blink = GetTime() + 0.4
--- 			NecrosisAntiFearButton:SetNormalTexture(GraphicsHelper:GetTexture("AntiFear"..Local.Warning.Antifear.Icon[Actif].."-0"..Local.Warning.Antifear.Toggle))
--- 		end
-
--- 	elseif Local.Warning.Antifear.Actif then	-- No antifear on target, but the button is still visible => gonna hide it
--- 		Local.Warning.Antifear.Actif = false
--- 		HideUIPanel(NecrosisAntiFearButton)
--- 	end
--- end
 
 -- Trade healthstone (out of combat) || Fonction pour gérer l'échange de pierre (hors combat)
 function Necrosis:TradeStone()
@@ -2469,17 +2334,38 @@ function Necrosis:Drag()
 	if  _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:RegisterForDrag("LeftButton") end
 end
 
-
 local function HideList(list, parent)
-	if (not EventHelper:IsCombatLocked()) then
-		for i, v in pairs(list) do
-			menuVariable = _G[Necrosis.Warlock_Buttons[v.f_ptr].f]
-			if menuVariable then
-				menuVariable:Hide()
-				menuVariable:ClearAllPoints()
-				menuVariable:SetPoint("CENTER", parent, "CENTER", 3000, 3000)
-			end
+	for i, v in pairs(list) do
+		local menuVariable = _G[Necrosis.Warlock_Buttons[v.f_ptr].f]
+		if menuVariable then
+			menuVariable:Hide()
+			-- menuVariable:ClearAllPoints()
+			-- menuVariable:SetPoint("CENTER", parent, "CENTER", 3000, 3000)
 		end
+	end
+end
+
+local function WireUpMenuChildrenStates(menuButton, childButtonList)
+	-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
+	for i = 1, #childButtonList, 1 do
+		local childButton = childButtonList[i]
+		childButton:SetParent(menuButton)
+		-- Close the menu when a child button is clicked || Si le menu se ferme à l'appui d'un bouton, alors il se ferme à l'appui d'un bouton !
+		menuButton:WrapScript(childButton, "OnClick", [[
+			if self:GetParent():GetAttribute("state") == "Ouvert" then
+				self:GetParent():SetAttribute("state", "Ferme")
+			end
+		]])
+		menuButton:WrapScript(childButton, "OnEnter", [[
+			self:GetParent():SetAttribute("mousehere", true)
+		]])
+		menuButton:WrapScript(childButton, "OnLeave", [[
+			self:GetParent():SetAttribute("mousehere", false)
+			local stateMenu = self:GetParent():GetAttribute("state")
+			if not (stateMenu == "Bloque" or stateMenu == "Combat" or stateMenu == "ClicDroit") then
+				self:GetParent():SetAttribute("state", "Refresh")
+			end
+		]])
 	end
 end
 
@@ -2489,9 +2375,6 @@ function Necrosis:CreateMenu()
 	Local.Menu.Curse = setmetatable({}, metatable)
 	Local.Menu.Buff = setmetatable({}, metatable)
 	local menuVariable = nil
-	local PetButtonPosition = "Button"
-	local BuffButtonPosition = "Button"
-	local CurseButtonPosition = "Button"
 
 	local f = Necrosis.Warlock_Buttons.main.f
 	HideList(Necrosis.Warlock_Lists.pets, f) -- Hide all the pet demon buttons || On cache toutes les icones des démons
@@ -2509,12 +2392,10 @@ function Necrosis:CreateMenu()
 			local petItem = Necrosis.Warlock_Lists.pets[index]
 			local f = Necrosis.Warlock_Buttons[petItem.f_ptr].f
 			if Necrosis.IsSpellKnown(petItem.high_of) -- in spell book
---			and NecrosisConfig.DemonSpellPosition[index] > 0 -- and requested
 			then
 				if Necrosis.Debug.buttons then
 					_G["DEFAULT_CHAT_FRAME"]:AddMessage("CreateMenu pets"
 					.." f'"..(petItem.f_ptr or "nyl")..'"'
---					.." p'"..(NecrosisConfig.DemonSpellPosition[index] or "nyl")..'"'
 					.." pr'"..(prior_button or "nyl")..'"'
 					)
 				end
@@ -2532,38 +2413,16 @@ function Necrosis:CreateMenu()
 
 		-- Display the pets menu button || Maintenant que tous les boutons de pet sont placés les uns à côté des autres, on affiche les disponibles
 		if Local.Menu.Pet[1] then
-			local f = _G[Necrosis.Warlock_Buttons.pets.f]
 			local fs = Necrosis.Warlock_Buttons.pets.f
+			local petButton = _G[fs]
 			Local.Menu.Pet[1]:ClearAllPoints()
 			Local.Menu.Pet[1]:SetPoint(
-				"CENTER", f, "CENTER",
+				"CENTER", petButton, "CENTER",
 				NecrosisConfig.PetMenuPos.direction * NecrosisConfig.PetMenuPos.x * 32 + NecrosisConfig.PetMenuDecalage.x,
 				NecrosisConfig.PetMenuPos.y * 32 + NecrosisConfig.PetMenuDecalage.y
 			)
 			-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
-			for i = 1, #Local.Menu.Pet, 1 do
-				Local.Menu.Pet[i]:SetParent(f)
-				-- Close the menu when a child button is clicked || Si le menu se ferme à l'appui d'un bouton, alors il se ferme à l'appui d'un bouton !
-				f:WrapScript(Local.Menu.Pet[i], "OnClick", [[
-					if self:GetParent():GetAttribute("state") == "Ouvert" then
-						self:GetParent():SetAttribute("state", "Ferme")
-					end
-				]])
-				f:WrapScript(Local.Menu.Pet[i], "OnEnter", [[
-					self:GetParent():SetAttribute("mousehere", true)
-				]])
-				f:WrapScript(Local.Menu.Pet[i], "OnLeave", [[
-					self:GetParent():SetAttribute("mousehere", false)
-					local stateMenu = self:GetParent():GetAttribute("state")
-					if not (stateMenu == "Bloque" or stateMenu == "Combat" or stateMenu == "ClicDroit") then
-						self:GetParent():SetAttribute("state", "Refresh")
-					end
-				]])
-				if NecrosisConfig.BlockedMenu or not NecrosisConfig.ClosingMenu then
-					f:UnwrapScript(Local.Menu.Pet[i], "OnClick")
-				end
---				Necrosis:SetPetSpellAttribute(Local.Menu.Pet[i])
-			end
+			WireUpMenuChildrenStates(petButton, Local.Menu.Pet)
 			Necrosis:MenuAttribute(fs)
 			Necrosis:PetSpellAttribute()
 		end
@@ -2577,19 +2436,25 @@ function Necrosis:CreateMenu()
 			_ = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons.buffs)
 		end
 
+		local anchor = "CENTER"
+		if (NecrosisConfig.BuffMenuPos.y == 1) then
+			anchor = "TOP"
+		elseif (NecrosisConfig.BuffMenuPos.y == -1) then
+			anchor = "BOTTOM"
+		elseif (NecrosisConfig.BuffMenuPos.x == 1) then
+			anchor = "RIGHT"
+		end
+
 		for index = 1, #Necrosis.Warlock_Lists.buffs, 1 do
 			local buffItem = Necrosis.Warlock_Lists.buffs[index]
 			local f = Necrosis.Warlock_Buttons[buffItem.f_ptr].f
-			if Necrosis.IsSpellKnown(buffItem.high_of) -- in spell book
---			and NecrosisConfig.BuffSpellPosition[index] > 0 -- and requested
-			then
-				menuVariable = Necrosis:CreateMenuItem(buffItem) -- Necrosis:CreateMenuBuff(v.f_ptr)
+			if Necrosis.IsSpellKnown(buffItem.high_of) then
+				-- in spell book
+				menuVariable = Necrosis:CreateMenuItem(buffItem)
+				local x = NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32
+				local y = NecrosisConfig.BuffMenuPos.y * 32
 				menuVariable:ClearAllPoints()
-				menuVariable:SetPoint(
-					"CENTER", prior_button, "CENTER",
-					NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32,
-					NecrosisConfig.BuffMenuPos.y * 32
-				)
+				menuVariable:SetPoint(anchor, prior_button, anchor, x, y)
 				prior_button = f -- anchor the next button
 				Local.Menu.Buff:insert(menuVariable)
 			end
@@ -2598,38 +2463,15 @@ function Necrosis:CreateMenu()
 		-- Display the buffs menu button on the sphere || Maintenant que tous les boutons de buff sont placés les uns à côté des autres, on affiche les disponibles
 		if Local.Menu.Buff[1] then
 			local fs = Necrosis.Warlock_Buttons.buffs.f
-			local f = _G[fs]
+			local buffButton = _G[fs]
 			Local.Menu.Buff[1]:ClearAllPoints()
-			Local.Menu.Buff[1]:SetPoint(
-				"CENTER", f, "CENTER",
-				NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32 + NecrosisConfig.BuffMenuDecalage.x,
-				NecrosisConfig.BuffMenuPos.y * 32 + NecrosisConfig.BuffMenuDecalage.y
-			)
+			local x = NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32 + NecrosisConfig.BuffMenuDecalage.x
+			local y = NecrosisConfig.BuffMenuPos.y * 32 + NecrosisConfig.BuffMenuDecalage.y
+			Local.Menu.Buff[1]:SetPoint("CENTER", buffButton, "CENTER", x, y)
 			-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
-			for i = 1, #Local.Menu.Buff, 1 do
-				Local.Menu.Buff[i]:SetParent(f)
-				-- Close the menu upon button Click || Si le menu se ferme à l'appui d'un bouton, alors il se ferme à l'appui d'un bouton !
-				f:WrapScript(Local.Menu.Buff[i], "OnClick", [[
-					if self:GetParent():GetAttribute("state") == "Ouvert" then
-						self:GetParent():SetAttribute("state", "Ferme")
-					end
-				]])
-				f:WrapScript(Local.Menu.Buff[i], "OnEnter", [[
-					self:GetParent():SetAttribute("mousehere", true)
-				]])
-				f:WrapScript(Local.Menu.Buff[i], "OnLeave", [[
-					self:GetParent():SetAttribute("mousehere", false)
-					local stateMenu = self:GetParent():GetAttribute("state")
-					if not (stateMenu == "Bloque" or stateMenu == "Combat" or stateMenu == "ClicDroit") then
-						self:GetParent():SetAttribute("state", "Refresh")
-					end
-				]])
-				if NecrosisConfig.BlockedMenu or not NecrosisConfig.ClosingMenu then
-					f:UnwrapScript(Local.Menu.Buff[i], "OnClick")
-				end
-			end
+			WireUpMenuChildrenStates(buffButton, Local.Menu.Buff)
 			Necrosis:MenuAttribute(fs)
-			Necrosis:BuffSpellAttribute()
+			Necrosis:BuffSpellAttribute(Local.Menu.Buff)
 		end
 	end
 
@@ -2661,37 +2503,16 @@ function Necrosis:CreateMenu()
 		end
 		-- Display the curse menu button on the sphere || Maintenant que tous les boutons de curse sont placés les uns à côté des autres, on affiche les disponibles
 		if Local.Menu.Curse[1] then
-			local f = _G[Necrosis.Warlock_Buttons.curses.f]
 			local fs = Necrosis.Warlock_Buttons.curses.f
+			local curseButton = _G[fs]
 			Local.Menu.Curse[1]:ClearAllPoints()
 			Local.Menu.Curse[1]:SetPoint(
-				"CENTER", f, "CENTER",
+				"CENTER", curseButton, "CENTER",
 				NecrosisConfig.CurseMenuPos.direction * NecrosisConfig.CurseMenuPos.x * 32 + NecrosisConfig.CurseMenuDecalage.x,
 				NecrosisConfig.CurseMenuPos.y * 32 + NecrosisConfig.CurseMenuDecalage.y
 			)
 			-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
-			for i = 1, #Local.Menu.Curse, 1 do
-				Local.Menu.Curse[i]:SetParent(f)
-				-- Respond to clicks || Si le menu se ferme à l'appui d'un bouton, alors il se ferme à l'appui d'un bouton !
-				f:WrapScript(Local.Menu.Curse[i], "OnClick", [[
-					if self:GetParent():GetAttribute("state") == "Ouvert" then
-						self:GetParent():SetAttribute("state","Ferme")
-					end
-				]])
-				f:WrapScript(Local.Menu.Curse[i], "OnEnter", [[
-					self:GetParent():SetAttribute("mousehere", true)
-				]])
-				f:WrapScript(Local.Menu.Curse[i], "OnLeave", [[
-					self:GetParent():SetAttribute("mousehere", false)
-					local stateMenu = self:GetParent():GetAttribute("state")
-					if not (stateMenu == "Bloque" or stateMenu == "Combat" or stateMenu == "ClicDroit") then
-						self:GetParent():SetAttribute("state", "Refresh")
-					end
-				]])
-				if NecrosisConfig.BlockedMenu or not NecrosisConfig.ClosingMenu then
-					f:UnwrapScript(Local.Menu.Curse[i], "OnClick")
-				end
-			end
+			WireUpMenuChildrenStates(curseButton, Local.Menu.Curse)
 			Necrosis:MenuAttribute(fs)
 			Necrosis:CurseSpellAttribute()
 		end
@@ -2734,78 +2555,6 @@ function Necrosis:Recall()
 	del(ui)
 	del(pos)
 end
-
--- Display the timers on the left or right || Fonction permettant le renversement des timers sur la gauche / la droite
--- function Necrosis:SymetrieTimer(bool)
--- 	local num
--- 	if bool then
--- 		NecrosisConfig.SpellTimerPos = -1
--- 		NecrosisConfig.SpellTimerJust = "RIGHT"
--- 		num = 1
--- 		while _G["NecrosisTimerFrame"..num.."OutText"] do
--- 			_G["NecrosisTimerFrame"..num.."OutText"]:ClearAllPoints()
--- 			_G["NecrosisTimerFrame"..num.."OutText"]:SetPoint(
--- 				"RIGHT",
--- 				_G["NecrosisTimerFrame"..num],
--- 				"LEFT",
--- 				-5, 1
--- 			)
--- 			_G["NecrosisTimerFrame"..num.."OutText"]:SetJustifyH("RIGHT")
--- 			num = num + 1
--- 		end
--- 	else
--- 		NecrosisConfig.SpellTimerPos = 1
--- 		NecrosisConfig.SpellTimerJust = "LEFT"
--- 		num = 1
--- 		while _G["NecrosisTimerFrame"..num.."OutText"] do
--- 			_G["NecrosisTimerFrame"..num.."OutText"]:ClearAllPoints()
--- 			_G["NecrosisTimerFrame"..num.."OutText"]:SetPoint(
--- 				"LEFT",
--- 				_G["NecrosisTimerFrame"..num],
--- 				"RIGHT",
--- 				5, 1
--- 			)
--- 			_G["NecrosisTimerFrame"..num.."OutText"]:SetJustifyH("LEFT")
--- 			num = num + 1
--- -- print("Necrosis:SymetrieTimer: "..tostring(_G["NecrosisTimerFrame"..num.."OutText"]:GetTop()))
--- 		end
--- 	end
--- 	if _G["NecrosisTimerFrame0"] then
--- 		NecrosisTimerFrame0:ClearAllPoints()
--- 		NecrosisTimerFrame0:SetPoint(
--- 			NecrosisConfig.SpellTimerJust,
--- 			NecrosisSpellTimerButton,
--- 			"CENTER",
--- 			NecrosisConfig.SpellTimerPos * 20, 0
--- 		)
--- 	end
--- 	if _G["NecrosisListSpells"] then
--- 		NecrosisListSpells:ClearAllPoints()
--- 		NecrosisListSpells:SetJustifyH(NecrosisConfig.SpellTimerJust)
--- 		NecrosisListSpells:SetPoint(
--- 			"TOP"..NecrosisConfig.SpellTimerJust,
--- 			NecrosisSpellTimerButton,
--- 			"CENTER",
--- 			NecrosisConfig.SpellTimerPos * 23, 10
--- 		)
--- 	end
--- end
-
--- function NecrosisTimer(nom, duree)
--- 	local Cible = UnitName("target")
--- 	local Niveau = UnitLevel("target")
--- 	local Guid = UnitGUID("target")
--- 	local truc = 6
--- 	if not Cible then
--- 		Cible = ""
--- 		truc = 2
--- 	end
--- 	if not Niveau then
--- 		Niveau = ""
--- 	end
-
--- 	Local.TimerManagement = NecrosisTimerX(nom, duree, truc, Cible, Niveau, Local.TimerManagement,Guid)
--- end
 
 function Necrosis:SetOfxy(menu)
 	if menu == "Buff" and _G["NecrosisBuffMenuButton"] then

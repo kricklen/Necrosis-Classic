@@ -335,7 +335,7 @@ function Localization.deDE()
 	}
 
 	Necrosis.Speech.ShortMessage = {
-		{{"<after>--> <target> hat nun einen Seelenstein aktiv f\195\188r 15 Minuten <--"}},
+		{{"<after>--> <target> hat nun einen Seelenstein aktiv f\195\188r 30 Minuten <--"}},
 		{{"<after><Portal> Ich beschw\195\182re <target>, bitte klickt auf das Tor <Portal>"}},
 		{{"Summoning a Ritual of Souls"}},
 	}

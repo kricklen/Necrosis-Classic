@@ -33,52 +33,56 @@
 -- Version $LastChangedDate: 2010-08-04 12:04:27 +1000 (Wed, 04 Aug 2010) $
 ------------------------------------------------------------------------------------------------------
 
-local new, del
-do
-	local cache = setmetatable({}, {__mode='k'})
-	function new(populate, ...)
-		local tbl
-		local t = next(cache)
-		if ( t ) then
-			cache[t] = nil
-			tbl = t
-		else
-			tbl = {}
-		end
-		if ( populate ) then
-			local num = select("#", ...)
-			if ( populate == "hash" ) then
-				assert(math.fmod(num, 2) == 0)
-				local key
-				for i = 1, num do
-					local v = select(i, ...)
-					if not ( math.fmod(i, 2) == 0 ) then
-						key = v
-					else
-						tbl[key] = v
-						key = nil
-					end
-				end
-			elseif ( populate == "array" ) then
-				for i = 1, num do
-					local v = select(i, ...)
-					table.insert(tbl, i, v)
-				end
-			end
-		end
-		return tbl
-	end
-	function del(t)
-		for k in next, t do
-			t[k] = nil
-		end
-		cache[t] = true
-	end
-end
+-- local new, del
+-- do
+-- 	local cache = setmetatable({}, {__mode='k'})
+-- 	function new(populate, ...)
+-- 		local tbl
+-- 		local t = next(cache)
+-- 		if ( t ) then
+-- 			cache[t] = nil
+-- 			tbl = t
+-- 		else
+-- 			tbl = {}
+-- 		end
+-- 		if ( populate ) then
+-- 			local num = select("#", ...)
+-- 			if ( populate == "hash" ) then
+-- 				assert(math.fmod(num, 2) == 0)
+-- 				local key
+-- 				for i = 1, num do
+-- 					local v = select(i, ...)
+-- 					if not ( math.fmod(i, 2) == 0 ) then
+-- 						key = v
+-- 					else
+-- 						tbl[key] = v
+-- 						key = nil
+-- 					end
+-- 				end
+-- 			elseif ( populate == "array" ) then
+-- 				for i = 1, num do
+-- 					local v = select(i, ...)
+-- 					table.insert(tbl, i, v)
+-- 				end
+-- 			end
+-- 		end
+-- 		return tbl
+-- 	end
+-- 	function del(t)
+-- 		for k in next, t do
+-- 			t[k] = nil
+-- 		end
+-- 		cache[t] = true
+-- 	end
+-- end
 
 
-
-Necrosis.Spells = {}
+Necrosis.Spells = {
+	-- Number of spells found in the chars spellbook
+	SpellsCount = 0,
+	-- True if spell count changed since last check
+	SpellsChanged = true
+}
 
 local _sp = Necrosis.Spells
 
@@ -304,6 +308,11 @@ local function UpdateSpellIfHigherRank(index, spellRank, spellID, spellNameOrg, 
 	end
 end
 
+local function SetSpellsChanged(countSpells)
+	_sp.SpellsChanged = _sp.SpellsCount ~= countSpells
+	_sp.SpellsCount = countSpells
+end
+
 -- My favourite feature! Create a list of spells known by the warlock sorted by name & rank || Ma fonction préférée ! Elle fait la liste des sorts connus par le démo, et les classe par rang.
 -- Select the highest available spell in the case of stones. || Pour les pierres, elle sélectionne le plus haut rang connu
 function Necrosis:SpellSetup()
@@ -352,6 +361,8 @@ function Necrosis:SpellSetup()
 		spellID = spellID + 1
 	end
 
+	SetSpellsChanged(spellID)
+
 	-- Populate usage list
 	for index = 1, #Necrosis.Spell, 1 do
 		local s = Necrosis.Spell[index]
@@ -379,17 +390,16 @@ function Necrosis:SpellSetup()
 	Necrosis.CurrentEnv.FelArmorAvailable = Necrosis.Spell[47].ID ~= nil
 	Necrosis.CurrentEnv.FelArmorName = Necrosis.Spell[47].Name
 
-	if (not InCombatLockdown()) then
-		Necrosis:MainButtonAttribute()
-		Necrosis:BuffSpellAttribute()
-		Necrosis:PetSpellAttribute()
-		Necrosis:CurseSpellAttribute()
-		Necrosis:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
-	end
+	-- if (not InCombatLockdown()) then
+	-- 	Necrosis:MainButtonAttribute()
+	-- 	Necrosis:BuffSpellAttribute()
+	-- 	Necrosis:PetSpellAttribute()
+	-- 	Necrosis:CurseSpellAttribute()
+	-- 	Necrosis:StoneAttribute(Necrosis.CurrentEnv.SteedAvailable)
+	-- end
 
 	Necrosis:BindName()
 end
-
 
 --[==[ Necrosis tables
 Translation items are in Dialog.lua!

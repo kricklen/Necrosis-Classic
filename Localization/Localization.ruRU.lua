@@ -353,7 +353,7 @@ function Localization.ruRU()
 	}
 
 	Necrosis.Speech.ShortMessage = {
-		{{"<after>--> <target> теперь сохранен(а) на 15 минут <--"}},
+		{{"<after>--> <target> теперь сохранен(а) на 30 минут <--"}},
 		{{"<after><TP> Призываю <target>. Пожалуйста, нажмите на портал! <TP>"}},
 		{{"Выполняется Ритуал душ"}},
 	}

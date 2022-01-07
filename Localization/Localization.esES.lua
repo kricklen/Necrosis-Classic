@@ -329,7 +329,7 @@ function Localization.esES()
 	}
 
 	Necrosis.Speech.ShortMessage = {
-		{{"<after>--> <target> ha recibido la piedra del alma durante 15 minutos <--"}},
+		{{"<after>--> <target> ha recibido la piedra del alma durante 30 minutos <--"}},
 		{{"<after><TP> Invocando a <target>, por favor cliquead en el portal <TP>"}},
 		{{"Summoning a Ritual of Souls"}},
 	}

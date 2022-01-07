@@ -106,7 +106,7 @@ function _bh:_FindStones(bag)
 					self.Soulstone_Rank = ItemHelper.Soulstone[itemId].Rank
 					self.Soulstone_Name = ItemHelper.Soulstone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
-					Necrosis:SoulstoneUpdateAttribute()
+					ButtonHelper:SoulstoneUpdateAttribute()
 
 				-- Check if its a healthstone and of higher rank than the current one
 				elseif (ItemHelper:IsHealthstone(itemId)
@@ -120,7 +120,7 @@ function _bh:_FindStones(bag)
 					self.Healthstone_SlotId = slot
 					self.Healthstone_Name = ItemHelper.Healthstone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
-					Necrosis:HealthstoneUpdateAttribute()
+					ButtonHelper:HealthstoneUpdateAttribute()
 
 				-- Check if its a spellstone and of higher rank than the current one
 				elseif (ItemHelper:IsSpellstone(itemId)
@@ -130,7 +130,7 @@ function _bh:_FindStones(bag)
 					self.Spellstone_Rank = ItemHelper.Spellstone[itemId].Rank
 					self.Spellstone_Name = ItemHelper.Spellstone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
-					Necrosis:SpellstoneUpdateAttribute()
+					ButtonHelper:SpellstoneUpdateAttribute()
 
 				-- Check if its a firestone and of higher rank than the current one
 				elseif (ItemHelper:IsFirestone(itemId)
@@ -140,7 +140,7 @@ function _bh:_FindStones(bag)
 					self.Firestone_Rank = ItemHelper.Firestone[itemId].Rank
 					self.Firestone_Name = ItemHelper.Firestone[itemId].Name
 					-- Update its button attributes on the sphere || On attache des actions au bouton de la pierre
-					Necrosis:FirestoneUpdateAttribute()
+					ButtonHelper:FirestoneUpdateAttribute()
 
 				-- Check if its a hearthstone || et enfin la pierre de foyer
 				elseif (ItemHelper:IsHearthstone(itemId)) then

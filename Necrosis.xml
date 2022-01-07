@@ -5,6 +5,7 @@
 				self:RegisterEvent("PLAYER_LOGIN")
 				self:RegisterEvent("SKILL_LINES_CHANGED")
 				self:RegisterEvent("SPELLS_CHANGED")
+				self:RegisterEvent("PLAYER_REGEN_ENABLED")
 				
 				<!-- self:RegisterEvent("VARIABLES_LOADED") -->
 				

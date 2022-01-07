@@ -84,8 +84,11 @@ local function ApplyLocalization()
 end
 
 local function setupMenu()
+	Necrosis:SpellSetup()
 	Necrosis:CreateMenu()
 	Necrosis:ButtonSetup()
+
+	Necrosis:MainButtonAttribute()
 
 	-- On règle la taille de la pierre et des boutons suivant les réglages du SavedVariables
 	NecrosisButton:SetScale(NecrosisConfig.NecrosisButtonScale/100)
@@ -93,44 +96,14 @@ local function setupMenu()
 	NecrosisBacklashButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
 	NecrosisAntiFearButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
 	NecrosisCreatureAlertButton:SetScale(NecrosisConfig.ShadowTranceScale/100)
-	-- -- On définit l'affichage des Timers Graphiques à gauche ou à droite du bouton
-	-- if _G["NecrosisTimerFrame0"] then
-	-- 	NecrosisTimerFrame0:ClearAllPoints()
-	-- 	NecrosisTimerFrame0:SetPoint(
-	-- 		NecrosisConfig.SpellTimerJust,
-	-- 		NecrosisSpellTimerButton,
-	-- 		"CENTER",
-	-- 		NecrosisConfig.SpellTimerPos * 20,
-	-- 		0
-	-- 	)
-	-- end
-	-- -- On définit l'affichage des Timers Textes à gauche ou à droite du bouton
-	-- if _G["NecrosisListSpells"] then
-	-- 	NecrosisListSpells:ClearAllPoints()
-	-- 	NecrosisListSpells:SetJustifyH(NecrosisConfig.SpellTimerJust)
-	-- 	NecrosisListSpells:SetPoint(
-	-- 		"TOP"..NecrosisConfig.SpellTimerJust,
-	-- 		"NecrosisSpellTimerButton",
-	-- 		"CENTER",
-	-- 		NecrosisConfig.SpellTimerPos * 23,
-	-- 		5
-	-- 	)
-	-- end
 
-	-- --On affiche ou on cache le bouton, d'ailleurs !
-	-- if not NecrosisConfig.ShowSpellTimers then
-	-- 	NecrosisSpellTimerButton:Hide()
-	-- end
-	
 	-- Le Shard est-il verrouillé sur l'interface ?
 	if NecrosisConfig.NoDragAll then
 		Necrosis:NoDrag()
 		NecrosisButton:RegisterForDrag("")
-		-- NecrosisSpellTimerButton:RegisterForDrag("")
 	else
 		Necrosis:Drag()
 		NecrosisButton:RegisterForDrag("LeftButton")
-		-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
 	end
 
 	-- Inventaire des pierres et des fragments possedés par le Démoniste
@@ -144,8 +117,6 @@ local function setupMenu()
 	if NecrosisConfig.SoulshardSort then
 		Necrosis:SoulshardSwitch("CHECK")
 	end
-
-	EventHelper:UnregisterOnCombatStopHandler(setupMenu)
 end
 
 function Necrosis:Initialize(Config)
@@ -163,7 +134,6 @@ function Necrosis:Initialize(Config)
 	end
 
 	if (NecrosisConfig.StonePosition[9] == nil) then
-		print("Add StonePosition 9")
 		NecrosisConfig.StonePosition[9] = 1
 	end
 	self:CreateWarlockUI()
@@ -178,17 +148,11 @@ function Necrosis:Initialize(Config)
 	f = _G[f]
 	-- Now ready to activate Necrosis
 	f:SetScript("OnEvent", Necrosis.OnEvent)
-	-- f:SetScript("OnUpdate", 	function(self, arg1) Necrosis:OnUpdate(self, arg1) end)
 	f:SetScript("OnEnter", 		function(self) Necrosis:BuildButtonTooltip(self) end)
 	f:SetScript("OnLeave", 		function() GameTooltip:Hide() end)
 	f:SetScript("OnMouseUp", 	function(self) Necrosis:OnDragStop(self) end)
 	f:SetScript("OnDragStart", 	function(self) Necrosis:OnDragStart(self) end)
 	f:SetScript("OnDragStop", 	function(self) Necrosis:OnDragStop(self) end)
-
-	-- Register the events used || Enregistrement des events utilisés
-	-- for i in ipairs(Events) do
-	-- 	f:RegisterEvent(Events[i])
-	-- end
 
 	self:CreateWarlockPopup()
 	-----------------------------------------------------------
@@ -199,20 +163,11 @@ function Necrosis:Initialize(Config)
 
 	-- Création de la liste des sorts disponibles
 	self:SpellLocalize()
-	self:SpellSetup()
-	if (EventHelper:IsCombatLocked()) then
-		print("Combat locked")
-		EventHelper:RegisterOnCombatStopHandler(setupMenu)
-	else
-		setupMenu()
-		-- self:CreateMenu()
-		-- self:ButtonSetup()
-	end
+	setupMenu()
 	
 	Necrosis.Timers:Initialize()
 
 	local successfulRequest = C_ChatInfo.RegisterAddonMessagePrefix(Necrosis.CurrentEnv.ChatPrefix)
-	-- print("request chat: "..tostring(successfulRequest))
 
     -- Enregistrement de la commande console
 	SlashCmdList["NecrosisCommand"] = Necrosis.SlashHandler
