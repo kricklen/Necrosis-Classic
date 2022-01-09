@@ -29,7 +29,7 @@ InitializeNamespaces.lua
 Fonts\RegisterFonts.lua
 
 Helpers\TableHelper.lua
-Helpers\ButtonHelper.lua
+Helpers\SphereButtonHelper.lua
 Helpers\ItemHelper.lua
 Helpers\BagHelper.lua
 Helpers\GraphicsHelper.lua

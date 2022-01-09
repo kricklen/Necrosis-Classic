@@ -12,19 +12,7 @@ local _G = getfenv(0)
 ------------------------------------------------------------------------------------------------------
 
 -- On crée les menus sécurisés pour les différents sorts Buff / Démon / Malédictions
-function Necrosis:MenuAttribute(menu)
-	-- if InCombatLockdown() then
-	-- 	return
-	-- end
-
-	if Necrosis.Debug.buttons then
-		_G["DEFAULT_CHAT_FRAME"]:AddMessage("MenuAttribute"
-		.." m'"..(tostring(menu) or "nyl")..'"'
-		)
-	end
-
-	local menuButton = _G[menu]
-	
+function Necrosis:MenuAttribute(menuButton)
 	if not menuButton:GetAttribute("state") then 
 		menuButton:SetAttribute("state", "Ferme")
 	end
@@ -186,18 +174,14 @@ end
 
 -- On associe les buffs au clic sur le bouton concerné
 function Necrosis:BuffSpellAttribute(buttonList)
-	for index = 1, #buttonList, 1 do
-		Necrosis:SetBuffSpellAttribute(buttonList[index])
+	for i = 1, #buttonList, 1 do
+		Necrosis:SetBuffSpellAttribute(buttonList[i])
 	end
 end
 
 -- On associe les démons au clic sur le bouton concerné
 function Necrosis:SetPetSpellAttribute(button)
-	-- if InCombatLockdown() then
-	-- 	return
-	-- end
-
-	local f = _G[button]
+	local f = button
 	if f then
 		if Necrosis.Debug.buttons then
 			_G["DEFAULT_CHAT_FRAME"]:AddMessage("SetPetSpellAttribute"
@@ -214,42 +198,27 @@ function Necrosis:SetPetSpellAttribute(button)
 			if Necrosis.IsSpellKnown("domination") then 
 				f:SetAttribute("type2", "macro")
 				local str = 
-					"/cast "..Necrosis.GetSpellCastName("domination")
-					.."\n/stopcasting\n/cast "..Necrosis.GetSpellCastName(f.high_of) 
---print(str)
+					"/stopcasting"
+					.."\n/cast "..Necrosis.GetSpellCastName("domination")
+					.."\n/cast "..Necrosis.GetSpellCastName(f.high_of) 
 				f:SetAttribute("macrotext",str)
 			end
 		else
 			f:SetAttribute("type", "spell")
 			f:SetAttribute("spell", Necrosis.GetSpellCastName(f.high_of)) 
 		end
-	else
 	end
 end
 
-function Necrosis:PetSpellAttribute()
-	-- if InCombatLockdown() then
-	-- 	return
-	-- end
-
-	for index = 1, #Necrosis.Warlock_Lists.pets, 1 do
-		local v = Necrosis.Warlock_Lists.pets[index]
-		local f = Necrosis.Warlock_Buttons[v.f_ptr].f
-		if Necrosis.IsSpellKnown(v.high_of) -- in spell book
---		and NecrosisConfig.DemonSpellPosition[index] > 0 -- and requested
-		then
-			Necrosis:SetPetSpellAttribute(f)
-		end
+function Necrosis:PetSpellAttribute(buttonList)
+	for i = 1, #buttonList, 1 do
+		Necrosis:SetPetSpellAttribute(buttonList[i])
 	end
 end
 
 -- On associe les malédictions au clic sur le bouton concerné
 function Necrosis:SetCurseSpellAttribute(button)
-	-- if InCombatLockdown() then
-	-- 	return
-	-- end
-
-	local f = _G[button]
+	local f = button
 	if f then
 		f:SetAttribute("harmbutton", "debuff")
 		f:SetAttribute("type-debuff", "spell")
@@ -266,29 +235,15 @@ function Necrosis:SetCurseSpellAttribute(button)
 	end
 end
 
-function Necrosis:CurseSpellAttribute()
-	-- if InCombatLockdown() then
-	-- 	return
-	-- end
-
-	for i = 1, #Necrosis.Warlock_Lists.curses, 1 do
-		local v = Necrosis.Warlock_Lists.curses[i]
-		local fr = Necrosis.Warlock_Buttons[v.f_ptr].f
-		if Necrosis.IsSpellKnown(v.high_of) -- in spell book
---		and NecrosisConfig.DemonSpellPosition[i] > 0 -- and requested
-		then
-			Necrosis:SetCurseSpellAttribute(fr)
-		end
+function Necrosis:CurseSpellAttribute(buttonList)
+	for i = 1, #buttonList, 1 do
+		Necrosis:SetCurseSpellAttribute(buttonList[i])
 	end
 end
 
 -- Associating the frames to buttons, and creating stones on right-click.
 -- Association de la monture au bouton, et de la création des pierres sur un clic droit
 function Necrosis:StoneAttribute(Steed)
-	-- if InCombatLockdown() then
-	-- 	return
-	-- end
-
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("StoneAttribute"
 		.." a'"..(tostring(Steed) or "nyl")..'"'
@@ -327,7 +282,7 @@ function Necrosis:StoneAttribute(Steed)
 		)
 	end
 	
-	ButtonHelper:SoulstoneUpdateAttribute()
+	SphereButtonHelper:SoulstoneUpdateAttribute()
 
 	-- mounts || Pour la monture
 	local f = Necrosis.Warlock_Buttons.mounts.f

@@ -74,15 +74,15 @@ end
 function _mv:cbBlockedMenu_Click()
 	NecrosisConfig.BlockedMenu = self:GetChecked()
 	if NecrosisConfig.BlockedMenu then
-		if _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:SetAttribute("state", ButtonHelper.States.Bloque) end
-		if _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:SetAttribute("state", ButtonHelper.States.Bloque) end
-		if _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:SetAttribute("state", ButtonHelper.States.Bloque) end
+		if _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque) end
+		if _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque) end
+		if _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque) end
 		_mv.cbAutoMenu:Disable()
 		_mv.cbCloseMenu:Disable()
 	else
-		if _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:SetAttribute("state", ButtonHelper.States.Ferme) end
-		if _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:SetAttribute("state", ButtonHelper.States.Ferme) end
-		if _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:SetAttribute("state", ButtonHelper.States.Ferme) end
+		if _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme) end
+		if _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme) end
+		if _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme) end
 		_mv.cbAutoMenu:Enable()
 		_mv.cbCloseMenu:Enable()
 	end
@@ -91,9 +91,9 @@ end
 function _mv:cbAutoMenu_Click()
 	NecrosisConfig.AutomaticMenu = self:GetChecked()
 	if not NecrosisConfig.AutomaticMenu then
-		if _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:SetAttribute("state", ButtonHelper.States.Ferme) end
-		if _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:SetAttribute("state", ButtonHelper.States.Ferme) end
-		if _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:SetAttribute("state", ButtonHelper.States.Ferme) end
+		if _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme) end
+		if _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme) end
+		if _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme) end
 	end
 end
 
@@ -442,7 +442,7 @@ function _mv:Show()
 				GameTooltip:SetText(self:GetValue())
 				if _G["NecrosisBuffMenuButton"] then
 					-- Block the menu button
-					NecrosisBuffMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+					NecrosisBuffMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 				end
 			end
 		)
@@ -452,9 +452,9 @@ function _mv:Show()
 				if _G["NecrosisBuffMenuButton"] then
 					-- Set the state that the menu button had before
 					if NecrosisConfig.BlockedMenu then
-						NecrosisBuffMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+						NecrosisBuffMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 					else
-						NecrosisBuffMenuButton:SetAttribute("state", ButtonHelper.States.Ferme)
+						NecrosisBuffMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme)
 					end
 				end
 			end
@@ -489,7 +489,7 @@ function _mv:Show()
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 				GameTooltip:SetText(self:GetValue())
 				if _G["NecrosisBuffMenuButton"] then
-					NecrosisBuffMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+					NecrosisBuffMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 				end
 			end
 		)
@@ -498,9 +498,9 @@ function _mv:Show()
 				GameTooltip:Hide()
 				if _G["NecrosisBuffMenuButton"] then
 					if NecrosisConfig.BlockedMenu then
-						NecrosisBuffMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+						NecrosisBuffMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 					else
-						NecrosisBuffMenuButton:SetAttribute("state", ButtonHelper.States.Ferme)
+						NecrosisBuffMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme)
 					end
 				end
 			end
@@ -561,7 +561,7 @@ function _mv:Show()
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 				GameTooltip:SetText(self:GetValue())
 				if _G["NecrosisPetMenuButton"] then
-					NecrosisPetMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+					NecrosisPetMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 				end
 			end
 		)
@@ -570,9 +570,9 @@ function _mv:Show()
 				GameTooltip:Hide()
 				if _G["NecrosisPetMenuButton"] then
 					if NecrosisConfig.BlockedMenu then
-						NecrosisPetMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+						NecrosisPetMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 					else
-						NecrosisPetMenuButton:SetAttribute("state", ButtonHelper.States.Ferme)
+						NecrosisPetMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme)
 					end
 				end
 			end
@@ -607,7 +607,7 @@ function _mv:Show()
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 				GameTooltip:SetText(self:GetValue())
 				if _G["NecrosisPetMenuButton"] then
-					NecrosisPetMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+					NecrosisPetMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 				end
 			end
 		)
@@ -616,9 +616,9 @@ function _mv:Show()
 				GameTooltip:Hide()
 				if _G["NecrosisPetMenuButton"] then
 					if NecrosisConfig.BlockedMenu then
-						NecrosisPetMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+						NecrosisPetMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 					else
-						NecrosisPetMenuButton:SetAttribute("state", ButtonHelper.States.Ferme)
+						NecrosisPetMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme)
 					end
 				end
 			end
@@ -679,7 +679,7 @@ function _mv:Show()
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 				GameTooltip:SetText(self:GetValue())
 				if _G["NecrosisCurseMenuButton"] then
-					NecrosisCurseMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+					NecrosisCurseMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 				end
 			end
 		)
@@ -688,9 +688,9 @@ function _mv:Show()
 				GameTooltip:Hide()
 				if _G["NecrosisCurseMenuButton"] then
 					if NecrosisConfig.BlockedMenu then
-						NecrosisCurseMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+						NecrosisCurseMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 					else
-						NecrosisCurseMenuButton:SetAttribute("state", ButtonHelper.States.Ferme)
+						NecrosisCurseMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme)
 					end
 				end
 			end
@@ -725,7 +725,7 @@ function _mv:Show()
 				GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 				GameTooltip:SetText(self:GetValue())
 				if _G["NecrosisCurseMenuButton"] then
-					NecrosisCurseMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+					NecrosisCurseMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 				end
 			end
 		)
@@ -734,9 +734,9 @@ function _mv:Show()
 				GameTooltip:Hide()
 				if _G["NecrosisCurseMenuButton"] then
 					if NecrosisConfig.BlockedMenu then
-						NecrosisCurseMenuButton:SetAttribute("state", ButtonHelper.States.Bloque)
+						NecrosisCurseMenuButton:SetAttribute("state", SphereButtonHelper.States.Bloque)
 					else
-						NecrosisCurseMenuButton:SetAttribute("state", ButtonHelper.States.Ferme)
+						NecrosisCurseMenuButton:SetAttribute("state", SphereButtonHelper.States.Ferme)
 					end
 				end
 			end
