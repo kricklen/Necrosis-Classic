@@ -158,7 +158,7 @@ function _sbh:CreateMenuButton(warlockButton)
 	frame:SetHighlightTexture(warlockButton.high) 
 	frame:RegisterForDrag("LeftButton")
 	frame:RegisterForClicks("AnyUp")
-	-- frame:Show()
+	frame:Show()
 
 	-- Edit the scripts associated with the button || Edition des scripts associés au bouton
 	frame:SetScript("OnEnter", function(self) Necrosis:BuildButtonTooltip(self) end)
@@ -203,7 +203,7 @@ function _sbh:CreateStoneButton(warlockButton)
 	frame:SetHighlightTexture(warlockButton.high) --("Interface\\AddOns\\Necrosis-Classic\\UI\\"..stone.."Button-0"..num)
 	frame:RegisterForDrag("LeftButton")
 	frame:RegisterForClicks("AnyUp")
-	-- frame:Show()
+	frame:Show()
 
 
 	-- Edit the scripts associated with the buttons || Edition des scripts associés au bouton

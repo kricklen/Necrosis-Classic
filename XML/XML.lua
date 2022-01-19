@@ -32,7 +32,7 @@ function Necrosis:CreateWarlockUI()
 	frame:SetHeight(58)
 	frame:RegisterForDrag("LeftButton")
 	frame:RegisterForClicks("AnyUp")
-	-- frame:Show()
+	frame:Show()
 
 	-- Place the button window at its saved location || Placement de la fenêtre à l'endroit sauvegardé ou à l'emplacement par défaut
 	frame:ClearAllPoints()
@@ -59,49 +59,38 @@ function Necrosis:CreateWarlockUI()
 end
 
 
-function Necrosis:CreateMenuItem(item)
-	local b = nil
-	-- look up the button info
-	for idx, v in pairs (Necrosis.Warlock_Buttons) do
-		if idx == item.f_ptr then
-			b = v
-			break
-		else
-		end
-	end
+function Necrosis:CreateMenuItem(warlockButton, high_of)
 	if Necrosis.Debug.buttons then
 		_G["DEFAULT_CHAT_FRAME"]:AddMessage("CreateMenuItem"
-		.." i'"..tostring(item.f_ptr).."'"
-		.." b'"..tostring(b.f).."'"
-		.." bt'"..tostring(b.tip).."'"
-		.." ih'"..tostring(item.high_of).."'"
-		.." s'"..tostring(Necrosis:GetSpellName(item.high_of)).."'"
+		.." i'"..tostring(warlockButton.f).."'"
+		.." ih'"..tostring(high_of).."'"
+		.." s'"..tostring(Necrosis:GetSpellName(high_of)).."'"
 		)
 	end
 
 	-- Create the button || Creaton du bouton
-	local frame = _G[b.f]
+	local frame = _G[warlockButton.f]
 	
 	if not frame then
-		frame = CreateFrame("Button", b.f, UIParent, "SecureActionButtonTemplate")
+		frame = CreateFrame("Button", warlockButton.f, UIParent, "SecureActionButtonTemplate")
 		-- Définition de ses attributs
 		frame:SetMovable(true)
 		frame:EnableMouse(true)
 		frame:SetWidth(40)
 		frame:SetHeight(40)
-		frame:SetHighlightTexture(b.high) --("Interface\\AddOns\\Necrosis-Classic\\UI\\"...)
+		frame:SetHighlightTexture(warlockButton.high) --("Interface\\AddOns\\Necrosis-Classic\\UI\\"...)
 		frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
 		-- ======  hidden but effective
 		-- Add valuable data to the frame for retrieval later
-		frame.high_of = item.high_of
-		frame.pet = b.pet
+		frame.high_of = high_of
+		frame.pet = warlockButton.pet
 		
 		-- Set the tooltip label to the localized name if not given one already
-		Necrosis.TooltipData[b.tip].Label = White(Necrosis.GetSpellName(item.high_of))
+		Necrosis.TooltipData[warlockButton.tip].Label = White(Necrosis.GetSpellName(high_of))
 	end
 
-	frame:SetNormalTexture(b.norm)
+	frame:SetNormalTexture(warlockButton.norm)
 	frame:Hide()
 
 	-- Edit the scripts associated with the button || Edition des scripts associés au bouton 
@@ -111,7 +100,7 @@ function Necrosis:CreateMenuItem(item)
 	--============= Special settings per button
 	--
 	-- Special attributes for casting certain buffs || Attributs spéciaux pour les buffs castables sur les autres joueurs
-	if item.f_ptr == "breath" or item.f_ptr == "invis" then
+	if (high_of == "breath" or high_of == "invisible") then
 		frame:SetScript("PreClick", function(self)
 			if (not UnitIsFriend("player","target")) then
 				self:SetAttribute("unit", "player")
@@ -125,7 +114,7 @@ function Necrosis:CreateMenuItem(item)
 	end
 
 	-- Special attribute for the Banish button || Attributes spéciaux pour notre ami le sort de Bannissement
-	if item.f_ptr == "banish" then
+	if (high_of == "banish") then
 		frame:SetScale(NecrosisConfig.BanishScale/100)
 	end
 

@@ -99,10 +99,10 @@ local function setupMenu()
 
 	-- Le Shard est-il verrouillé sur l'interface ?
 	if NecrosisConfig.NoDragAll then
-		Necrosis:NoDrag()
+		SphereMenu:NoDrag()
 		NecrosisButton:RegisterForDrag("")
 	else
-		Necrosis:Drag()
+		SphereMenu:Drag()
 		NecrosisButton:RegisterForDrag("LeftButton")
 	end
 

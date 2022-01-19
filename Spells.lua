@@ -851,7 +851,7 @@ Necrosis.Warlock_Buttons = {
 					norm = GraphicsHelper:GetTexture("Aqua-01"),
 					high = GraphicsHelper:GetTexture("Aqua-02"),
 					}, --
-	invis 		= {f = "NecrosisBuffMenu03", tip = "Invisible", anchor = "ANCHOR_RIGHT", can_target = true,
+	invisible	= {f = "NecrosisBuffMenu03", tip = "Invisible", anchor = "ANCHOR_RIGHT", can_target = true,
 					norm = GraphicsHelper:GetTexture("Invisible-01"),
 					high = GraphicsHelper:GetTexture("Invisible-02"),
 					}, --
@@ -997,7 +997,7 @@ Necrosis.Warlock_Lists = {
 		[6] = {f_ptr = "mounts", high_of = "mount",},
 		[7] = {f_ptr = "pets", menu = "pets", },
 		[8] = {f_ptr = "curses", menu = "curses", },
-		[9] = {f_ptr = "destroy_shards", function_name = "BagHelper:DestroyShards", },
+		[9] = {f_ptr = "destroy_shards" },
 --		[9] = {f_ptr = "hearth_stone", item = "Hearthstone",},
 	},
 -- 31=Demon Armor | 47=Fel Armor | 32=Unending Breath | 33=Detect Invis | 34=Eye of Kilrogg | 37=Ritual of Summoning | 38=Soul Link | 43=Shadow Ward | 35=Enslave Demon | 59=Demonic Empowerment | 9=Banish
@@ -1005,7 +1005,7 @@ Necrosis.Warlock_Lists = {
 	["buffs"] = {
 		[1] = {f_ptr = "armor", high_of = "armor", },
 		[2] = {f_ptr = "breath", high_of = "breath", },
-		[3] = {f_ptr = "invis", high_of = "invisible", },
+		[3] = {f_ptr = "invisible", high_of = "invisible", },
 		[4] = {f_ptr = "eye", high_of = "eye", },
 		[5] = {f_ptr = "summoning", high_of = "summoning", },
 		[6] = {f_ptr = "link", high_of = "link", },

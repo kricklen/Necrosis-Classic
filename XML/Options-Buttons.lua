@@ -71,7 +71,7 @@ function _bv:cbLockButtons_Click()
 		NecrosisConfig.NecrosisLockServ = true
 		Necrosis:ClearAllPoints()
 		Necrosis:ButtonSetup()
-		Necrosis:NoDrag()
+		SphereMenu:NoDrag()
 		if not NecrosisConfig.NoDragAll then
 			NecrosisButton:RegisterForDrag("LeftButton")
 			-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
@@ -79,31 +79,44 @@ function _bv:cbLockButtons_Click()
 	else
 		NecrosisConfig.NecrosisLockServ = false
 		Necrosis:ClearAllPoints()
-		local ButtonName = {
-			"NecrosisFirestoneButton",
-			"NecrosisSpellstoneButton",
-			"NecrosisHealthstoneButton",
-			"NecrosisSoulstoneButton",
-			"NecrosisBuffMenuButton",
-			"NecrosisMountButton",
-			"NecrosisPetMenuButton",
-			"NecrosisCurseMenuButton",
-			"NecrosisDestroyShardsButton"
-		}
-		local loc = {-121, -87, -53, -17, 17, 53, 87, 121}
-		for i in ipairs(ButtonName) do
-			if _G[ButtonName[i]] then
-				_G[ButtonName[i]]:SetPoint("CENTER", "UIParent", "CENTER", loc[i], -100)
-				NecrosisConfig.FramePosition[ButtonName[i]] = {
+		local loc = {-121, -87, -53, -17, 17, 53, 87, 121, 155}
+		for index, item in ipairs(Necrosis.Warlock_Lists.on_sphere) do
+			local warlockButton = Necrosis.Warlock_Buttons[item.f_ptr]
+	
+			-- local ButtonName = {
+			-- 	"NecrosisFirestoneButton",
+			-- 	"NecrosisSpellstoneButton",
+			-- 	"NecrosisHealthstoneButton",
+			-- 	"NecrosisSoulstoneButton",
+			-- 	"NecrosisBuffMenuButton",
+			-- 	"NecrosisMountButton",
+			-- 	"NecrosisPetMenuButton",
+			-- 	"NecrosisCurseMenuButton",
+			-- 	"NecrosisDestroyShardsButton"
+			-- }
+			-- for i in ipairs(ButtonName) do
+			-- if _G[ButtonName[i]] then
+			-- 	_G[ButtonName[i]]:SetPoint("CENTER", "UIParent", "CENTER", loc[i], -100)
+			-- 	NecrosisConfig.FramePosition[ButtonName[i]] = {
+			-- 		"CENTER",
+			-- 		"UIParent",
+			-- 		"CENTER",
+			-- 		loc[i],
+			-- 		-100
+			-- 	}
+			-- end
+			if _G[warlockButton.f] then
+				_G[warlockButton.f]:SetPoint("CENTER", "UIParent", "CENTER", loc[i], -100)
+				NecrosisConfig.FramePosition[warlockButton.f] = {
 					"CENTER",
 					"UIParent",
 					"CENTER",
-					loc[i],
+					loc[index],
 					-100
 				}
 			end
 		end
-		Necrosis:Drag()
+		SphereMenu:Drag()
 		NecrosisConfig.NoDragAll = false
 		NecrosisButton:RegisterForDrag("LeftButton")
 		-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")

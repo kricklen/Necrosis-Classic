@@ -2214,10 +2214,10 @@ function Necrosis:ButtonSetup()
 			_G["DEFAULT_CHAT_FRAME"]:AddMessage("ButtonSetup".." '"..tostring(fr))
 		end
 		local f = _G[fr]
-		if (Necrosis.IsSpellKnown(v.high_of) 	  -- in spell book
-			or v.menu                             -- or on menu of spells
-			or v.function_name					  -- Function to call when clicking the button
-			or v.item)                            -- or item to use
+		if (Necrosis.IsSpellKnown(v.high_of)            -- in spell book
+			or v.menu                                   -- or on menu of spells
+			or warlockButton.func                       -- Function to call when clicking the button
+			or v.item)                                  -- or item to use
 			and NecrosisConfig.StonePosition[index] > 0 -- and requested
 		then
 			if not f then
@@ -2250,7 +2250,7 @@ function Necrosis:ButtonSetup()
 					)
 				end
 				f:SetScale(NBRScale)
-				-- f:Show()
+				f:Show()
 			-- end
 		else
 			if f then
@@ -2304,234 +2304,12 @@ function Necrosis:GameTooltip_ClearMoney()
 end
 
 
--- Function (XML) to restore the default attachment points of the buttons || Fonction (XML) pour rétablir les points d'attache par défaut des boutons
-function Necrosis:ClearAllPoints()
-	if  _G["NecrosisFirestoneButton"] then NecrosisFirestoneButton:ClearAllPoints() end
-	if  _G["NecrosisSpellstoneButton"] then NecrosisSpellstoneButton:ClearAllPoints() end
-	if  _G["NecrosisHealthstoneButton"] then NecrosisHealthstoneButton:ClearAllPoints() end
-	if  _G["NecrosisSoulstoneButton"] then NecrosisSoulstoneButton:ClearAllPoints() end
-	if  _G["NecrosisMountButton"] then NecrosisMountButton:ClearAllPoints() end
-	if  _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:ClearAllPoints() end
-	if  _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:ClearAllPoints() end
-	if  _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:ClearAllPoints() end
-end
-
--- Disable drag functionality || Fonction (XML) pour étendre la propriété NoDrag() du bouton principal de Necrosis sur tout ses boutons
-function Necrosis:NoDrag()
-	if  _G["NecrosisFirestoneButton"] then NecrosisFirestoneButton:RegisterForDrag("") end
-	if  _G["NecrosisSpellstoneButton"] then NecrosisSpellstoneButton:RegisterForDrag("") end
-	if  _G["NecrosisHealthstoneButton"] then NecrosisHealthstoneButton:RegisterForDrag("") end
-	if  _G["NecrosisSoulstoneButton"] then NecrosisSoulstoneButton:RegisterForDrag("")end
-	if  _G["NecrosisMountButton"] then NecrosisMountButton:RegisterForDrag("") end
-	if  _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:RegisterForDrag("") end
-	if  _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:RegisterForDrag("") end
-	if  _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:RegisterForDrag("") end
-end
-
--- Enable drag functionality || Fonction (XML) inverse de celle du dessus
-function Necrosis:Drag()
-	if  _G["NecrosisFirestoneButton"] then NecrosisFirestoneButton:RegisterForDrag("LeftButton") end
-	if  _G["NecrosisSpellstoneButton"] then NecrosisSpellstoneButton:RegisterForDrag("LeftButton") end
-	if  _G["NecrosisHealthstoneButton"] then NecrosisHealthstoneButton:RegisterForDrag("LeftButton") end
-	if  _G["NecrosisSoulstoneButton"] then NecrosisSoulstoneButton:RegisterForDrag("LeftButton") end
-	if  _G["NecrosisMountButton"] then NecrosisMountButton:RegisterForDrag("LeftButton") end
-	if  _G["NecrosisPetMenuButton"] then NecrosisPetMenuButton:RegisterForDrag("LeftButton") end
-	if  _G["NecrosisBuffMenuButton"] then NecrosisBuffMenuButton:RegisterForDrag("LeftButton") end
-	if  _G["NecrosisCurseMenuButton"] then NecrosisCurseMenuButton:RegisterForDrag("LeftButton") end
-end
-
-local function HideList(list)
-	for i, v in pairs(list) do
-		local menuVariable = _G[Necrosis.Warlock_Buttons[v.f_ptr].f]
-		if menuVariable then
-			menuVariable:Hide()
-		end
-	end
-end
-
-local function WireUpMenuChildrenStates(menuButton, childButtonList)
-	-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
-	for i = 1, #childButtonList, 1 do
-		local childButton = childButtonList[i]
-		childButton:SetParent(menuButton)
-		-- Close the menu when a child button is clicked || Si le menu se ferme à l'appui d'un bouton, alors il se ferme à l'appui d'un bouton !
-		menuButton:WrapScript(childButton, "OnClick", [[
-			if self:GetParent():GetAttribute("state") == "Ouvert" then
-				self:GetParent():SetAttribute("state", "Ferme")
-			end
-		]])
-		menuButton:WrapScript(childButton, "OnEnter", [[
-			self:GetParent():SetAttribute("mousehere", true)
-		]])
-		menuButton:WrapScript(childButton, "OnLeave", [[
-			self:GetParent():SetAttribute("mousehere", false)
-			local stateMenu = self:GetParent():GetAttribute("state")
-			if not (stateMenu == "Bloque" or stateMenu == "Combat" or stateMenu == "ClicDroit") then
-				self:GetParent():SetAttribute("state", "Refresh")
-			end
-		]])
-	end
-end
-
--- Rebuild the menus at mod startup or when the spellbook changes || A chaque changement du livre des sorts, au démarrage du mod, ainsi qu'au changement de sens du menu on reconstruit les menus des sorts
+-- -- Rebuild the menus at mod startup or when the spellbook changes || A chaque changement du livre des sorts, au démarrage du mod, ainsi qu'au changement de sens du menu on reconstruit les menus des sorts
 function Necrosis:CreateMenu()
 	Local.Menu.Pet = setmetatable({}, metatable)
 	Local.Menu.Curse = setmetatable({}, metatable)
 	Local.Menu.Buff = setmetatable({}, metatable)
-	local menuVariable = nil
-
-	-- local f = Necrosis.Warlock_Buttons.main.f
-	HideList(Necrosis.Warlock_Lists.pets) -- Hide all the pet demon buttons || On cache toutes les icones des démons
-	HideList(Necrosis.Warlock_Lists.buffs) -- Hide the general buff spell buttons || On cache toutes les icones des sorts
-	HideList(Necrosis.Warlock_Lists.curses) -- Hide the curse buttons || On cache toutes les icones des curses
-
-	if NecrosisConfig.StonePosition[7] > 0 then -- pets
-		-- Setup the buttons available on the pets menu 
-		local prior_button = Necrosis.Warlock_Buttons.pets.f -- menu button on sphere
-		-- Create on demand 
-		if not _G[prior_button] then
-			-- _ = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons.pets)
-			_ = SphereButtonHelper:CreateMenuButton(Necrosis.Warlock_Buttons.pets)
-		end
-		for index = 1, #Necrosis.Warlock_Lists.pets, 1 do
-			local petItem = Necrosis.Warlock_Lists.pets[index]
-			local f = Necrosis.Warlock_Buttons[petItem.f_ptr].f
-			if Necrosis.IsSpellKnown(petItem.high_of) -- in spell book
-			then
-				if Necrosis.Debug.buttons then
-					_G["DEFAULT_CHAT_FRAME"]:AddMessage("CreateMenu pets"
-					.." f'"..(petItem.f_ptr or "nyl")..'"'
-					.." pr'"..(prior_button or "nyl")..'"'
-					)
-				end
-				menuVariable = Necrosis:CreateMenuItem(petItem) -- Necrosis:CreateMenuPet(v.f_ptr)
-				menuVariable:ClearAllPoints()
-				menuVariable:SetPoint(
-					"CENTER", prior_button, "CENTER",
-					NecrosisConfig.PetMenuPos.direction * NecrosisConfig.PetMenuPos.x * 32,
-					NecrosisConfig.PetMenuPos.y * 32
-				)
-				prior_button = f -- anchor the next button
-				Local.Menu.Pet:insert(menuVariable)
-			end
-		end
-
-		-- Display the pets menu button || Maintenant que tous les boutons de pet sont placés les uns à côté des autres, on affiche les disponibles
-		if Local.Menu.Pet[1] then
-			local fs = Necrosis.Warlock_Buttons.pets.f
-			local petButton = _G[fs]
-			Local.Menu.Pet[1]:ClearAllPoints()
-			Local.Menu.Pet[1]:SetPoint(
-				"CENTER", petButton, "CENTER",
-				NecrosisConfig.PetMenuPos.direction * NecrosisConfig.PetMenuPos.x * 32 + NecrosisConfig.PetMenuDecalage.x,
-				NecrosisConfig.PetMenuPos.y * 32 + NecrosisConfig.PetMenuDecalage.y
-			)
-			-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
-			WireUpMenuChildrenStates(petButton, Local.Menu.Pet)
-			Necrosis:MenuAttribute(petButton)
-			Necrosis:PetSpellAttribute(Local.Menu.Pet)
-		end
-	end
-
-	if NecrosisConfig.StonePosition[5] > 0 then -- buffs
-		-- Setup the buttons available on the buffs menu || On ordonne et on affiche les boutons dans le menu des buffs
-		local prior_button = Necrosis.Warlock_Buttons.buffs.f -- menu button on sphere
-		-- Create on demand || Création à la demande du bouton du menu des Buffs
-		if not _G[prior_button] then
-			-- _ = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons.buffs)
-			_ = SphereButtonHelper:CreateMenuButton(Necrosis.Warlock_Buttons.buffs)
-		end
-
-		local anchor = "CENTER"
-		if (NecrosisConfig.BuffMenuPos.y == 1) then
-			anchor = "TOP"
-		elseif (NecrosisConfig.BuffMenuPos.y == -1) then
-			anchor = "BOTTOM"
-		elseif (NecrosisConfig.BuffMenuPos.x == 1) then
-			anchor = "RIGHT"
-		end
-
-		for index = 1, #Necrosis.Warlock_Lists.buffs, 1 do
-			local buffItem = Necrosis.Warlock_Lists.buffs[index]
-			local f = Necrosis.Warlock_Buttons[buffItem.f_ptr].f
-			if Necrosis.IsSpellKnown(buffItem.high_of) then
-				-- in spell book
-				menuVariable = Necrosis:CreateMenuItem(buffItem)
-				local x = NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32
-				local y = NecrosisConfig.BuffMenuPos.y * 32
-				menuVariable:ClearAllPoints()
-				menuVariable:SetPoint(anchor, prior_button, anchor, x, y)
-				prior_button = f -- anchor the next button
-				Local.Menu.Buff:insert(menuVariable)
-			end
-		end
-
-		-- Display the buffs menu button on the sphere || Maintenant que tous les boutons de buff sont placés les uns à côté des autres, on affiche les disponibles
-		if Local.Menu.Buff[1] then
-			local fs = Necrosis.Warlock_Buttons.buffs.f
-			local buffButton = _G[fs]
-			Local.Menu.Buff[1]:ClearAllPoints()
-			local x = NecrosisConfig.BuffMenuPos.direction * NecrosisConfig.BuffMenuPos.x * 32 + NecrosisConfig.BuffMenuDecalage.x
-			local y = NecrosisConfig.BuffMenuPos.y * 32 + NecrosisConfig.BuffMenuDecalage.y
-			Local.Menu.Buff[1]:SetPoint("CENTER", buffButton, "CENTER", x, y)
-			-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
-			WireUpMenuChildrenStates(buffButton, Local.Menu.Buff)
-			Necrosis:MenuAttribute(buffButton)
-			Necrosis:BuffSpellAttribute(Local.Menu.Buff)
-		end
-	end
-
-	if NecrosisConfig.StonePosition[8] > 0 then -- curses
-		-- Setup the buttons available on the curses menu 
-		local prior_button = Necrosis.Warlock_Buttons.curses.f -- menu button on sphere
-		-- Create on demand 
-		if not _G[prior_button] then
-			-- _ = Necrosis:CreateSphereButtons(Necrosis.Warlock_Buttons.curses)
-			_ = SphereButtonHelper:CreateMenuButton(Necrosis.Warlock_Buttons.curses)
-		end
-
-		for index = 1, #Necrosis.Warlock_Lists.curses, 1 do
-			local curseItem = Necrosis.Warlock_Lists.curses[index]
-			local f = Necrosis.Warlock_Buttons[curseItem.f_ptr].f
-			if Necrosis.IsSpellKnown(curseItem.high_of) -- in spell book
---			and NecrosisConfig.DemonSpellPosition[index] > 0 -- and requested
-			then
-				menuVariable = Necrosis:CreateMenuItem(curseItem)   -- Necrosis:CreateMenuCurse(v.f_ptr)
-				menuVariable:ClearAllPoints()
-				menuVariable:SetPoint(
-					"CENTER", prior_button, "CENTER",
-					NecrosisConfig.CurseMenuPos.direction * NecrosisConfig.CurseMenuPos.x * 32,
-					NecrosisConfig.CurseMenuPos.y * 32
-				)
---				menuVariable.high_of = v.high_of
-				prior_button = f -- anchor the next button
-				Local.Menu.Curse:insert(menuVariable)
-			end
-		end
-		-- Display the curse menu button on the sphere || Maintenant que tous les boutons de curse sont placés les uns à côté des autres, on affiche les disponibles
-		if Local.Menu.Curse[1] then
-			local fs = Necrosis.Warlock_Buttons.curses.f
-			local curseButton = _G[fs]
-			Local.Menu.Curse[1]:ClearAllPoints()
-			Local.Menu.Curse[1]:SetPoint(
-				"CENTER", curseButton, "CENTER",
-				NecrosisConfig.CurseMenuPos.direction * NecrosisConfig.CurseMenuPos.x * 32 + NecrosisConfig.CurseMenuDecalage.x,
-				NecrosisConfig.CurseMenuPos.y * 32 + NecrosisConfig.CurseMenuDecalage.y
-			)
-			-- Secure the menu || Maintenant on sécurise le menu, et on y associe nos nouveaux boutons
-			WireUpMenuChildrenStates(curseButton, Local.Menu.Curse)
-			Necrosis:MenuAttribute(curseButton)
-			Necrosis:CurseSpellAttribute(Local.Menu.Curse)
-		end
-	end
-
-	-- Always keep menus Open (if enabled) || On bloque le menu en position ouverte si configuré
-	if NecrosisConfig.BlockedMenu then
-		local s = "Bloque"
-		SetState(_G[Necrosis.Warlock_Buttons.buffs.f], s)
-		SetState(_G[Necrosis.Warlock_Buttons.pets.f], s)
-		SetState(_G[Necrosis.Warlock_Buttons.curses.f], s)
-	end
+	SphereMenu:CreateMenu(Local)
 end
 
 -- Reset Necrosis to default position || Fonction pour ramener tout au centre de l'écran
