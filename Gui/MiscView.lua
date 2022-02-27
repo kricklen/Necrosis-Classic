@@ -40,7 +40,7 @@ local _G = getfenv(0)
 Necrosis.Gui.MiscView = {
 	Frame = false,
 	cbMoveShards = false,
-	cbDestroyShardsOnFullBag = false,
+	-- cbDestroyShardsOnFullBag = false,
 	ddShardBag = false,
 	lblShardBag = false,
 	
@@ -95,27 +95,28 @@ function _mv:Show()
 			0, -18,
 			function(self)
 				NecrosisConfig.SoulshardSort = self:GetChecked()
-				if NecrosisConfig.SoulshardSort then
-					_mv.cbDestroyShardsOnFullBag:Enable()
-					-- UIDropDownMenu_EnableDropDown(_mv.ddShardBag)
-				else
-					_mv.cbDestroyShardsOnFullBag:Disable()
-					-- UIDropDownMenu_DisableDropDown(_mv.ddShardBag)
-				end
+				-- if NecrosisConfig.SoulshardSort then
+				-- 	_mv.cbDestroyShardsOnFullBag:Enable()
+				-- 	-- UIDropDownMenu_EnableDropDown(_mv.ddShardBag)
+				-- else
+				-- 	_mv.cbDestroyShardsOnFullBag:Disable()
+				-- 	-- UIDropDownMenu_DisableDropDown(_mv.ddShardBag)
+				-- end
 			end
 		)
 		self.cbMoveShards:SetChecked(NecrosisConfig.SoulshardSort)
 
-		-- Destruction des fragments quand le sac est plein
-		self.cbDestroyShardsOnFullBag = GraphicsHelper:CreateCheckButton(
-			self.Frame,
-			Necrosis.Config.Misc["Detruit les fragments si le sac plein"],
-			20, -40,
-			function(self)
-				NecrosisConfig.SoulshardDestroy = self:GetChecked()
-			end
-		)
-		self.cbDestroyShardsOnFullBag:SetChecked(NecrosisConfig.SoulshardDestroy)
+-- 		-- Destruction des fragments quand le sac est plein
+-- 		self.cbDestroyShardsOnFullBag = GraphicsHelper:CreateCheckButton(
+-- 			self.Frame,
+-- 			Necrosis.Config.Misc["Detruit les fragments si le sac plein"],
+-- 			20, -40,
+-- 			function(self)
+-- 				NecrosisConfig.SoulshardDestroy = self:GetChecked()
+-- print("SoulshardDestroy: "..tostring(NecrosisConfig.SoulshardDestroy))
+-- 			end
+-- 		)
+-- 		self.cbDestroyShardsOnFullBag:SetChecked(NecrosisConfig.SoulshardDestroy)
 
 		-- Choose the bag for storing soul shards || Choix du sac à fragments
 		self.ddShardBag, self.lblShardBag = GraphicsHelper:CreateDropDown(
@@ -195,16 +196,16 @@ function _mv:Show()
 			0, -180,
 			function(self)
 				if (self:GetChecked()) then
-					Necrosis:NoDrag()
+					SphereMenu:NoDrag()
 					NecrosisButton:RegisterForDrag("")
-					NecrosisSpellTimerButton:RegisterForDrag("")
+					-- NecrosisSpellTimerButton:RegisterForDrag("")
 					NecrosisConfig.NoDragAll = true
 				else
 					if not NecrosisConfig.NecrosisLockServ then
-						Necrosis:Drag()
+						SphereMenu:Drag()
 					end
 					NecrosisButton:RegisterForDrag("LeftButton")
-					NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+					-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
 					NecrosisConfig.NoDragAll = false
 				end
 			end
@@ -215,7 +216,7 @@ function _mv:Show()
 		self.cbShowHiddenButtons = GraphicsHelper:CreateCheckButton(
 			self.Frame,
 			Necrosis.Config.Misc["Afficher les boutons caches"],
-			0, -240,
+			0, -220,
 			function(self)
 				if (self:GetChecked()) then
 					_mv.slHiddenButtonSize:Enable()
@@ -246,7 +247,7 @@ function _mv:Show()
 			self.Frame, "slHiddenButtonSize",
 			50, 200, 5,
 			15, 150,
-			0, -272
+			0, -252
 		)
 
 		self.slHiddenButtonSize:SetValue(NecrosisConfig.ShadowTranceScale)
@@ -314,13 +315,13 @@ function _mv:Show()
 			end
 		)
 
-		if NecrosisConfig.SoulshardSort then
-			-- UIDropDownMenu_EnableDropDown(_mv.ddShardBag)
-			self.cbDestroyShardsOnFullBag:Enable()
-		else
-			-- UIDropDownMenu_DisableDropDown(_mv.ddShardBag)
-			self.cbDestroyShardsOnFullBag:Disable()
-		end
+		-- if NecrosisConfig.SoulshardSort then
+		-- 	-- UIDropDownMenu_EnableDropDown(_mv.ddShardBag)
+		-- 	self.cbDestroyShardsOnFullBag:Enable()
+		-- else
+		-- 	-- UIDropDownMenu_DisableDropDown(_mv.ddShardBag)
+		-- 	self.cbDestroyShardsOnFullBag:Disable()
+		-- end
 	end
 
 	self.Frame:Show()

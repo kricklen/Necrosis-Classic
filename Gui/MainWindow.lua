@@ -135,7 +135,7 @@ function _mw:Show()
 		-- Credits
 		self.fsCredits = GraphicsHelper:CreateFontString(
 			self.Frame,
-			"Developed by Lomig & Tarcalion, adopted by kricklen",
+			"Developed by Lomig & Tarcalion, rewritten by urnati & kricklen",
 			"TOP",
 			0, -44
 		)
@@ -196,6 +196,8 @@ function _mw:Show()
 
 		-- Register handler to update texts when language changes
 		EventHelper:RegisterLanguageChangedHandler(_mw.UpdateTexts)
+		-- Make it closable by hitting escape
+		tinsert(UISpecialFrames, self.Frame:GetName())
 	end
 
 	self.Frame:Show()

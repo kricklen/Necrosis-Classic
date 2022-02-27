@@ -48,7 +48,7 @@ Necrosis.Gui.ButtonsView = {
 	Frame = false,
 	Page1 = false,
 	Page2 = false,
-	_ButtonTypes = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu"},
+	_ButtonTypes = {"Firestone", "Spellstone", "HealthStone", "Soulstone", "BuffMenu", "Mount", "PetMenu", "CurseMenu", "DestroyShards"},
 	_Buttons = {}
 }
 
@@ -71,41 +71,55 @@ function _bv:cbLockButtons_Click()
 		NecrosisConfig.NecrosisLockServ = true
 		Necrosis:ClearAllPoints()
 		Necrosis:ButtonSetup()
-		Necrosis:NoDrag()
+		SphereMenu:NoDrag()
 		if not NecrosisConfig.NoDragAll then
 			NecrosisButton:RegisterForDrag("LeftButton")
-			NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+			-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
 		end
 	else
 		NecrosisConfig.NecrosisLockServ = false
 		Necrosis:ClearAllPoints()
-		local ButtonName = {
-			"NecrosisFirestoneButton",
-			"NecrosisSpellstoneButton",
-			"NecrosisHealthstoneButton",
-			"NecrosisSoulstoneButton",
-			"NecrosisBuffMenuButton",
-			"NecrosisMountButton",
-			"NecrosisPetMenuButton",
-			"NecrosisCurseMenuButton"
-		}
-		local loc = {-121, -87, -53, -17, 17, 53, 87, 121}
-		for i in ipairs(ButtonName) do
-			if _G[ButtonName[i]] then
-				_G[ButtonName[i]]:SetPoint("CENTER", "UIParent", "CENTER", loc[i], -100)
-				NecrosisConfig.FramePosition[ButtonName[i]] = {
+		local loc = {-121, -87, -53, -17, 17, 53, 87, 121, 155}
+		for index, item in ipairs(Necrosis.Warlock_Lists.on_sphere) do
+			local warlockButton = Necrosis.Warlock_Buttons[item.f_ptr]
+	
+			-- local ButtonName = {
+			-- 	"NecrosisFirestoneButton",
+			-- 	"NecrosisSpellstoneButton",
+			-- 	"NecrosisHealthstoneButton",
+			-- 	"NecrosisSoulstoneButton",
+			-- 	"NecrosisBuffMenuButton",
+			-- 	"NecrosisMountButton",
+			-- 	"NecrosisPetMenuButton",
+			-- 	"NecrosisCurseMenuButton",
+			-- 	"NecrosisDestroyShardsButton"
+			-- }
+			-- for i in ipairs(ButtonName) do
+			-- if _G[ButtonName[i]] then
+			-- 	_G[ButtonName[i]]:SetPoint("CENTER", "UIParent", "CENTER", loc[i], -100)
+			-- 	NecrosisConfig.FramePosition[ButtonName[i]] = {
+			-- 		"CENTER",
+			-- 		"UIParent",
+			-- 		"CENTER",
+			-- 		loc[i],
+			-- 		-100
+			-- 	}
+			-- end
+			if _G[warlockButton.f] then
+				_G[warlockButton.f]:SetPoint("CENTER", "UIParent", "CENTER", loc[i], -100)
+				NecrosisConfig.FramePosition[warlockButton.f] = {
 					"CENTER",
 					"UIParent",
 					"CENTER",
-					loc[i],
+					loc[index],
 					-100
 				}
 			end
 		end
-		Necrosis:Drag()
+		SphereMenu:Drag()
 		NecrosisConfig.NoDragAll = false
 		NecrosisButton:RegisterForDrag("LeftButton")
-		NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
+		-- NecrosisSpellTimerButton:RegisterForDrag("LeftButton")
 	end
 end
 
@@ -359,7 +373,7 @@ function _bv:Show()
 		self.cbLockButtons = GraphicsHelper:CreateCheckButton(
 			self.Page1,
 			Necrosis.Config.Buttons["Fixer les boutons autour de la sphere"],
-			0, -210,
+			0, -220,
 			self.cbLockButtons_Click
 		)
 		self.cbLockButtons:SetChecked(NecrosisConfig.NecrosisLockServ)
@@ -367,7 +381,7 @@ function _bv:Show()
 		self.slRotation = GraphicsHelper:CreateSlider(
 			self.Page1, "slRotation",
 			0, 360, 9,
-			15, 250,
+			15, 260,
 			0, -252
 		)
 
