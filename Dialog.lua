@@ -224,6 +224,9 @@ Necrosis.TooltipData = {
 	["Succubus"] = {
 		Label = "" --L["SUCCUBUS_LABEL"]
 	},
+	["Incubus"] = {
+		Label = "" --L["SUCCUBUS_LABEL"]
+	},
 	["Felhunter"] = {
 		Label = "" --L["FELHUNTER_LABEL"]
 	},

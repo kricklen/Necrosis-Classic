@@ -71,7 +71,6 @@ end
 -- Setup the buttons available on the menu 
 local function PopulateMenuTable(menuTable, warlockButton, warlockList, menuPos, menuOffset)
     local buttonName = warlockButton.f -- menu button on sphere
-
     -- Create menu button on demand, needed to anchor child buttons to it
     local menuButtonFrame = _G[buttonName]
     if not menuButtonFrame then
@@ -165,11 +164,12 @@ function _sm:CreateMenu(Local)
         end
 	end
 
-	-- Always keep menus Open (if enabled) || On bloque le menu en position ouverte si configuré
-	if NecrosisConfig.BlockedMenu then
-		local s = "Bloque"
-		SetState(_G[Necrosis.Warlock_Buttons.buffs.f], s)
-		SetState(_G[Necrosis.Warlock_Buttons.pets.f], s)
-		SetState(_G[Necrosis.Warlock_Buttons.curses.f], s)
-	end
+    -- This function doesn't exist anymore?
+	-- -- Always keep menus Open (if enabled) || On bloque le menu en position ouverte si configuré
+	-- if NecrosisConfig.BlockedMenu then
+	-- 	local s = "Bloque"
+	-- 	SetState(_G[Necrosis.Warlock_Buttons.buffs.f], s)
+	-- 	SetState(_G[Necrosis.Warlock_Buttons.pets.f], s)
+	-- 	SetState(_G[Necrosis.Warlock_Buttons.curses.f], s)
+	-- end
 end
