@@ -165,6 +165,7 @@ function Necrosis:SpellLocalize(tooltip)
 			[3] = {Name = GetSpellInfo(688), 	GlobalId = 688,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "imp", PetId = 416}, -- Imp || Diablotin 
 			[4] = {Name = GetSpellInfo(697),	GlobalId = 697,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "voidwalker", PetId = 1860, reagent = "soul_shard"}, -- Voidwalker || Marcheur
 			[5] = {Name = GetSpellInfo(712),	GlobalId = 712,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "succubus", PetId = 1863, reagent = "soul_shard"}, -- Succubus || Succube
+			[60] = {Name = GetSpellInfo(713),	GlobalId = 713,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "incubus", PetId = 185317, reagent = "soul_shard"}, -- Incubus
 			[6] = {Name = GetSpellInfo(691),	GlobalId = 691,		Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "felhunter", PetId = 417, reagent = "soul_shard"}, -- Fellhunter
 			[7] = {Name = GetSpellInfo(30146),	GlobalId = 30146,	Mana = 50,	Rank = 0,	Duration = 0,	Type = nil,      Usage = "felguard", PetId = 17252, reagent = "soul_shard"}, -- Felguard -- Fellhunter now
 			[8] = {Name = GetSpellInfo(1122),	GlobalId = 1122,	Mana = 50,	Rank = 0,	Duration = 600,	Type = "single", Usage = "inferno", reagent = "infernal_stone"}, -- Infernal
@@ -245,7 +246,7 @@ function Necrosis:SpellLocalize(tooltip)
 				SpellIds = {
 					18789, -- Burning Wish (Imp)
 					18790, -- Fel Stamina (Void Walker)
-					18791, -- Touch of Shadow (Succubus)
+					18791, -- Touch of Shadow (Succubus / Incubus)
 					18792, -- Fel Energy (Fel Hunter)
 					35701  -- Touch of Shadow (Fel Guard)
 				}
@@ -900,27 +901,31 @@ Necrosis.Warlock_Buttons = {
 					norm = GraphicsHelper:GetTexture("Succubus-01"),
 					high = GraphicsHelper:GetTexture("Succubus-02"),
 					}, --
-	felguard 	= {f = "NecrosisPetMenu05", tip = "Felguard", anchor = "ANCHOR_RIGHT", pet = true,
+	incubus 	= {f = "NecrosisPetMenu05", tip = "Incubus", anchor = "ANCHOR_RIGHT", pet = true,
+					norm = GraphicsHelper:GetTexture("Succubus-01"),
+					high = GraphicsHelper:GetTexture("Succubus-02"),
+					}, --
+	felguard 	= {f = "NecrosisPetMenu06", tip = "Felguard", anchor = "ANCHOR_RIGHT", pet = true,
 					norm = GraphicsHelper:GetTexture("Felguard-01"),
 					high = GraphicsHelper:GetTexture("Felguard-02"),
 					}, --
-	felhunter 	= {f = "NecrosisPetMenu06", tip = "Felhunter", anchor = "ANCHOR_RIGHT", pet = true,
+	felhunter 	= {f = "NecrosisPetMenu07", tip = "Felhunter", anchor = "ANCHOR_RIGHT", pet = true,
 					norm = GraphicsHelper:GetTexture("Felhunter-01"),
 					high = GraphicsHelper:GetTexture("Felhunter-02"),
 					}, --
-	inferno 	= {f = "NecrosisPetMenu07", tip = "Infernal", anchor = "ANCHOR_RIGHT", 
+	inferno 	= {f = "NecrosisPetMenu08", tip = "Infernal", anchor = "ANCHOR_RIGHT", 
 					norm = GraphicsHelper:GetTexture("Infernal-01"),
 					high = GraphicsHelper:GetTexture("Infernal-02"),
 					}, --
-	rit_of_doom	= {f = "NecrosisPetMenu08", tip = "Doomguard", anchor = "ANCHOR_RIGHT", 
+	rit_of_doom	= {f = "NecrosisPetMenu09", tip = "Doomguard", anchor = "ANCHOR_RIGHT", 
 					norm = GraphicsHelper:GetTexture("Doomguard-01"),
 					high = GraphicsHelper:GetTexture("Doomguard-02"),
 					}, --
-	enslave 	= {f = "NecrosisPetMenu09", tip = "Enslave", anchor = "ANCHOR_RIGHT",
+	enslave 	= {f = "NecrosisPetMenu10", tip = "Enslave", anchor = "ANCHOR_RIGHT",
 					norm = GraphicsHelper:GetTexture("Enslave-01"),
 					high = GraphicsHelper:GetTexture("Enslave-02"),
 					}, --
-	sacrifice 	= {f = "NecrosisPetMenu10", tip = "Sacrifice", anchor = "ANCHOR_RIGHT",
+	sacrifice 	= {f = "NecrosisPetMenu11", tip = "Sacrifice", anchor = "ANCHOR_RIGHT",
 					norm = GraphicsHelper:GetTexture("Sacrifice-01"),
 					high = GraphicsHelper:GetTexture("Sacrifice-02"),
 					}, --
@@ -1019,12 +1024,13 @@ Necrosis.Warlock_Lists = {
 		[2]  = {f_ptr = "imp", high_of = "imp", s_type = "summon", },
 		[3]  = {f_ptr = "voidwalker", high_of = "voidwalker", },
 		[4]  = {f_ptr = "succubus", high_of = "succubus", },
-		[5]  = {f_ptr = "felhunter", high_of = "felhunter", },
-		[6]  = {f_ptr = "felguard", high_of = "felguard", },
-		[7]  = {f_ptr = "inferno", high_of = "inferno", },
-		[8]  = {f_ptr = "rit_of_doom", high_of = "rit_of_doom", },
-		[9]  = {f_ptr = "enslave", high_of = "enslave", },
-		[10] = {f_ptr = "sacrifice", high_of = "sacrifice", },
+		[5]  = {f_ptr = "incubus", high_of = "incubus", },
+		[6]  = {f_ptr = "felhunter", high_of = "felhunter", },
+		[7]  = {f_ptr = "felguard", high_of = "felguard", },
+		[8]  = {f_ptr = "inferno", high_of = "inferno", },
+		[9]  = {f_ptr = "rit_of_doom", high_of = "rit_of_doom", },
+		[10]  = {f_ptr = "enslave", high_of = "enslave", },
+		[11] = {f_ptr = "sacrifice", high_of = "sacrifice", },
 	},
 -- 23, -- Curse of weakness 22, -- Curse of agony 25, -- Curse of tongues 40, -- Curse of exhaustion 26, -- Curse of the elements 16, -- Curse of doom 14 -- Corruption
 	["curses"] = {

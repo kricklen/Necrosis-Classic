@@ -139,7 +139,7 @@ Local.DefaultConfig = {
 		-- 5 = Elements
 		-- 6 = Doom || Funeste
 		-- 7 = Corruption (not really a curse, but hey - its useful :)
-	DemonSpellPosition = {1, 2, 3, 4, 5, 6, 8, 9, 10, -11},
+	DemonSpellPosition = {1, 2, 3, 4, 5, 6, 8, 9, -10, -11},
 		-- 1 = Fel Domination || Domination corrompue
 		-- 2 = Summon Imp
 		-- 3 = Summon Voidwalker || Marcheur
@@ -2297,9 +2297,11 @@ function Necrosis:BuildButtonTooltip(button)
 	elseif (Type == "Imp")			then AddCastAndCost("imp"); AddDominion()--start, duration)
 	elseif (Type == "Voidwalker")	then AddCastAndCost("voidwalker"); AddShard(); AddDominion()--start, duration)
 	elseif (Type == "Succubus")		then AddCastAndCost("succubus"); AddShard(); AddDominion()--start, duration)
+	elseif (Type == "Incubus")		then AddCastAndCost("incubus"); AddShard(); AddDominion()--start, duration)
 	elseif (Type == "Felhunter")	then AddCastAndCost("felhunter"); AddShard(); AddDominion()--start, duration)
 	elseif (Type == "Infernal")		then AddCastAndCost("inferno"); AddInfernalReagent()
 	elseif (Type == "Doomguard")	then AddCastAndCost("ritual_doom"); AddDemoniacReagent()
+	elseif (Type == "Sacrifice")	then AddCastAndCost("sacrifice")
 	elseif (Type == "BuffMenu")		then AddMenuTip(Type)
 	elseif (Type == "CurseMenu")	then AddMenuTip(Type)
 	elseif (Type == "PetMenu")		then AddMenuTip(Type)
@@ -2440,7 +2442,7 @@ function Necrosis:UpdateMana()
 
 	-- Texturing of pet buttons || Texturage des boutons de pet
 	local PetNameHere = new("array",
-		"Imp-0", "Voidwalker-0", "Succubus-0", "Felhunter-0", "Felguard-0", "Infernal-0", "Doomguard-0"
+		"Imp-0", "Voidwalker-0", "Succubus-0", "Incubus-0", "Felhunter-0", "Felguard-0", "Infernal-0", "Doomguard-0"
 	)
 
 	for i = 1, #PetNameHere, 1 do
@@ -2559,15 +2561,15 @@ function Necrosis:UpdateMana()
 		del(BoutonNumber)
 		del(SortNumber)
 
-		if _G["NecrosisPetMenu10"] and self.Spell[44].ID then
+		if _G["NecrosisPetMenu11"] and self.Spell[44].ID then
 			if not UnitExists("pet") then
 				if not Local.Desatured["Sacrifice"] then
-					NecrosisPetMenu10:GetNormalTexture():SetDesaturated(1)
+					NecrosisPetMenu11:GetNormalTexture():SetDesaturated(1)
 					Local.Desatured["Sacrifice"] = true
 				end
 			else
 				if Local.Desatured["Sacrifice"] then
-					NecrosisPetMenu10:GetNormalTexture():SetDesaturated(nil)
+					NecrosisPetMenu11:GetNormalTexture():SetDesaturated(nil)
 					Local.Desatured["Sacrifice"] = false
 				end
 			end
