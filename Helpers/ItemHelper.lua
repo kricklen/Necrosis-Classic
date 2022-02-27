@@ -10,17 +10,31 @@ ItemHelper = {
             1254,  -- Lesser
             13699, -- Normal
             13700, -- Greater
-            13701  -- Major
+            13701, -- Major
+            22128  -- Master
         }
     },
 
     Healthstone = {
         ItemIds = {
-            19005, -- Minor
-            19007, -- Lesser
-            19009, -- Normal
-            19011, -- Greater
-            19013  -- Major
+            5512,  -- Minor (0 talent points)
+            19004, -- Minor (1 talent point)
+            19005, -- Minor (2 talent points)
+            5511,  -- Lesser (0 talent points)
+            19006, -- Lesser (1 talent point)
+            19007, -- Lesser (2 talent points)
+            5509,  -- Normal (0 talent points)
+            19008, -- Normal (1 talent point)
+            19009, -- Normal (2 talent points)
+            5510,  -- Greater (0 talent points)
+            19010, -- Greater (1 talent point)
+            19011, -- Greater (2 talent points)
+            9421,  -- Major (0 talent points)
+            19012, -- Major (1 talent point)
+            19013, -- Major (2 talent points)
+            22103, -- Master (0 talent points)
+            22104, -- Master (1 talent point)
+            22105  -- Master (2 talent points)
         }
     },
 
@@ -30,7 +44,8 @@ ItemHelper = {
             16892, -- Lesser
             16893, -- Normal
             16895, -- Greater
-            16896  -- Major
+            16896, -- Major
+            22116  -- Master
         }
     },
 
@@ -38,7 +53,8 @@ ItemHelper = {
         ItemIds = {
             5522,  -- Normal
             13602, -- Greater
-            13603  -- Major
+            13603, -- Major
+            22646  -- Master
         }
     }
 }

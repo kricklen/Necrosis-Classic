@@ -40,7 +40,7 @@
 
 Necrosis.Gui.TimersView = {
 	Frame = false,
-	cbEnableTimers = false,
+	-- cbEnableTimers = false,
 	cbTimersGrowUpwards = false,
 	cbTimersOnLeftSide = false
 }
@@ -57,14 +57,14 @@ function _tv:cbLockTimers_Click()
 	end
 end
 
-function _tv:cbEnableTimers_Click()
-	NecrosisConfig.ShowSpellTimers = self:GetChecked()
-	if NecrosisConfig.ShowSpellTimers then
-		NecrosisSpellTimerButton:Show()
-	else
-		NecrosisSpellTimerButton:Hide()
-	end
-end
+-- function _tv:cbEnableTimers_Click()
+-- 	NecrosisConfig.ShowSpellTimers = self:GetChecked()
+-- 	-- if NecrosisConfig.ShowSpellTimers then
+-- 	-- 	NecrosisSpellTimerButton:Show()
+-- 	-- else
+-- 	-- 	NecrosisSpellTimerButton:Hide()
+-- 	-- end
+-- end
 
 function _tv:cbEnableTimerBars_Click()
 	NecrosisConfig.EnableTimerBars = self:GetChecked()
@@ -159,7 +159,7 @@ function _tv.EnableGraphicalTimers()
 end
 
 function _tv.UpdateTexts()
-	_tv.cbEnableTimers:SetText(Necrosis.Config.Timers["Afficher le bouton des timers"])
+	-- _tv.cbEnableTimers:SetText(Necrosis.Config.Timers["Afficher le bouton des timers"])
 	_tv.cbTimersGrowUpwards:SetText(Necrosis.Config.Timers["Afficher les timers de bas en haut"])
 	_tv.cbTimersOnLeftSide:SetText(Necrosis.Config.Timers["Afficher les timers sur la gauche du bouton"])
 end
@@ -178,14 +178,14 @@ function _tv:Show()
 		)
 		self.cbLockTimers:SetChecked(true)
 
-		-- Affiche ou masque le bouton des timers
-		self.cbEnableTimers = GraphicsHelper:CreateCheckButton(
-			self.Frame,
-			Necrosis.Config.Timers["Afficher le bouton des timers"],
-			0, -40,
-			self.cbEnableTimers_Click
-		)
-		self.cbEnableTimers:SetChecked(NecrosisConfig.ShowSpellTimers)
+		-- -- Affiche ou masque le bouton des timers
+		-- self.cbEnableTimers = GraphicsHelper:CreateCheckButton(
+		-- 	self.Frame,
+		-- 	Necrosis.Config.Timers["Afficher le bouton des timers"],
+		-- 	0, -40,
+		-- 	self.cbEnableTimers_Click
+		-- )
+		-- self.cbEnableTimers:SetChecked(NecrosisConfig.ShowSpellTimers)
 
 		-- Affiche ou masque le bouton des timers
 		self.cbEnableTimerBars = GraphicsHelper:CreateCheckButton(

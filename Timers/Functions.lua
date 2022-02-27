@@ -216,10 +216,10 @@ local function UpdateRaidIcon(data, iconNumber)
 end
 
 local function RemoveTimer(timerData)
-	if (timerData.Finished) then
+	if (timerData.Finished or timerData.Finishing) then
 		return
 	end
-	timerData.Finished = true
+	timerData.Finishing = true
 	-- Hide the timer, stopping the countdown
 	timerData.Frame:Hide()
 	-- Remove the raid icon from the timer (might have been banish or ss)
@@ -233,12 +233,17 @@ local function RemoveTimer(timerData)
 		-- Remove the raid icon from the timer group
 		UpdateRaidIcon(timerData.Group, nil)
 		timerData.Group.Frame:Hide()
-		if (timerData.SpellType ~= "soulstone" and timerData.SpellType ~= "single") then
+		if (timerData.SpellType ~= "soulstone"
+			and timerData.SpellType ~= "single"
+			and timerData.SpellType ~= "self"
+		) then
 			PositionMobTimerGroups()
 		end
 	end
 	-- Remove reference to the timer group as well
 	timerData.Group = nil
+	timerData.Finishing = false
+	timerData.Finished = true
 end
 
 local function FindFreeTimer()
@@ -309,6 +314,7 @@ local function MakeTimerGui(parentFrame)
 	return
 		{
 			Finished = false,
+			Finishing = false,
 			Frame = frame,
 			lblCountdown = lblCountdown,
 			lblSpellname = lblSpellname,
@@ -358,7 +364,7 @@ local function InsertTimer(timerGroup)
 end
 
 local function StartTimer(timerData)
-	-- Timers are split into 3 types: single, soulstone and the rest
+	-- Timers are split into 4 types: single, soulstone, self and debuff
 	-- Single are Banish, Enslave Demon etc.
 	-- Single and soulstone are displayed in the same timer group, banishes etc. on top, soulstones at the bottom
 	-- The rest is displayed in a timer group per mob since it's dots etc.
@@ -372,7 +378,12 @@ local function StartTimer(timerData)
 
 	-- Assign the spell name or target
 	if (timerData.SpellType == "soulstone" or timerData.SpellType == "single") then
-		timerData.lblSpellname:SetText(timerData.TargetName)
+		-- If we target outselves, display the spell name instead
+		if (timerData.CasterGuid == timerData.TargetGuid) then
+			timerData.lblSpellname:SetText(timerData.SpellName)
+		else
+			timerData.lblSpellname:SetText(timerData.TargetName)
+		end
 	else
 		timerData.lblSpellname:SetText(timerData.SpellName)
 	end
@@ -391,7 +402,7 @@ local function StartTimer(timerData)
 	timerData.TickEnd = GetTime() + TICK_SECS
 	timerData.UpdateFunc =
 		function()
-			if (not timerData.Finished) then
+			if (not (timerData.Finished or timerData.Finishing)) then
 				timerData.Value = timerData.Value - TICK_SECS
 				local fraction = timerData.Value / timerData.SpellDuration
 				
@@ -440,8 +451,8 @@ function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, tar
 	assert(spellType ~= nil, 	 "spellType is nil")
 
 	local timerData
--- print("InsertSpellTimer: "..spellName)	
-	if (spellType == "soulstone" or spellType == "single") then
+
+	if (spellType == "soulstone" or spellType == "single" or spellType == "self") then
 		-- If we cast soulstone or banish etc., tell our fellow warlocks
 		if (casterGuid == Necrosis.CurrentEnv.PlayerGuid) then
 			if (spellType == "soulstone") then
@@ -512,14 +523,23 @@ function _t:InsertSpellTimer(casterGuid, casterName, targetGuid, targetName, tar
 	return timerData
 end
 
--- Update an existing timer, a debuff has been casted on a tareget while it was still active
+-- Update an existing timer, a (de)buff has been casted on a target while it was still active
 function _t:UpdateTimer(casterGuid, targetGuid, spellId, spellDuration)
 	for i,timerData in ipairs(_t.Instances) do
-		if (timerData.CasterGuid == casterGuid and timerData.TargetGuid == targetGuid and timerData.SpellId == spellId) then
+		if (not (timerData.Finished or timerData.Finishing)
+			and timerData.CasterGuid == casterGuid
+			and timerData.TargetGuid == targetGuid
+			and timerData.SpellId == spellId)
+		then
 			timerData.Value = spellDuration
-			return
+			timerData.EndTime = GetTime() + spellDuration
+			if (timerData.Group) then
+				SortTimerGroup(timerData.Group)
+			end
+			return true
 		end
 	end
+	return false
 end
 
 local function RemoveSoulstone(timerData)
@@ -662,9 +682,10 @@ function _t:UpdateRaidIcon(unitGuid, iconNumber)
 		for i,timerData in ipairs(_t.SingleFrame.Timers) do
 			if (timerData.TargetGuid == unitGuid
 				and (timerData.SpellType == "soulstone"
-				or timerData.SpellType == "single"))
+				or timerData.SpellType == "single"
+				or timerData.SpellType == "self"))
 			then
-				if (not timerData.Finished) then
+				if (not (timerData.Finished or timerData.Finishing)) then
 					UpdateRaidIcon(timerData, iconNumber)
 				end
 				break
@@ -703,7 +724,7 @@ function _t:Initialize()
 	-- Add soulstone timer if it's on cooldown
 	local iscd, secs = ItemHelper:GetSoulstoneCooldownSecs()
 	if (iscd) then
-		local spellId = 20765 -- Major Soulstone Resurrection
+		local spellId = Necrosis.Spell.SoulstoneRez.SpellIds[1] -- Major Soulstone Resurrection
 		-- Add the timer
 		local ssTimer =
 			_t:InsertSpellTimer(

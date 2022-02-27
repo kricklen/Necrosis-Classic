@@ -47,109 +47,109 @@ function Localization.enUS()
 		["Echange"] = "Trade",
 	}
 
-	Necrosis.TooltipData = {
-		["Main"] = {
-			Label = "|c00FFFFFFNecrosis|r",
-			Stone = {
-				[true] = "Yes",
-				[false] = "No",
-			},
-			Hellspawn = {
-				[true] = "On",
-				[false] = "Off",
-			},
-			["Soulshard"] = "Soul Shard(s): ",
-			["InfernalStone"] = "Infernal Stone(s): ",
-			["DemoniacStone"] = "Demonic Figurine(s): ",
-			["Soulstone"] = "Soulstone: ",
-			["Healthstone"] = "Healthstone: ",
-			["Spellstone"] = "Spellstone: ",
-			["Firestone"] = "Firestone: ",
-			["CurrentDemon"] = "Demon: ",
-			["EnslavedDemon"] = "Demon: Enslaved",
-			["NoCurrentDemon"] = "Demon: None",
-		},
-		Create = "Right click to create",
-		Use = "Left click to use",
-		OnCooldown = "On cooldown: ",
-		["Soulstone"] = {
-			Text = {"Right click to create","Left click to use","Used\nRight click to recreate","Waiting"},
-			Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
-		},
-		["Healthstone"] = {
-			Text = {"Right click to create", "Left click to use"},
-			Text2 = "Middle click or Ctrl+left click to trade",
-			Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Souls|r"
-		},
-		["Spellstone"] = {
-			Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\nClick to create"}
-		},
-		["Firestone"] = {
-			Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\nClick to create"}
-		},
-		["SpellTimer"] = {
-			Label = "|c00FFFFFFSpell Durations|r",
-			Text = "Active Spells on the target",
-			Right = "Right click for Hearthstone to "
-		},
-		["ShadowTrance"] = {
-			Label = "|c00FFFFFFShadow Trance|r"
-		},
-		["Backlash"] = {
-			Label = "|c00FFFFFFBacklash|r"
-		},
-		["Banish"] = {
-			Text = "Right click to cast Rank 1"
-		},
-		["Imp"] = {
-			Label = "|c00FFFFFFImp|r"
-		},
-		["Voidwalker"] = {
-			Label = "|c00FFFFFFVoidwalker|r"
-		},
-		["Succubus"] = {
-			Label = "|c00FFFFFFSuccubus|r"
-		},
-		["Felhunter"] = {
-			Label = "|c00FFFFFFFelhunter|r"
-		},
-		["Felguard"] = {
-			Label = "|c00FFFFFFFelguard|r"
-		},
-		["Infernal"] = {
-			Label = "|c00FFFFFFInferno|r"
-		},
-		["Doomguard"] = {
-			Label = "|c00FFFFFFDoomguard|r"
-		},
-		["Mount"] = {
-			Label = "|c00FFFFFFMounts|r",
-			Text = "Left click to summon Dreadsteed\nRight click to summon Felsteed"
-		},
-		["BuffMenu"] = {
-			Label = "|c00FFFFFFSpell Menu|r",
-			Text = "Right click to keep the menu open",
-			Text2 = "Automatic Mode : Closing when leave combat",
-		},
-		["PetMenu"] = {
-			Label = "|c00FFFFFFDemon Menu|r",
-			Text = "Right click to keep the menu open",
-			Text2 = "Automatic Mode : Closing when leave combat",
-		},
-		["CurseMenu"] = {
-			Label = "|c00FFFFFFCurse Menu|r",
-			Text = "Right click to keep the menu open",
-			Text2 = "Automatic Mode : Closing when leave combat",
-		},
-		["DominationCooldown"] = "Right click for fast summon",
-	}
+	-- Necrosis.TooltipData = {
+	-- 	["Main"] = {
+	-- 		Label = "|c00FFFFFFNecrosis|r",
+	-- 		Stone = {
+	-- 			[true] = "Yes",
+	-- 			[false] = "No",
+	-- 		},
+	-- 		Hellspawn = {
+	-- 			[true] = "On",
+	-- 			[false] = "Off",
+	-- 		},
+	-- 		["Soulshard"] = "Soul Shard(s): ",
+	-- 		["InfernalStone"] = "Infernal Stone(s): ",
+	-- 		["DemoniacStone"] = "Demonic Figurine(s): ",
+	-- 		["Soulstone"] = "Soulstone: ",
+	-- 		["Healthstone"] = "Healthstone: ",
+	-- 		["Spellstone"] = "Spellstone: ",
+	-- 		["Firestone"] = "Firestone: ",
+	-- 		["CurrentDemon"] = "Demon: ",
+	-- 		["EnslavedDemon"] = "Demon: Enslaved",
+	-- 		["NoCurrentDemon"] = "Demon: None",
+	-- 	},
+	-- 	Create = "Right click to create",
+	-- 	Use = "Left click to use",
+	-- 	OnCooldown = "On cooldown: ",
+	-- 	["Soulstone"] = {
+	-- 		Text = {"Right click to create","Left click to use","Used\nRight click to recreate","Waiting"},
+	-- 		Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
+	-- 	},
+	-- 	["Healthstone"] = {
+	-- 		Text = {"Right click to create", "Left click to use"},
+	-- 		Text2 = "Middle click or Ctrl+left click to trade",
+	-- 		Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Souls|r"
+	-- 	},
+	-- 	["Spellstone"] = {
+	-- 		Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\nClick to create"}
+	-- 	},
+	-- 	["Firestone"] = {
+	-- 		Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\nClick to create"}
+	-- 	},
+	-- 	["SpellTimer"] = {
+	-- 		Label = "|c00FFFFFFSpell Durations|r",
+	-- 		Text = "Active Spells on the target",
+	-- 		Right = "Right click for Hearthstone to "
+	-- 	},
+	-- 	["ShadowTrance"] = {
+	-- 		Label = "|c00FFFFFFShadow Trance|r"
+	-- 	},
+	-- 	["Backlash"] = {
+	-- 		Label = "|c00FFFFFFBacklash|r"
+	-- 	},
+	-- 	["Banish"] = {
+	-- 		Text = "Right click to cast Rank 1"
+	-- 	},
+	-- 	["Imp"] = {
+	-- 		Label = "|c00FFFFFFImp|r"
+	-- 	},
+	-- 	["Voidwalker"] = {
+	-- 		Label = "|c00FFFFFFVoidwalker|r"
+	-- 	},
+	-- 	["Succubus"] = {
+	-- 		Label = "|c00FFFFFFSuccubus|r"
+	-- 	},
+	-- 	["Felhunter"] = {
+	-- 		Label = "|c00FFFFFFFelhunter|r"
+	-- 	},
+	-- 	["Felguard"] = {
+	-- 		Label = "|c00FFFFFFFelguard|r"
+	-- 	},
+	-- 	["Infernal"] = {
+	-- 		Label = "|c00FFFFFFInferno|r"
+	-- 	},
+	-- 	["Doomguard"] = {
+	-- 		Label = "|c00FFFFFFDoomguard|r"
+	-- 	},
+	-- 	["Mount"] = {
+	-- 		Label = "|c00FFFFFFMounts|r",
+	-- 		Text = "Left click to summon Dreadsteed\nRight click to summon Felsteed"
+	-- 	},
+	-- 	["BuffMenu"] = {
+	-- 		Label = "|c00FFFFFFSpell Menu|r",
+	-- 		Text = "Right click to keep the menu open",
+	-- 		Text2 = "Automatic Mode : Closing when leave combat",
+	-- 	},
+	-- 	["PetMenu"] = {
+	-- 		Label = "|c00FFFFFFDemon Menu|r",
+	-- 		Text = "Right click to keep the menu open",
+	-- 		Text2 = "Automatic Mode : Closing when leave combat",
+	-- 	},
+	-- 	["CurseMenu"] = {
+	-- 		Label = "|c00FFFFFFCurse Menu|r",
+	-- 		Text = "Right click to keep the menu open",
+	-- 		Text2 = "Automatic Mode : Closing when leave combat",
+	-- 	},
+	-- 	["DominationCooldown"] = "Right click for fast summon",
+	-- }
 
 	Necrosis.Sound = {
-		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-En.mp3",
-		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\SoulstoneEnd-En.mp3",
-		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\EnslaveDemonEnd-En.mp3",
-		["ShadowTrance"] = "Interface\\AddOns\\Necrosis\\sounds\\ShadowTrance-En.mp3",
-		["Backlash"] = "Interface\\AddOns\\Necrosis\\sounds\\Backlash-Fr.mp3",
+		["Fear"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\Fear-En.mp3",
+		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\SoulstoneEnd-En.mp3",
+		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\EnslaveDemonEnd-En.mp3",
+		["ShadowTrance"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\ShadowTrance-En.mp3",
+		["Backlash"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\Backlash-Fr.mp3",
 	}
 
 	Necrosis.ProcText = {
@@ -253,6 +253,7 @@ function Localization.enUS()
 		"Show Steed button",
 		"Show Demon menu button",
 		"Show Curse menu button",
+		"Show Destroy Shards button",
 	}
 
 	Necrosis.Config.Menus = {

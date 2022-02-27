@@ -1,15 +1,15 @@
-## Interface: 11307
+## Interface: 20503
 ## Title: Necrosis-Classic
 ## Title-ruRU: Necrosis-Classic (Русский)
 ## Title-frFR: Necrosis-Classic (Français)
 ## Notes: Warlock UI & Shard Management
 ## Notes-frFR: Gestion graphique des shards.
 ## Notes-ruRU: Менеджер заклинаний, камней и демонов для чернокнижника.
-## Version: 1.0
+## Version: 8.11 bcc
 ## Author: kricklen
 ## DefaultState: Enabled
 ## X-Website: https://github.com/kricklen/Necrosis-Classic
-## X-Original-Author: Lomig, Tarcalion, robert388@hotmail.com
+## X-Original-Author: Lomig, Tarcalion, robert388@hotmail.com, urnati
 ## X-Original-Website: http://necrosis.larmes-cenarius.net/  [does not work anymore]
 ## X-Localizations: enUS, enGB, deDE, frFR, koKR, zhCN, zhTW, esES, ruRU
 ## X-Category: Warlock
@@ -17,6 +17,9 @@
 ## SavedVariablesPerCharacter: NecrosisConfig
 
 Necrosis.xml
+
+libs\LibStub\LibStub.lua
+libs\AceLocale-3.0\AceLocale-3.0.xml
 
 BlizzardUI\AsyncCallbackSystem.lua
 BlizzardUI\Item.lua
@@ -26,6 +29,7 @@ InitializeNamespaces.lua
 Fonts\RegisterFonts.lua
 
 Helpers\TableHelper.lua
+Helpers\SphereButtonHelper.lua
 Helpers\ItemHelper.lua
 Helpers\BagHelper.lua
 Helpers\GraphicsHelper.lua
@@ -51,8 +55,20 @@ Localization\Localization.ruRU.lua
 
 Localization\Localization.lua
 
+Locales\Localization.lua
+Locales\Localization.CN.lua
+Locales\Localization.DE.lua
+Locales\Localization.ES.lua
+Locales\Localization.FR.lua
+Locales\Localization.RU.lua
+Locales\Localization.TW.lua
+Locales\Localization.MX.lua
+Dialog.lua
+
+
 Initialize.lua
 Spells.lua
+SphereMenu.lua
 
 Timers\Functions.lua
 
