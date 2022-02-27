@@ -47,106 +47,106 @@ function Localization.ruRU()
 		["Echange"] = "Trade",
 	}
 
-	Necrosis.TooltipData = {
-		["Main"] = {
-			Label = "|c00FFFFFFNecrosis|r",
-			Stone = {
-				[true] = "Есть",
-				[false] = "Нет",
-			},
-			Hellspawn = {
-				[true] = "Вкл",
-				[false] = "Выкл",
-			},
-			["Soulshard"] = "Осколки душ: ",
-			["InfernalStone"] = "Камни инфернала: ",
-			["DemoniacStone"] = "Демонические статуэтки: ",
-			["Soulstone"] = "\nКамень души: ",
-			["Healthstone"] = "Камень здоровья: ",
-			["Spellstone"] = "Камень чар: ",
-			["Firestone"] = "Камень огня: ",
-			["CurrentDemon"] = "Демон: ",
-			["EnslavedDemon"] = "Демон: Порабощенный",
-			["NoCurrentDemon"] = "Демон: Отсутствует",
-		},
-		["Soulstone"] = {
-			Text = {"[Правый Клик] Создать","[Левый Клик] Использовать","[Правый Клик] Повторное создание","Ожидание"},
-			Ritual = "|c00FFFFFF[Shift]+[Клик] начало выполнения Ритуала призыва|r"
-		},
-		["Healthstone"] = {
-			Text = {"[Правый Клик] Создать","[Левый Клик] Использовать"},
-			Text2 = "[Средний Клик] или [Ctrl]+[Левый Клик] для передачи",
-			Ritual = "|c00FFFFFF[Shift]+[Клик] Начать Ритуал Душ|r"
-		},
-		["Spellstone"] = {
-			Text = {"[Правый Клик] Создать камень","Камень у Вас в сумке\n[Левый Клик] Нанести на оружие","Нанесено на оружие\n[Клик] Для замены/обновления", "Созданный ранее камень полностью использован\n[Клик] Создать новый камень"}
-		},
-		["Firestone"] = {
-			Text = {"[Правый Клик] Создать камень","Камень у Вас в сумке\n[Левый Клик] Нанести на оружие","Нанесено на оружие\n[Клик] Для замены/обновления", "Созданный ранее камень полностью использован\n[Клик] Создать новый камень"}
-		},
-		["SpellTimer"] = {
-			Label = "|c00FFFFFFТаймер заклинаний|r",
-			Text = "Активное заклинание на цели",
-			Right = "[Правый Клик] Использовать Камень Возвращения в "
-		},
-		["ShadowTrance"] = {
-			Label = "|c00FFFFFFТеневой транс|r"
-		},
-		["Backlash"] = {
-			Label = "|c00FFFFFFОтветный Удар|r"
-		},
-		["Banish"] = {
-			Text = "[Правый Клик] для применения Уровня 1"
-		},
-		["Imp"] = {
-			Label = "|c00FFFFFFБес|r"
-		},
-		["Voidwalker"] = {
-			Label = "|c00FFFFFFДемон Бездны|r"
-		},
-		["Succubus"] = {
-			Label = "|c00FFFFFFСуккуба|r"
-		},
-		["Felhunter"] = {
-			Label = "|c00FFFFFFОхотник Скверны|r"
-		},
-		["Felguard"] = {
-			Label = "|c00FFFFFFСтраж Скверны|r"
-		},
-		["Infernal"] = {
-			Label = "|c00FFFFFFИнфернал|r"
-		},
-		["Doomguard"] = {
-			Label = "|c00FFFFFFСтражник Ужаса|r"
-		},
-		["Mount"] = {
-			Label = "|c00FFFFFFКонь|r",
-			Text = "[Левый Клик] Призыв коня погибели\n[Правый Клик] Призыв коня Скверны"
-		},
-		["BuffMenu"] = {
-			Label = "|c00FFFFFFМеню заклинаний|r",
-			Text = "[Правый Клик] Для удержания меню открытым",
-			Text2 = "Авто-Режим: Закрытие при выходе из боя",
-		},
-		["PetMenu"] = {
-			Label = "|c00FFFFFFМеню демонов|r",
-			Text = "[Правый Клик] Для удержания меню открытым",
-			Text2 = "Авто-Режим: Закрытие при выходе из боя",
-		},
-		["CurseMenu"] = {
-			Label = "|c00FFFFFFМеню проклятий|r",
-			Text = "[Правый Клик] Для удержания меню открытым",
-			Text2 = "Авто-Режим: Закрытие при выходе из боя",
-		},
-		["DominationCooldown"] = "[Правый Клик] Быстрый вызов",
-	}
+	-- Necrosis.TooltipData = {
+	-- 	["Main"] = {
+	-- 		Label = "|c00FFFFFFNecrosis|r",
+	-- 		Stone = {
+	-- 			[true] = "Есть",
+	-- 			[false] = "Нет",
+	-- 		},
+	-- 		Hellspawn = {
+	-- 			[true] = "Вкл",
+	-- 			[false] = "Выкл",
+	-- 		},
+	-- 		["Soulshard"] = "Осколки душ: ",
+	-- 		["InfernalStone"] = "Камни инфернала: ",
+	-- 		["DemoniacStone"] = "Демонические статуэтки: ",
+	-- 		["Soulstone"] = "\nКамень души: ",
+	-- 		["Healthstone"] = "Камень здоровья: ",
+	-- 		["Spellstone"] = "Камень чар: ",
+	-- 		["Firestone"] = "Камень огня: ",
+	-- 		["CurrentDemon"] = "Демон: ",
+	-- 		["EnslavedDemon"] = "Демон: Порабощенный",
+	-- 		["NoCurrentDemon"] = "Демон: Отсутствует",
+	-- 	},
+	-- 	["Soulstone"] = {
+	-- 		Text = {"[Правый Клик] Создать","[Левый Клик] Использовать","[Правый Клик] Повторное создание","Ожидание"},
+	-- 		Ritual = "|c00FFFFFF[Shift]+[Клик] начало выполнения Ритуала призыва|r"
+	-- 	},
+	-- 	["Healthstone"] = {
+	-- 		Text = {"[Правый Клик] Создать","[Левый Клик] Использовать"},
+	-- 		Text2 = "[Средний Клик] или [Ctrl]+[Левый Клик] для передачи",
+	-- 		Ritual = "|c00FFFFFF[Shift]+[Клик] Начать Ритуал Душ|r"
+	-- 	},
+	-- 	["Spellstone"] = {
+	-- 		Text = {"[Правый Клик] Создать камень","Камень у Вас в сумке\n[Левый Клик] Нанести на оружие","Нанесено на оружие\n[Клик] Для замены/обновления", "Созданный ранее камень полностью использован\n[Клик] Создать новый камень"}
+	-- 	},
+	-- 	["Firestone"] = {
+	-- 		Text = {"[Правый Клик] Создать камень","Камень у Вас в сумке\n[Левый Клик] Нанести на оружие","Нанесено на оружие\n[Клик] Для замены/обновления", "Созданный ранее камень полностью использован\n[Клик] Создать новый камень"}
+	-- 	},
+	-- 	["SpellTimer"] = {
+	-- 		Label = "|c00FFFFFFТаймер заклинаний|r",
+	-- 		Text = "Активное заклинание на цели",
+	-- 		Right = "[Правый Клик] Использовать Камень Возвращения в "
+	-- 	},
+	-- 	["ShadowTrance"] = {
+	-- 		Label = "|c00FFFFFFТеневой транс|r"
+	-- 	},
+	-- 	["Backlash"] = {
+	-- 		Label = "|c00FFFFFFОтветный Удар|r"
+	-- 	},
+	-- 	["Banish"] = {
+	-- 		Text = "[Правый Клик] для применения Уровня 1"
+	-- 	},
+	-- 	["Imp"] = {
+	-- 		Label = "|c00FFFFFFБес|r"
+	-- 	},
+	-- 	["Voidwalker"] = {
+	-- 		Label = "|c00FFFFFFДемон Бездны|r"
+	-- 	},
+	-- 	["Succubus"] = {
+	-- 		Label = "|c00FFFFFFСуккуба|r"
+	-- 	},
+	-- 	["Felhunter"] = {
+	-- 		Label = "|c00FFFFFFОхотник Скверны|r"
+	-- 	},
+	-- 	["Felguard"] = {
+	-- 		Label = "|c00FFFFFFСтраж Скверны|r"
+	-- 	},
+	-- 	["Infernal"] = {
+	-- 		Label = "|c00FFFFFFИнфернал|r"
+	-- 	},
+	-- 	["Doomguard"] = {
+	-- 		Label = "|c00FFFFFFСтражник Ужаса|r"
+	-- 	},
+	-- 	["Mount"] = {
+	-- 		Label = "|c00FFFFFFКонь|r",
+	-- 		Text = "[Левый Клик] Призыв коня погибели\n[Правый Клик] Призыв коня Скверны"
+	-- 	},
+	-- 	["BuffMenu"] = {
+	-- 		Label = "|c00FFFFFFМеню заклинаний|r",
+	-- 		Text = "[Правый Клик] Для удержания меню открытым",
+	-- 		Text2 = "Авто-Режим: Закрытие при выходе из боя",
+	-- 	},
+	-- 	["PetMenu"] = {
+	-- 		Label = "|c00FFFFFFМеню демонов|r",
+	-- 		Text = "[Правый Клик] Для удержания меню открытым",
+	-- 		Text2 = "Авто-Режим: Закрытие при выходе из боя",
+	-- 	},
+	-- 	["CurseMenu"] = {
+	-- 		Label = "|c00FFFFFFМеню проклятий|r",
+	-- 		Text = "[Правый Клик] Для удержания меню открытым",
+	-- 		Text2 = "Авто-Режим: Закрытие при выходе из боя",
+	-- 	},
+	-- 	["DominationCooldown"] = "[Правый Клик] Быстрый вызов",
+	-- }
 
 	Necrosis.Sound = {
-		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-Ru.mp3",
-		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\SoulstoneEnd-Ru.mp3",
-		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\EnslaveDemonEnd-Ru.mp3",
-		["ShadowTrance"] = "Interface\\AddOns\\Necrosis\\sounds\\ShadowTrance-Ru.mp3",
-		["Backlash"] = "Interface\\AddOns\\Necrosis\\sounds\\Backlash-Ru.mp3",
+		["Fear"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\Fear-Ru.mp3",
+		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\SoulstoneEnd-Ru.mp3",
+		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\EnslaveDemonEnd-Ru.mp3",
+		["ShadowTrance"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\ShadowTrance-Ru.mp3",
+		["Backlash"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\Backlash-Ru.mp3",
 	}
 
 	Necrosis.ProcText = {
@@ -353,7 +353,7 @@ function Localization.ruRU()
 	}
 
 	Necrosis.Speech.ShortMessage = {
-		{{"<after>--> <target> теперь сохранен(а) на 15 минут <--"}},
+		{{"<after>--> <target> теперь сохранен(а) на 30 минут <--"}},
 		{{"<after><TP> Призываю <target>. Пожалуйста, нажмите на портал! <TP>"}},
 		{{"Выполняется Ритуал душ"}},
 	}

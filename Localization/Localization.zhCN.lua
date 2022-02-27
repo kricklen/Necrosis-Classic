@@ -49,106 +49,106 @@ function Localization.zhCN()
 		["Echange"] = "Trade",
 	}
 
-	Necrosis.TooltipData = {
-		["Main"] = {
-			Label = "|c00FFFFFFNecrosis|r",
-			Stone = {
-				[true] = "是",
-				[false] = "否",
-			},
-			Hellspawn = {
-				[true] = "开",
-				[false] = "关",
-			},
-			["Soulshard"] = "灵魂碎片: ",
-			["InfernalStone"] = "地狱火石: ",
-			["DemoniacStone"] = "恶魔雕像: ",
-			["Soulstone"] = "\n灵魂石: ",
-			["Healthstone"] = "治疗石: ",
-			["Spellstone"] = "法术石: ",
-			["Firestone"] = "火焰石: ",
-			["CurrentDemon"] = "恶魔: ",
-			["EnslavedDemon"] = "恶魔: 奴役",
-			["NoCurrentDemon"] = "恶魔 : 无",
-		},
-		["Soulstone"] = {
-			Text = {"制造","可使用","已使用","等待"},
-			Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
-		},
-		["Healthstone"] = {
-			Text = {"制造","使用"},
-			Text2 = "按中键或是Ctrl-左键交易",
-			Ritual = "|c00FFFFFFShift+左键施放灵魂仪式|r"
-		},
-		["Spellstone"] = {
-			Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\Click to create"}
-		},
-		["Firestone"] = {
-			Label = "|c00FF4444火焰石|r",
-			Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\Click to create"}
-		},
-		["SpellTimer"] = {
-			Text = "启用对目标的法术计时",
-			Right = "右键使用炉石到"
-		},
-		["ShadowTrance"] = {
-			Label = "|c00FFFFFF暗影冥思|r"
-		},
-		["Backlash"] = {
-			Label = "|c00FFFFFF反冲|r"
-		},
-		["Banish"] = {
-			Text = "按右键施放等级1"
-		},
-		["Imp"] = {
-			Label = "|c00FFFFFF小鬼|r"
-		},
-		["Voidwalker"] = {
-			Label = "|c00FFFFFF虚空行者|r"
-		},
-		["Succubus"] = {
-			Label = "|c00FFFFFF魅魔|r"
-		},
-		["Felhunter"] = {
-			Label = "|c00FFFFFF地狱猎犬|r"
-		},
-		["Felguard"] = {
-			Label = "|c00FFFFFF地狱守卫|r"
-		},
-		["Infernal"] = {
-			Label = "|c00FFFFFF地狱火|r"
-		},
-		["Doomguard"] = {
-			Label = "|c00FFFFFF末日守卫|r"
-		},
-		["Mount"] = {
-			Label = "|c00FFFFFF坐骑|r",
-			Text = "右键施放等级1"
-		},
-		["BuffMenu"] = {
-			Label = "|c00FFFFFF法术菜单|r",
-			Text = "右键保持菜单开启",
-			Text2 = "自动模式：脱离战斗后自动关闭",
-		},
-		["PetMenu"] = {
-			Label = "|c00FFFFFF恶魔菜单|r",
-			Text = "右键保持菜单开启",
-			Text2 = "自动模式：脱离战斗后自动关闭",
-		},
-		["CurseMenu"] = {
-			Label = "|c00FFFFFF诅咒菜单|r",
-			Text = "右键保持菜单开启",
-			Text2 = "自动模式：脱离战斗后自动关闭",
-		},
-		["DominationCooldown"] = "右键快速召唤",
-	}
+	-- Necrosis.TooltipData = {
+	-- 	["Main"] = {
+	-- 		Label = "|c00FFFFFFNecrosis|r",
+	-- 		Stone = {
+	-- 			[true] = "是",
+	-- 			[false] = "否",
+	-- 		},
+	-- 		Hellspawn = {
+	-- 			[true] = "开",
+	-- 			[false] = "关",
+	-- 		},
+	-- 		["Soulshard"] = "灵魂碎片: ",
+	-- 		["InfernalStone"] = "地狱火石: ",
+	-- 		["DemoniacStone"] = "恶魔雕像: ",
+	-- 		["Soulstone"] = "\n灵魂石: ",
+	-- 		["Healthstone"] = "治疗石: ",
+	-- 		["Spellstone"] = "法术石: ",
+	-- 		["Firestone"] = "火焰石: ",
+	-- 		["CurrentDemon"] = "恶魔: ",
+	-- 		["EnslavedDemon"] = "恶魔: 奴役",
+	-- 		["NoCurrentDemon"] = "恶魔 : 无",
+	-- 	},
+	-- 	["Soulstone"] = {
+	-- 		Text = {"制造","可使用","已使用","等待"},
+	-- 		Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
+	-- 	},
+	-- 	["Healthstone"] = {
+	-- 		Text = {"制造","使用"},
+	-- 		Text2 = "按中键或是Ctrl-左键交易",
+	-- 		Ritual = "|c00FFFFFFShift+左键施放灵魂仪式|r"
+	-- 	},
+	-- 	["Spellstone"] = {
+	-- 		Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\Click to create"}
+	-- 	},
+	-- 	["Firestone"] = {
+	-- 		Label = "|c00FF4444火焰石|r",
+	-- 		Text = {"Right click to create","In Inventory\nLeft click to use","Used", "Used\Click to create"}
+	-- 	},
+	-- 	["SpellTimer"] = {
+	-- 		Text = "启用对目标的法术计时",
+	-- 		Right = "右键使用炉石到"
+	-- 	},
+	-- 	["ShadowTrance"] = {
+	-- 		Label = "|c00FFFFFF暗影冥思|r"
+	-- 	},
+	-- 	["Backlash"] = {
+	-- 		Label = "|c00FFFFFF反冲|r"
+	-- 	},
+	-- 	["Banish"] = {
+	-- 		Text = "按右键施放等级1"
+	-- 	},
+	-- 	["Imp"] = {
+	-- 		Label = "|c00FFFFFF小鬼|r"
+	-- 	},
+	-- 	["Voidwalker"] = {
+	-- 		Label = "|c00FFFFFF虚空行者|r"
+	-- 	},
+	-- 	["Succubus"] = {
+	-- 		Label = "|c00FFFFFF魅魔|r"
+	-- 	},
+	-- 	["Felhunter"] = {
+	-- 		Label = "|c00FFFFFF地狱猎犬|r"
+	-- 	},
+	-- 	["Felguard"] = {
+	-- 		Label = "|c00FFFFFF地狱守卫|r"
+	-- 	},
+	-- 	["Infernal"] = {
+	-- 		Label = "|c00FFFFFF地狱火|r"
+	-- 	},
+	-- 	["Doomguard"] = {
+	-- 		Label = "|c00FFFFFF末日守卫|r"
+	-- 	},
+	-- 	["Mount"] = {
+	-- 		Label = "|c00FFFFFF坐骑|r",
+	-- 		Text = "右键施放等级1"
+	-- 	},
+	-- 	["BuffMenu"] = {
+	-- 		Label = "|c00FFFFFF法术菜单|r",
+	-- 		Text = "右键保持菜单开启",
+	-- 		Text2 = "自动模式：脱离战斗后自动关闭",
+	-- 	},
+	-- 	["PetMenu"] = {
+	-- 		Label = "|c00FFFFFF恶魔菜单|r",
+	-- 		Text = "右键保持菜单开启",
+	-- 		Text2 = "自动模式：脱离战斗后自动关闭",
+	-- 	},
+	-- 	["CurseMenu"] = {
+	-- 		Label = "|c00FFFFFF诅咒菜单|r",
+	-- 		Text = "右键保持菜单开启",
+	-- 		Text2 = "自动模式：脱离战斗后自动关闭",
+	-- 	},
+	-- 	["DominationCooldown"] = "右键快速召唤",
+	-- }
 
 	Necrosis.Sound = {
-		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-En.mp3",
-		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\SoulstoneEnd-En.mp3",
-		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\EnslaveDemonEnd-En.mp3",
-		["ShadowTrance"] = "Interface\\AddOns\\Necrosis\\sounds\\ShadowTrance-En.mp3",
-		["Backlash"] = "Interface\\AddOns\\Necrosis\\sounds\\Backlash-En.mp3",
+		["Fear"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\Fear-En.mp3",
+		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\SoulstoneEnd-En.mp3",
+		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\EnslaveDemonEnd-En.mp3",
+		["ShadowTrance"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\ShadowTrance-En.mp3",
+		["Backlash"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\Backlash-En.mp3",
 	}
 
 	NECROSIS_NIGHTFALL_TEXT = {

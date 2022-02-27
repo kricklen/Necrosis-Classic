@@ -47,107 +47,107 @@ function Localization.deDE()
 		["Echange"] = "Trade",
 	}
 
-	Necrosis.TooltipData = {
-		["Main"] = {
-			Label = "|c00FFFFFFNecrosis|r",
-			Stone = {
-				[true] = "Ja";
-				[false] = "Nein";
-			},
-			Hellspawn = {
-				[true] = "An";
-				[false] = "Aus";
-			},
-			["Soulshard"] = "Seelensplitter : ",
-			["InfernalStone"] = "H\195\182llensteine : ",
-			["DemoniacStone"] = "D\195\164monen-Statuetten : ",
-			["Soulstone"] = "\nSeelenstein : ",
-			["Healthstone"] = "Gesundheitsstein : ",
-			["Spellstone"] = "Zauberstein: ",
-			["Firestone"] = "Feuerstein : ",
-			["CurrentDemon"] = "D\195\164mon : ",
-			["EnslavedDemon"] = "D\195\164mon : Versklavter",
-			["NoCurrentDemon"] = "D\195\164mon : Keiner",
-		},
-		["Soulstone"] = {
-			Text = {"Rechte Maustaste zum herstellen","Linke Maustaste zum benutzten","Benutzt\nRechte Maustaste zum wiederherstellen","Warten"},
-			Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
-		},
-		["Healthstone"] = {
-			Text = {"Rechte Maustaste zum herstellen","Linke Maustaste zum benutzten"},
-			Text2 = "Mittlerer Maustaste oder Strg+rechte Maustaste zum handeln",
-			Ritual = "|c00FFFFFFShift+Klick um das Ritual der Seelen zu zaubern|r"
-		},
-		["Spellstone"] = {
-			Text = {"Rechte Maustaste zum herstellen","Im Inventar\nLinke Maustaste zum benutzten","Benutzt", "Benutzt\n Maustaste zum herstellen"}
-		},
-		["Firestone"] = {
-			Text = {"Rechte Maustaste zum herstellen","Im Inventar\nLinke Maustaste zum benutzten","Benutzt", "Benutzt\n Maustaste zum herstellen"}
-		},
-		["SpellTimer"] = {
-			Label = "|c00FFFFFFSpruchdauer|r",
-			Text = "Aktive Spr\195\188che auf dem Ziel\n",
-			Right = "Rechtsklick f\195\188r Ruhestein nach "
-		},
-		["ShadowTrance"] = {
-			Label = "|c00FFFFFFSchatten Trance|r"
-		},
-		["Backlash"] = {
-			Label = "|c00FFFFFFHeimzahlen|r"
-		},
-		["Banish"] = {
-			Text = "Rechtsklick f\195\188r Rang 1"
-		},
-		["Imp"] = {
-			Label = "|c00FFFFFFWichtel|r"
-		},
-		["Voidwalker"] = {
-			Label = "|c00FFFFFFLeerwandler|r"
-		},
-		["Succubus"] = {
-			Label = "|c00FFFFFFSukkubus|r"
-		},
-		["Felhunter"] = {
-			Label = "|c00FFFFFFTeufelsj\195\164ger|r"
-		},
-		["Felguard"] = {
-			Label = "|c00FFFFFFTeufelswache|r"
-		},
-		["Infernal"] = {
-			Label = "|c00FFFFFFH\195\182llenbestie|r"
-		},
-		["Doomguard"] = {
-			Label = "|c00FFFFFFVerdammniswache|r"
-		},
-		["Mount"] = {
-			Label = "|c00FFFFFFMount|r",
-			Text = "Rechtsklick f\195\188r Rang 1"
-		},
-		["BuffMenu"] = {
-			Label = "|c00FFFFFFSpruch Men\195\188|r",
-			Text = "Rechtsklick um das Men\195\188 zu \195\182ffnen",
-			Text2 = "Automatischer Modus: Wird beim verlassen des Kampfes geschlossen",
-		},
-		["PetMenu"] = {
-			Label = "|c00FFFFFFD\195\164monen Men\195\188|r",
-			Text = "Rechtsklick um das Men\195\188 zu \195\182ffnen",
-			Text2 = "Automatischer Modus: Wird beim verlassen des Kampfes geschlossen",
-		},
-		["CurseMenu"] = {
-			Label = "|c00FFFFFFFluch Men\195\188|r",
-			Text = "Rechtsklick um das Men\195\188 zu \195\182ffnen",
-			Text2 = "Automatischer Modus: Wird beim verlassen des Kampfes geschlossen",
-		},
-		["DominationCooldown"] = "Mit der rechten Taste klicken f\195\188r eine schnelle Beschw\195\182rung",
-	}
+	-- Necrosis.TooltipData = {
+	-- 	["Main"] = {
+	-- 		Label = "|c00FFFFFFNecrosis|r",
+	-- 		Stone = {
+	-- 			[true] = "Ja";
+	-- 			[false] = "Nein";
+	-- 		},
+	-- 		Hellspawn = {
+	-- 			[true] = "An";
+	-- 			[false] = "Aus";
+	-- 		},
+	-- 		["Soulshard"] = "Seelensplitter : ",
+	-- 		["InfernalStone"] = "H\195\182llensteine : ",
+	-- 		["DemoniacStone"] = "D\195\164monen-Statuetten : ",
+	-- 		["Soulstone"] = "\nSeelenstein : ",
+	-- 		["Healthstone"] = "Gesundheitsstein : ",
+	-- 		["Spellstone"] = "Zauberstein: ",
+	-- 		["Firestone"] = "Feuerstein : ",
+	-- 		["CurrentDemon"] = "D\195\164mon : ",
+	-- 		["EnslavedDemon"] = "D\195\164mon : Versklavter",
+	-- 		["NoCurrentDemon"] = "D\195\164mon : Keiner",
+	-- 	},
+	-- 	["Soulstone"] = {
+	-- 		Text = {"Rechte Maustaste zum herstellen","Linke Maustaste zum benutzten","Benutzt\nRechte Maustaste zum wiederherstellen","Warten"},
+	-- 		Ritual = "|c00FFFFFFShift+Click to cast the Ritual of Summoning|r"
+	-- 	},
+	-- 	["Healthstone"] = {
+	-- 		Text = {"Rechte Maustaste zum herstellen","Linke Maustaste zum benutzten"},
+	-- 		Text2 = "Mittlerer Maustaste oder Strg+rechte Maustaste zum handeln",
+	-- 		Ritual = "|c00FFFFFFShift+Klick um das Ritual der Seelen zu zaubern|r"
+	-- 	},
+	-- 	["Spellstone"] = {
+	-- 		Text = {"Rechte Maustaste zum herstellen","Im Inventar\nLinke Maustaste zum benutzten","Benutzt", "Benutzt\n Maustaste zum herstellen"}
+	-- 	},
+	-- 	["Firestone"] = {
+	-- 		Text = {"Rechte Maustaste zum herstellen","Im Inventar\nLinke Maustaste zum benutzten","Benutzt", "Benutzt\n Maustaste zum herstellen"}
+	-- 	},
+	-- 	["SpellTimer"] = {
+	-- 		Label = "|c00FFFFFFSpruchdauer|r",
+	-- 		Text = "Aktive Spr\195\188che auf dem Ziel\n",
+	-- 		Right = "Rechtsklick f\195\188r Ruhestein nach "
+	-- 	},
+	-- 	["ShadowTrance"] = {
+	-- 		Label = "|c00FFFFFFSchatten Trance|r"
+	-- 	},
+	-- 	["Backlash"] = {
+	-- 		Label = "|c00FFFFFFHeimzahlen|r"
+	-- 	},
+	-- 	["Banish"] = {
+	-- 		Text = "Rechtsklick f\195\188r Rang 1"
+	-- 	},
+	-- 	["Imp"] = {
+	-- 		Label = "|c00FFFFFFWichtel|r"
+	-- 	},
+	-- 	["Voidwalker"] = {
+	-- 		Label = "|c00FFFFFFLeerwandler|r"
+	-- 	},
+	-- 	["Succubus"] = {
+	-- 		Label = "|c00FFFFFFSukkubus|r"
+	-- 	},
+	-- 	["Felhunter"] = {
+	-- 		Label = "|c00FFFFFFTeufelsj\195\164ger|r"
+	-- 	},
+	-- 	["Felguard"] = {
+	-- 		Label = "|c00FFFFFFTeufelswache|r"
+	-- 	},
+	-- 	["Infernal"] = {
+	-- 		Label = "|c00FFFFFFH\195\182llenbestie|r"
+	-- 	},
+	-- 	["Doomguard"] = {
+	-- 		Label = "|c00FFFFFFVerdammniswache|r"
+	-- 	},
+	-- 	["Mount"] = {
+	-- 		Label = "|c00FFFFFFMount|r",
+	-- 		Text = "Rechtsklick f\195\188r Rang 1"
+	-- 	},
+	-- 	["BuffMenu"] = {
+	-- 		Label = "|c00FFFFFFSpruch Men\195\188|r",
+	-- 		Text = "Rechtsklick um das Men\195\188 zu \195\182ffnen",
+	-- 		Text2 = "Automatischer Modus: Wird beim verlassen des Kampfes geschlossen",
+	-- 	},
+	-- 	["PetMenu"] = {
+	-- 		Label = "|c00FFFFFFD\195\164monen Men\195\188|r",
+	-- 		Text = "Rechtsklick um das Men\195\188 zu \195\182ffnen",
+	-- 		Text2 = "Automatischer Modus: Wird beim verlassen des Kampfes geschlossen",
+	-- 	},
+	-- 	["CurseMenu"] = {
+	-- 		Label = "|c00FFFFFFFluch Men\195\188|r",
+	-- 		Text = "Rechtsklick um das Men\195\188 zu \195\182ffnen",
+	-- 		Text2 = "Automatischer Modus: Wird beim verlassen des Kampfes geschlossen",
+	-- 	},
+	-- 	["DominationCooldown"] = "Mit der rechten Taste klicken f\195\188r eine schnelle Beschw\195\182rung",
+	-- }
 
 
 	Necrosis.Sound = {
-		["Fear"] = "Interface\\AddOns\\Necrosis\\sounds\\Fear-En.mp3",
-		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\SoulstoneEnd-En.mp3",
-		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis\\sounds\\EnslaveDemonEnd-En.mp3",
-		["ShadowTrance"] = "Interface\\AddOns\\Necrosis\\sounds\\ShadowTrance-En.mp3",
-		["Backlash"] = "Interface\\AddOns\\Necrosis\\sounds\\Backlash-Fr.mp3",
+		["Fear"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\Fear-En.mp3",
+		["SoulstoneEnd"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\SoulstoneEnd-En.mp3",
+		["EnslaveEnd"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\EnslaveDemonEnd-En.mp3",
+		["ShadowTrance"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\ShadowTrance-En.mp3",
+		["Backlash"] = "Interface\\AddOns\\Necrosis-Classic\\sounds\\Backlash-Fr.mp3",
 	}
 
 
@@ -335,7 +335,7 @@ function Localization.deDE()
 	}
 
 	Necrosis.Speech.ShortMessage = {
-		{{"<after>--> <target> hat nun einen Seelenstein aktiv f\195\188r 15 Minuten <--"}},
+		{{"<after>--> <target> hat nun einen Seelenstein aktiv f\195\188r 30 Minuten <--"}},
 		{{"<after><Portal> Ich beschw\195\182re <target>, bitte klickt auf das Tor <Portal>"}},
 		{{"Summoning a Ritual of Souls"}},
 	}
