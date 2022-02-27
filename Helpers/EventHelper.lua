@@ -3,29 +3,32 @@ EventHelper = {
     -- Events utilised by Necrosis || Events utilisés dans Necrosis
     ApiEvents = {
         "BAG_UPDATE",
+        "CHAT_MSG_ADDON",
+        "COMBAT_LOG_EVENT_UNFILTERED",
+        "GROUP_ROSTER_UPDATE",
+        "LEARNED_SPELL_IN_TAB",
+        "PLAYER_ALIVE",
+        "PLAYER_DEAD",
         "PLAYER_REGEN_DISABLED",
         "PLAYER_REGEN_ENABLED",
-        "PLAYER_DEAD",
-        "PLAYER_ALIVE",
+        "PLAYER_TARGET_CHANGED",
         "PLAYER_UNGHOST",
+        -- "UNIT_AURA",
+        "UNIT_HEALTH",
+        "UNIT_MANA",
         "UNIT_PET",
         "UNIT_SPELLCAST_FAILED",
         "UNIT_SPELLCAST_INTERRUPTED",
-        "UNIT_SPELLCAST_SUCCEEDED",
         "UNIT_SPELLCAST_SENT",
-        "UNIT_MANA",
-        "UNIT_HEALTH",
-        "LEARNED_SPELL_IN_TAB",
-        "PLAYER_TARGET_CHANGED",
+        "UNIT_SPELLCAST_START",
+        "UNIT_SPELLCAST_SUCCEEDED",
+        "SKILL_LINES_CHANGED",
+        "SPELLS_CHANGED",
+        "TRADE_ACCEPT_UPDATE",
+        "TRADE_CLOSED",
         "TRADE_REQUEST",
         "TRADE_REQUEST_CANCEL",
-        "TRADE_ACCEPT_UPDATE",
         "TRADE_SHOW",
-        "TRADE_CLOSED",
-        "SKILL_LINES_CHANGED",
-        "COMBAT_LOG_EVENT_UNFILTERED",
-        "CHAT_MSG_ADDON",
-        "GROUP_ROSTER_UPDATE",
         -- "RAID_TARGET_UPDATE",
         -- "UNIT_FLAGS",
         -- GROUP_ROSTER_CHANGED
@@ -81,6 +84,7 @@ end
 
 -- Process messages from other warlocks in the raid or party
 function _eh:ProcessAddonMessage(text)
+    print("ProcessAddonMessage: "..tostring(text))
     local split_cmd = split(text, "~")
     -- print("command: "..tostring(split_cmd[1])..", "..tostring(split_cmd[2]))
 
@@ -150,7 +154,7 @@ end
 
 function _eh:UnregisterOnCombatStopHandler(handler)
     local idx = table.indexOf(_onCombatStopHandlers, handler)
-    if (idx > 0) then
+    if (idx and idx > 0) then
         table.remove(_onCombatStopHandlers, idx)
     end
 end
@@ -160,4 +164,8 @@ function _eh:OnCombatStop()
     for i,handler in ipairs(_onCombatStopHandlers) do
         handler()
     end
+end
+
+function _eh:IsCombatLocked()
+    return InCombatLockdown()
 end

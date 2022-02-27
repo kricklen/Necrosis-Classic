@@ -58,56 +58,60 @@ local _chat = Necrosis.Chat
 ------------------------------------------------------------------------------------------------------
 -- Handles the posting of messages while casting a spell.
 ------------------------------------------------------------------------------------------------------
-function _chat:BeforeSpellCast(Spell)
+function _chat:BeforeSpellCast(spellData)
 	if not NecrosisConfig.ChatMsg then
 		-- Chat messages have been disabled
 		return nil
 	end
+
 	-- messages to be posted while summoning a mount
-	if (Spell.Name == Necrosis.Spell[1].Name or Spell.Name == Necrosis.Spell[2].Name) then
+	if (spellData.Name == Necrosis.Spell[1].Name or spellData.Name == Necrosis.Spell[2].Name) then
 		if NecrosisConfig.SteedSummon then
 			_chat:SummonMount()
 		end
 	-- messsages to be posted while casting 'Ritual of Souls' -Draven (April 3rd, 2008)
-	elseif Spell.Name == Necrosis.Spell[50].Name then
+	elseif spellData.Name == Necrosis.Spell[50].Name then
 		if NecrosisConfig.RoSSummon then
 			_chat:CastRitualOfSouls()
 		end
 	-- messages to be posted while casting 'Soulstone' on a friendly target
-	elseif Spell.Name == Necrosis.Spell[11].Name and not (Spell.TargetName == UnitName("player")) then
-		_chat:CastSoulstone(Spell.TargetName)
+	elseif tContains(Necrosis.Spell.SoulstoneRez.SpellIds, spellData.SpellId)
+			and spellData.TargetName ~= nil
+			and spellData.TargetName ~= Necrosis.CurrentEnv.PlayerName
+	then
+		_chat:CastSoulstone(spellData.TargetName)
 	-- messages to be posted while casting 'Ritual of Summoning'
-	elseif Spell.Name == Necrosis.Spell[37].Name then
-		_chat:CastRitualOfSummoning(Spell.TargetName)
+	elseif spellData.Name == Necrosis.Spell[37].Name then
+		_chat:CastRitualOfSummoning(spellData.TargetName)
 		AlphaBuffMenu = 1
 		AlphaBuffVar = GetTime() + 3
 	-- Messages for summoning Imp
-	elseif Spell.Name == Necrosis.Spell[3].Name then
+	elseif spellData.Name == Necrosis.Spell[3].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Imp")
 		end
 	-- Messages for summoning Voidwalker
-	elseif Spell.Name == Necrosis.Spell[4].Name then
+	elseif spellData.Name == Necrosis.Spell[4].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Voidwalker")
 		end
 	-- Messages for summoning Succubus
-	elseif Spell.Name == Necrosis.Spell[5].Name then
+	elseif spellData.Name == Necrosis.Spell[5].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Succubus")
 		end
 	-- Messages for summoning Felhunter
-	elseif Spell.Name == Necrosis.Spell[6].Name then
+	elseif spellData.Name == Necrosis.Spell[6].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Felhunter")
 		end
 	-- Messages for summoning Felguard
-	elseif Spell.Name == Necrosis.Spell[7].Name then
+	elseif spellData.Name == Necrosis.Spell[7].Name then
 		if NecrosisConfig.DemonSummon then
 			_chat:SummonDemon("Felguard")
 		end
 	-- Messages for Demonic Sacrifice
-	elseif Spell.Name == Necrosis.Spell[44].Name then
+	elseif spellData.Name == Necrosis.Spell[44].Name then
 		if NecrosisConfig.DemonicSacrifice then
 			_chat:CastDemonicSacrifice(Necrosis.CurrentEnv.DemonType)
 		end
